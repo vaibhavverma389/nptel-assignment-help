@@ -7,7 +7,6 @@
   <tr>
     <th>Email</th>
     <th>IP</th>
-    <th>ISP</th>
     <th>Path</th>
     <th>Time</th>
   </tr>
@@ -16,8 +15,10 @@
     <tr>
       <td><%= v.email || "Guest" %></td>
       <td><%= v.ip %></td>
-      <td><%= v.isp %></td>
-      <td><%= v.path %></td>
+      <td title="<%= v.path %>">
+  <%= v.path.length > 60 ? v.path.substring(0, 60) + "..." : v.path %>
+</td>
+
       <td><%= v.visitedAt.toLocaleString() %></td>
     </tr>
   <% }) %>
