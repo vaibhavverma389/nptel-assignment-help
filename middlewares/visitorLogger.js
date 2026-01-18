@@ -14,15 +14,19 @@ module.exports = async (req, res, next) => {
 
     // 🔍 Geo lookup
     const geo = geoip.lookup(ip) || {};
+const path = req.originalUrl;
 
-    await VisitorLog.create({
-      ip,
-      email: req.user.email,           // ✅ only logged-in
-      isp: geo.org || "Unknown",
-      asn: geo.asn || "Unknown",
-      userAgent: req.headers["user-agent"],
-      path: req.originalUrl
-    });
+if (path !== "/admin" && path !== "/admin/visitors") {
+  await VisitorLog.create({
+    ip,
+    email: req.user.email,           // ✅ only logged-in
+    isp: geo.org || "Unknown",
+    asn: geo.asn || "Unknown",
+    userAgent: req.headers["user-agent"],
+    path
+  });
+}
+
 
   } catch (err) {
     console.error("Visitor log error:", err.message);
