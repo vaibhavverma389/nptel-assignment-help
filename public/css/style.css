@@ -506,3 +506,7 @@ select option {
   text-decoration: underline;
   transform: translateX(-3px);
 }
+.whatsapp-join-btn
+{
+  background: #25d366;
+}

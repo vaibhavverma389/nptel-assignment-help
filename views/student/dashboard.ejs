@@ -2,13 +2,11 @@
 
 <div class="dashboard">
 
-  <!-- WELCOME -->
   <div class="welcome-card">
     <h2>Welcome <span><%= user.name %></span></h2>
     <p>NPTEL Assignment Dashboard</p>
   </div>
 
-  <!-- QUICK STATS -->
   <div class="stats-row">
     <div class="stat-box highlight-week">
       <h4>📅 Current Week</h4>
@@ -30,7 +28,6 @@
     </div>
 
 
-  <!-- FILTER -->
   <div class="card" style="margin-top:30px;">
     <h3>Search NPTEL Assignments
     </h3>
@@ -60,7 +57,6 @@
 
   <% if (course) { %>
 
-    <!-- ANSWERS -->
     <div class="card">
       <h3>🧑‍🎓 Answers (Week <%= week || currentWeek %>)</h3>
 
@@ -76,7 +72,6 @@
       <% } %>
     </div>
 
-    <!-- STUDY MATERIAL -->
     <div class="card">
       <h3>📘 Study Material</h3>
 
@@ -109,5 +104,7 @@
   <% } %>
 
 </div>
+
+
 
 <%- include("../partials/footer") %>

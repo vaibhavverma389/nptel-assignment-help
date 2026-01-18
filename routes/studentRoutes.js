@@ -113,14 +113,37 @@ router.post("/submit", isAuth, async (req, res) => {
 /* ======================================================
    📝 BULK SUBMIT
 ====================================================== */
-router.get("/submit-bulk", isAuth, async (req, res) => {
-  const subjects = await Subject.find().sort({ name: 1 });
-  const { currentWeek } = getWeekInfo();
+// router.get("/submit-bulk", isAuth, async (req, res) => {
+//   const subjects = await Subject.find().sort({ name: 1 });
+//   const { currentWeek } = getWeekInfo();
 
-  res.render("student/submitBulk", {
-    subjects,
-    currentWeek
-  });
+//   res.render("student/submitBulk", {
+//     subjects,
+//     currentWeek,
+//     existingAnswers
+//   });
+// });
+router.get("/submit-bulk", isAuth, async (req, res) => {
+  try {
+    const subjects = await Subject.find().sort({ name: 1 });
+    const { currentWeek } = getWeekInfo();
+
+    // 🔥 FETCH EXISTING ANSWERS OF LOGGED-IN USER
+    const existingAnswers = await Answer.find({
+      email: req.user.email,
+      week: currentWeek
+    }).sort({ question: 1 });
+
+    res.render("student/submitBulk", {
+      subjects,
+      currentWeek,
+      existingAnswers // ✅ NOW DEFINED
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
 });
 
 router.post("/submit-bulk", isAuth, async (req, res) => {

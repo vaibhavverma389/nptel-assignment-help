@@ -4,87 +4,89 @@
 
 <form method="post" action="/submit-bulk" class="card">
 
-  <!-- SUBJECT + WEEK (AUTO) -->
   <div class="form-row">
 
-    <!-- Subject Dropdown -->
     <select class="input" name="course" required>
       <option value="">Select Subject</option>
       <% subjects.forEach(s => { %>
-        <option value="<%= s.name %>"><%= s.name %></option>
+        <option value="<%= s.name %>"
+          <%= existingAnswers && existingAnswers.length && existingAnswers[0].course === s.name ? "selected" : "" %>>
+          <%= s.name %>
+        </option>
       <% }) %>
     </select>
 
-    <!-- Week (AUTO – READ ONLY) -->
-    <!-- DISPLAY ONLY -->
-<input
-  class="input"
-  value="Week <%= currentWeek %>"
-  readonly
-/>
+    <input class="input" value="Week <%= currentWeek %>" readonly />
 
-<!-- ACTUAL VALUE -->
-<input
-  type="hidden"
-  name="week"
-  value="<%= currentWeek %>"
-/>
-
+    <input type="hidden" name="week" value="<%= currentWeek %>" />
 
   </div>
 
   <hr />
 
-  <!-- QUESTIONS -->
   <div id="questions-container"></div>
 
   <div class="btn-group">
-    <button type="button" class="btn btn-add" onclick="addQuestion()">➕ Add Question</button>
+    <button type="button" class="btn btn-add" onclick="addNewQuestion()">➕ Add Question</button>
     <button type="button" class="btn btn-remove" onclick="removeQuestion()">➖ Remove Last</button>
-    <button type="submit" class="btn btn-submit">Submit All</button>
+
+    <button type="submit" class="btn btn-submit">
+      <%= existingAnswers && existingAnswers.length ? "Update Answers" : "Submit All" %>
+    </button>
   </div>
 
 </form>
 
 <a href="/dashboard" class="back-dashboard">← Back to Dashboard</a>
 
-
 <script>
   let questionCount = 0;
 
-  function addQuestion() {
-    questionCount++;
+  const existingAnswers = <%- JSON.stringify(existingAnswers || []) %>;
+
+  function renderQuestion(questionNo, selectedOption = "") {
+    questionCount = questionNo;
 
     const div = document.createElement("div");
     div.className = "question-row";
 
     div.innerHTML = `
-      <span class="q-label">Q${questionCount}</span>
+      <span class="q-label">Q${questionNo}</span>
 
-      <input type="hidden" name="questions[]" value="${questionCount}" />
+      <input type="hidden" name="questions[]" value="${questionNo}" />
 
       <select name="options[]" class="select" required>
         <option value="">Select Option</option>
-        <option>A</option>
-        <option>B</option>
-        <option>C</option>
-        <option>D</option>
+        <option value="A" ${selectedOption === "A" ? "selected" : ""}>A</option>
+        <option value="B" ${selectedOption === "B" ? "selected" : ""}>B</option>
+        <option value="C" ${selectedOption === "C" ? "selected" : ""}>C</option>
+        <option value="D" ${selectedOption === "D" ? "selected" : ""}>D</option>
       </select>
     `;
 
     document.getElementById("questions-container").appendChild(div);
   }
 
+  function addNewQuestion() {
+    renderQuestion(questionCount + 1);
+  }
+
   function removeQuestion() {
     const container = document.getElementById("questions-container");
-    if (questionCount > 1) {
+    if (questionCount > 0) {
       container.removeChild(container.lastElementChild);
       questionCount--;
     }
   }
 
-  // default 1 question
-  addQuestion();
+  if (existingAnswers.length > 0) {
+    
+    existingAnswers.forEach(ans => {
+      renderQuestion(ans.question, ans.option);
+    });
+  } else {
+    renderQuestion(1);
+  }
 </script>
 
 <%- include("../partials/footer") %>
