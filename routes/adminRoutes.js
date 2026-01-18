@@ -65,6 +65,55 @@ router.get("/admin/visitors", isAdmin, async (req, res) => {
   }
 });
 
+//
+router.get("/admin/export/visitors", isAdmin, async (req, res) => {
+  try {
+    const logs = await VisitorLog.find().sort({ visitedAt: -1 });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Visitors");
+
+    worksheet.columns = [
+      { header: "IP Address", key: "ip", width: 18 },
+      { header: "Email", key: "email", width: 30 },
+      { header: "User Agent", key: "userAgent", width: 40 },
+      { header: "Path", key: "path", width: 25 },
+      { header: "Visited At", key: "visitedAt", width: 22 }
+    ];
+
+    logs.forEach(v => {
+      worksheet.addRow({
+        ip: v.ip,
+        email: v.email || "Guest",
+        userAgent: v.userAgent,
+        path: v.path,
+        visitedAt: v.visitedAt
+          ? v.visitedAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+          : ""
+      });
+    });
+
+    // Header bold
+    worksheet.getRow(1).font = { bold: true };
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=visitors.xlsx"
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Visitor export error");
+  }
+});
+
 /* ================= SUBJECT MANAGEMENT ================= */
 router.get("/admin/subjects", isAdmin, async (req, res) => {
   const subjects = await Subject.find().sort({ name: 1 });
