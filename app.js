@@ -1,34 +1,35 @@
 require("dotenv").config();
 const express = require("express");
-
 const session = require("express-session");
 const passport = require("passport");
 const path = require("path");
 
 const connectDB = require("./utils/db");
 
-// Routes
+// 🔥 ROUTES
 const authRoutes = require("./routes/authRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
-// Passport config (VERY IMPORTANT)
+// 🔥 VISITOR LOGGER
+const visitorLogger = require("./middlewares/visitorLogger");
+
+// Passport config
 require("./utils/passport");
 
 const app = express();
 
+// Needed for correct IP when behind proxy (Render / Railway / VPS)
 app.set("trust proxy", 1);
 
 /* ================= DATABASE ================= */
 connectDB();
 
-/* ================= MIDDLEWARE ================= */
-
-// Body parser
+/* ================= BODY PARSER ================= */
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Static files
+/* ================= STATIC FILES ================= */
 app.use(express.static(path.join(__dirname, "public")));
 
 /* ================= SESSION ================= */
@@ -40,9 +41,9 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // HTTPS only in prod
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-    },
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+    }
   })
 );
 
@@ -50,11 +51,14 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-/* ================= GLOBAL USER (for EJS) ================= */
+/* ================= GLOBAL USER (EJS) ================= */
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
   next();
 });
+
+/* ================= VISITOR LOGGER (🔥 CORRECT PLACE) ================= */
+app.use(visitorLogger);
 
 /* ================= VIEW ENGINE ================= */
 app.set("view engine", "ejs");
@@ -69,19 +73,6 @@ app.use(adminRoutes);
 app.get("/", (req, res) => {
   res.redirect("/auth/login");
 });
-// 🔴 HANDLE ALL INVALID ROUTES
-// app.use((req, res) => {
-//   // logout user if logged in
-//   req.logout(() => {
-//     if (req.session) {
-//       req.session.destroy(() => {
-//         res.redirect("/auth/login");
-//       });
-//     } else {
-//       res.redirect("/auth/login");
-//     }
-//   });
-// });
 
 /* ================= SERVER ================= */
 const PORT = process.env.PORT || 3000;

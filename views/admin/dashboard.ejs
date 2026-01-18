@@ -50,8 +50,30 @@
     <h3>Submit Answers</h3>
     <p>Submit answers for all students</p>
   </a>
+  <a href="/admin/visitors" class="dash-card">
+    <h3> Visitors</h3>
+    <p>View IP, Email & Activity</p>
+
+  </a>
+
+
+
+  <div class="dash-card">
+    <h3>Logged-in Visitors</h3>
+    <p><%= loggedInUsers %></p>
+  </div>
+
+  <div class="dash-card">
+    <h3>Guest Visitors</h3>
+    <p><%= guests %></p>
+  </div>
+  <div>
+
+  </div>
+
 
 </div>
+
 
 
 <%- include("../partials/footer") %>

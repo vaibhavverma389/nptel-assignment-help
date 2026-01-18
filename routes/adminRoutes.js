@@ -5,6 +5,7 @@ const User = require("../models/User");
 const Answer = require("../models/Answer");
 const Subject = require("../models/Subject");
 const WeekMaterial = require("../models/WeekMaterial");
+const VisitorLog = require("../models/VisitorLog"); // ✅ ONLY ONCE
 
 const isAdmin = require("../middlewares/admin");
 
@@ -12,13 +13,56 @@ const router = express.Router();
 
 /* ================= ADMIN DASHBOARD ================= */
 router.get("/admin", isAdmin, async (req, res) => {
-  const usersCount = await User.countDocuments();
-  const answersCount = await Answer.countDocuments();
+  try {
+    const usersCount = await User.countDocuments();
+    const answersCount = await Answer.countDocuments();
 
-  res.render("admin/dashboard", {
-    usersCount,
-    answersCount
-  });
+    const loggedInUsers = await VisitorLog.countDocuments({
+      email: { $ne: null }
+    });
+
+    const guests = await VisitorLog.countDocuments({
+      email: null
+    });
+
+    res.render("admin/dashboard", {
+      usersCount,
+      answersCount,
+      loggedInUsers,
+      guests
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Admin dashboard error");
+  }
+});
+
+/* ================= VISITOR LIST ================= */
+router.get("/admin/visitors", isAdmin, async (req, res) => {
+  try {
+    const logs = await VisitorLog.find()
+      .sort({ visitedAt: -1 })
+      .limit(500);
+
+    const loggedInUsers = await VisitorLog.countDocuments({
+      email: { $ne: null }
+    });
+
+    const guests = await VisitorLog.countDocuments({
+      email: null
+    });
+
+    res.render("admin/visitors", {
+      logs,
+      loggedInUsers,
+      guests
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Visitor list error");
+  }
 });
 
 /* ================= SUBJECT MANAGEMENT ================= */
@@ -33,9 +77,7 @@ router.post("/admin/subjects", isAdmin, async (req, res) => {
 
   try {
     await Subject.create({ name });
-  } catch (err) {
-    // duplicate ignore
-  }
+  } catch (err) {}
 
   res.redirect("/admin/subjects");
 });
@@ -78,7 +120,7 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
     { header: "Name", key: "name", width: 25 },
     { header: "Email", key: "email", width: 30 },
     { header: "Role", key: "role", width: 15 },
-    { header: "Date", key: "Date", width: 20 }
+    { header: "Date", key: "date", width: 20 }
   ];
 
   users.forEach(u => {
@@ -86,7 +128,7 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
       name: u.name,
       email: u.email,
       role: u.role,
-      Date: u.date.toDateString()
+      date: u.date.toDateString()
     });
   });
 
@@ -105,7 +147,7 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
   res.end();
 });
 
-/* ================= WEEK-WISE MATERIAL ================= */
+/* ================= WEEK MATERIAL ================= */
 router.get("/admin/materials", isAdmin, async (req, res) => {
   const subjects = await Subject.find().sort({ name: 1 });
   const materials = await WeekMaterial.find().sort({
@@ -119,7 +161,6 @@ router.get("/admin/materials", isAdmin, async (req, res) => {
   });
 });
 
-/* SAVE / UPDATE MATERIAL */
 router.post("/admin/materials", isAdmin, async (req, res) => {
   const { subject, week, studyMaterialId, finalAnswerId } = req.body;
 
@@ -145,7 +186,6 @@ router.post("/admin/materials", isAdmin, async (req, res) => {
   res.redirect("/admin/materials");
 });
 
-/* DELETE MATERIAL */
 router.post("/admin/materials/delete/:id", isAdmin, async (req, res) => {
   await WeekMaterial.findByIdAndDelete(req.params.id);
   res.redirect("/admin/materials");

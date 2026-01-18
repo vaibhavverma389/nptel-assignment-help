@@ -1,0 +1,29 @@
+<%- include("../partials/header") %>
+
+
+<div class="card">
+    <div class="table-wrapper">
+        <table class="answers-table">
+  <tr>
+    <th>Email</th>
+    <th>IP</th>
+    <th>ISP</th>
+    <th>Path</th>
+    <th>Time</th>
+  </tr>
+
+  <% logs.forEach(v => { %>
+    <tr>
+      <td><%= v.email || "Guest" %></td>
+      <td><%= v.ip %></td>
+      <td><%= v.isp %></td>
+      <td><%= v.path %></td>
+      <td><%= v.visitedAt.toLocaleString() %></td>
+    </tr>
+  <% }) %>
+</table>
+
+    </div>
+</div>
+
+ <%- include("../partials/footer") %>
