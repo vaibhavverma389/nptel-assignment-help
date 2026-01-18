@@ -1,0 +1,37 @@
+<%- include("../partials/header") %>
+
+  <h2 class="page-title">📘 Manage Subjects</h2>
+
+  <div class="card centered-card" style="text-align: left;">
+    <form method="post" action="/admin/subjects" class="form-row">
+      <input class="input" name="name" placeholder="Enter subject name (e.g. MIS)" required />
+      <button class="btn btn-submit">Add Subject</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h3>All Subjects</h3>
+
+    <% if (subjects.length===0) { %>
+      <p class="muted-text">No subjects added yet.</p>
+      <% } else { %>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+          <% subjects.forEach(s=> { %>
+            <div class="question-row"
+              style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; flex-direction: row; justify-content: space-between; align-items: center;">
+              <strong style="color: var(--accent-blue);">
+                <%= s.name %>
+              </strong>
+
+              <form method="post" action="/admin/subjects/delete/<%= s._id %>" style="margin: 0;">
+                <button class="btn btn-remove" style="padding: 8px 15px; font-size: 13px;">Delete</button>
+              </form>
+            </div>
+            <% }) %>
+        </div>
+        <% } %>
+  </div>
+
+  <a href="/admin" class="back-link">← Back</a>
+
+  <%- include("../partials/footer") %>

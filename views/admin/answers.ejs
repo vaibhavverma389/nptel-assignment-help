@@ -1,0 +1,53 @@
+<%- include("../partials/header") %>
+
+  <h2 class="page-title">All Answers</h2>
+
+  <div class="card">
+    <div class="table-wrapper">
+      <table class="answers-table">
+        <thead>
+          <tr>
+            <th>Course </th>
+            <th>Week </th>
+            <th>Question </th>
+            <th>Answer </th>
+            <th>User </th>
+            <th>Email </th>
+            <th>Action </th>
+          </tr>
+        </thead>
+        <tbody>
+          <% answers.forEach(a=> { %>
+            <tr>
+              <td>
+                <%= a.course %>
+              </td>
+              <td>Week <%= a.week %>
+              </td>
+              <td>Question <%= a.question %>
+              </td>
+              <td class="answer-cell">
+                <%= a.option %>
+              </td>
+              <td>
+                <%= a.user %>
+              </td>
+              <td>
+                <%= a.email || "—" %>
+              </td>
+
+              <td>
+                <form method="post" action="/admin/answers/delete/<%= a._id %>">
+                  <button class="btn btn-remove">Delete</button>
+                </form>
+              </td>
+            </tr>
+            <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <a href="/admin" class="back-link">← Back</a>
+
+  <%- include("../partials/footer") %>

@@ -1,0 +1,89 @@
+<%- include("../partials/header") %>
+
+<h2 class="page-title">Submit MCQ Answers</h2>
+
+<form method="post" action="/submit-bulk" class="card">
+
+  <!-- SUBJECT + WEEK (AUTO) -->
+  <div class="form-row">
+
+    <!-- Subject Dropdown -->
+    <select class="input" name="course" required>
+      <option value="">Select Subject</option>
+      <% subjects.forEach(s => { %>
+        <option value="<%= s.name %>"><%= s.name %></option>
+      <% }) %>
+    </select>
+
+    <!-- Week (AUTO – READ ONLY) -->
+    <!-- DISPLAY ONLY -->
+<input
+  class="input"
+  value="Week <%= currentWeek %>"
+  readonly
+/>
+
+<!-- ACTUAL VALUE -->
+<input
+  type="hidden"
+  name="week"
+  value="<%= currentWeek %>"
+/>
+
+
+  </div>
+
+  <hr />
+
+  <!-- QUESTIONS -->
+  <div id="questions-container"></div>
+
+  <div class="btn-group">
+    <button type="button" class="btn btn-add" onclick="addQuestion()">➕ Add Question</button>
+    <button type="button" class="btn btn-remove" onclick="removeQuestion()">➖ Remove Last</button>
+    <button type="submit" class="btn btn-submit">Submit All</button>
+  </div>
+
+</form>
+
+<a href="/dashboard" class="back-link">← Back to Dashboard</a>
+
+<script>
+  let questionCount = 0;
+
+  function addQuestion() {
+    questionCount++;
+
+    const div = document.createElement("div");
+    div.className = "question-row";
+
+    div.innerHTML = `
+      <span class="q-label">Q${questionCount}</span>
+
+      <input type="hidden" name="questions[]" value="${questionCount}" />
+
+      <select name="options[]" class="select" required>
+        <option value="">Select Option</option>
+        <option>A</option>
+        <option>B</option>
+        <option>C</option>
+        <option>D</option>
+      </select>
+    `;
+
+    document.getElementById("questions-container").appendChild(div);
+  }
+
+  function removeQuestion() {
+    const container = document.getElementById("questions-container");
+    if (questionCount > 1) {
+      container.removeChild(container.lastElementChild);
+      questionCount--;
+    }
+  }
+
+  // default 1 question
+  addQuestion();
+</script>
+
+<%- include("../partials/footer") %>

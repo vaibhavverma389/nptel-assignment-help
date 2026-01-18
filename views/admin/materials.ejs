@@ -1,0 +1,110 @@
+<%- include("../partials/header") %>
+
+  <h2 class="page-title">📚 Week-wise Study Material</h2>
+
+  <!-- ================= ADD / UPDATE FORM ================= -->
+  <form method="post" action="/admin/materials" class="card">
+
+    <label>📘 Subject</label>
+    <select name="subject" class="input" required>
+      <option value="">Select Subject</option>
+      <% subjects.forEach(s=> { %>
+        <option value="<%= s.name %>">
+          <%= s.name %>
+        </option>
+        <% }) %>
+    </select>
+
+    <br /><br />
+
+    <label>📅 Week</label>
+    <select name="week" class="input" required>
+      <option value="">Select Week</option>
+      <% for(let i=1;i<=12;i++){ %>
+        <option value="<%= i %>">Week <%= i %>
+        </option>
+        <% } %>
+    </select>
+
+    <br /><br />
+
+    <label>📘 Study Material (Google Drive FILE ID)</label>
+    <input class="input" type="text" name="studyMaterialId" placeholder="e.g. 1AbCDeFgHiJKlmn" />
+
+    <p class="muted-text">
+      👉 Only FILE_ID paste karein (auto convert ho jayega)
+    </p>
+
+    <br />
+
+    <label>✅ Final Answer PDF (Google Drive FILE ID)</label>
+    <input class="input" type="text" name="finalAnswerId" placeholder="e.g. 1XyZAbC123" />
+
+    <br /><br />
+
+    <button class="btn btn-submit">
+      💾 Save / Update Material
+    </button>
+  </form>
+
+  <hr style="margin:40px 0;" />
+
+  <!-- ================= EXISTING MATERIAL LIST ================= -->
+  <h3>🗂 Upload History</h3>
+
+  <div class="card">
+    <% if (materials.length===0) { %>
+      <p class="muted-text">No materials uploaded yet.</p>
+      <% } else { %>
+
+        <div class="table-wrapper">
+          <table class="answers-table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Week</th>
+                <th>Notes</th>
+                <th>Final Answer</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% materials.forEach(m=> { %>
+                <tr>
+                  <td>
+                    <%= m.subject %>
+                  </td>
+                  <td>Week <%= m.week %>
+                  </td>
+
+                  <td>
+                    <% if (m.studyMaterialUrl) { %>
+                      <a href="<%= m.studyMaterialUrl %>" target="_blank">📘 Preview</a>
+                      <% } else { %>
+                        ❌
+                        <% } %>
+                  </td>
+
+                  <td>
+                    <% if (m.finalAnswerPdfUrl) { %>
+                      <a href="<%= m.finalAnswerPdfUrl %>" target="_blank">✅ Preview</a>
+                      <% } else { %>
+                        ❌
+                        <% } %>
+                  </td>
+
+                  <td>
+                    <form method="post" action="/admin/materials/delete/<%= m._id %>" style="display:inline;">
+                      <button class="btn btn-remove">🗑 Delete</button>
+                    </form>
+                  </td>
+                </tr>
+                <% }) %>
+            </tbody>
+          </table>
+        </div>
+
+        <% } %>
+  </div>
+
+  <%- include("../partials/footer") %>

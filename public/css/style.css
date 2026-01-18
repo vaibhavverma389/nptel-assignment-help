@@ -1,0 +1,493 @@
+/* ===== Global ===== */
+:root {
+  --primary-gradient: linear-gradient(135deg, #00e5ff, #2979ff);
+  --success-gradient: linear-gradient(135deg, #00c853, #00e676);
+  --danger-gradient: linear-gradient(135deg, #ff5252, #ff1744);
+  --download-gradient: linear-gradient(135deg, #4facfe, #00c6ff);
+  --glass-bg: rgba(0, 0, 0, 0.35);
+  --input-bg: rgba(255, 255, 255, 0.08);
+  --accent-blue: #00e5ff;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  line-height: 1.5;
+  font-size: 15px;
+  /* Mobile first base font size */
+}
+
+/* Container */
+.container {
+  width: 92%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ===== Header ===== */
+.header {
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+  padding: 15px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-flex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.nav-links a {
+  color: #e0f7ff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.nav-links a:hover {
+  color: var(--accent-blue);
+}
+
+.user-chip {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ===== Page title ===== */
+.page-title {
+  margin: 25px 0 15px;
+  font-size: 22px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* ===== Glass Card ===== */
+.card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(15px);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ===== Form inputs ===== */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--input-bg);
+  color: #ffffff;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.input::placeholder {
+  color: #bcd9e6;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.2);
+}
+
+/* ===== Question Row ===== */
+.question-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.q-label {
+  font-weight: bold;
+  color: var(--accent-blue);
+}
+
+/* ===== Select ===== */
+.select {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #1e2f36;
+  color: #ffffff;
+  width: 100%;
+}
+
+select option {
+  background-color: #1e2f36;
+  color: #ffffff;
+}
+
+/* ===== Buttons ===== */
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 15px;
+  transition: all 0.2s;
+  text-align: center;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-add {
+  background: var(--success-gradient);
+  color: #002b12;
+}
+
+.btn-remove {
+  background: var(--danger-gradient);
+  color: white;
+}
+
+.btn-submit {
+  background: var(--primary-gradient);
+  color: #002233;
+}
+
+/* ===== Auth & Centered Card ===== */
+.centered-card {
+  max-width: 450px;
+  margin: 40px auto;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .centered-card {
+    margin: 80px auto;
+  }
+}
+
+/* ===== Dashboard ===== */
+.dashboard {
+  margin-top: 25px;
+}
+
+.welcome-card {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(15px);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.welcome-card h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.welcome-card h2 span {
+  color: var(--accent-blue);
+}
+
+.welcome-card p {
+  margin-top: 10px;
+  color: #bcd9e6;
+}
+
+/* Action cards */
+.dashboard-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.dash-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 20px;
+  text-decoration: none;
+  color: #ffffff;
+  transition: transform 0.25s;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dash-card:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.dash-card h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.dash-card p {
+  font-size: 13px;
+  color: #cfefff;
+  margin: 0;
+}
+
+.dash-card.danger {
+  background: var(--danger-gradient);
+}
+
+/* ===== Stats ===== */
+.stats-row {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 18px;
+  color: #fff;
+  margin-bottom: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+}
+
+.stat-box p {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 8px 0 0;
+}
+
+.highlight-week {
+  border-left: 5px solid #1da1f2;
+}
+
+.highlight-date {
+  border-left: 5px solid #ff4757;
+}
+
+.countdown-text {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(255, 71, 87, 0.15);
+  color: #ff6b81;
+}
+
+/* ===== Download Button ===== */
+.btn-download {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  background: var(--download-gradient);
+  color: #002233;
+  margin-top: 10px;
+}
+
+/* ===== Answers Table (Responsive Scroll) ===== */
+.table-wrapper {
+  overflow-x: auto;
+  margin: 15px 0;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.answers-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #eaf6ff;
+  font-size: 14px;
+  min-width: 500px;
+}
+
+.answers-table th,
+.answers-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.answers-table th {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* ===== Google Button ===== */
+.google-btn {
+  display: block;
+  margin-top: 20px;
+  padding: 14px;
+  background: white;
+  color: #444;
+  font-weight: bold;
+  border-radius: 10px;
+  text-decoration: none;
+  text-align: center;
+}
+
+/* ===== Footer ===== */
+.footer {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+  color: #cfefff;
+  font-size: 13px;
+}
+
+/* ==========================================================
+   DESKTOP STYLES (768px and up)
+   ========================================================== */
+@media (min-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+
+  .header-flex {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 5px 0;
+  }
+
+  .header h2 {
+    font-size: 24px;
+    text-align: left;
+  }
+
+  .nav-links {
+    gap: 25px;
+  }
+
+  .page-title {
+    font-size: 28px;
+    text-align: left;
+    margin: 35px 0 20px;
+  }
+
+  .card {
+    padding: 30px;
+  }
+
+  .form-row {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .question-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 12px 20px;
+  }
+
+  .q-label {
+    min-width: 60px;
+  }
+
+  .btn-group {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .btn {
+    width: auto;
+    padding: 12px 24px;
+  }
+
+  .btn-submit {
+    margin-left: auto;
+  }
+
+  .dashboard-actions {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .welcome-card {
+    padding: 40px;
+    text-align: left;
+  }
+
+  .welcome-card h2 {
+    font-size: 32px;
+  }
+
+  .stats-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .stat-box {
+    min-width: 250px;
+    flex: 1;
+  }
+
+  .google-btn {
+    display: inline-block;
+    width: auto;
+    padding: 12px 25px;
+  }
+}
+
+/* ==========================================================
+   LARGE SCREENS (1024px and up)
+   ========================================================== */
+@media (min-width: 1024px) {
+  body {
+    font-size: 17px;
+  }
+
+  .container {
+    width: 90%;
+  }
+}

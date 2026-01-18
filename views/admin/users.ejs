@@ -1,0 +1,36 @@
+<%- include("../partials/header") %>
+
+  <h2 class="page-title">All Users</h2>
+
+  <div class="card">
+    <div class="table-wrapper">
+      <table class="answers-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach(u=> { %>
+            <tr>
+              <td>
+                <%= u.name %>
+              </td>
+              <td>
+                <%= u.email %>
+              </td>
+              <td>
+                <%= u.role %>
+              </td>
+            </tr>
+            <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <a href="/admin" class="back-link">← Back</a>
+
+  <%- include("../partials/footer") %>

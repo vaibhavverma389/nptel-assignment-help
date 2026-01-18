@@ -1,0 +1,105 @@
+<%- include("../partials/header") %>
+
+<div class="dashboard">
+
+  <!-- WELCOME -->
+  <div class="welcome-card">
+    <h2>Welcome <span><%= user.name %></span></h2>
+    <p>NPTEL Assignment Dashboard</p>
+  </div>
+
+  <!-- QUICK STATS -->
+  <div class="stats-row">
+    <div class="stat-box highlight-week">
+      <h4>📅 Current Week</h4>
+      <p>Week <%= currentWeek %></p>
+    </div>
+
+    <div class="stat-box highlight-date">
+      <h4>⏰ Last Date</h4>
+      <p><%= new Date(lastDate).toLocaleDateString("en-IN") %></p>
+    </div>
+  </div>
+
+
+  <!-- FILTER -->
+  <div class="card" style="margin-top:30px;">
+    <h3>Search NPTEL Assignments
+    </h3>
+
+    <form method="get" action="/dashboard" class="form-row">
+      <select name="course" class="input" required>
+        <option value="">Select Subject</option>
+        <% subjects.forEach(s => { %>
+          <option value="<%= s.name %>" <%= course === s.name ? "selected" : "" %>>
+            <%= s.name %>
+          </option>
+        <% }) %>
+      </select>
+
+      <select name="week" class="input">
+        <option value="">Current Week (Auto)</option>
+        <% for(let i=1;i<=12;i++){ %>
+          <option value="<%= i %>" <%= Number(week) === i ? "selected" : "" %>>
+            Week <%= i %>
+          </option>
+        <% } %>
+      </select>
+
+      <button class="btn btn-submit">Search</button>
+    </form>
+  </div>
+
+  <% if (course) { %>
+
+    <!-- ANSWERS -->
+    <div class="card">
+      <h3>🧑‍🎓 Answers (Week <%= week || currentWeek %>)</h3>
+
+      <% if (!answers || answers.length === 0) { %>
+        <p class="muted-text">No answers yet</p>
+      <% } else { %>
+        <% answers.forEach(a => { %>
+          <p>
+            Q<%= a.question %> → <b><%= a.option %></b>
+            <span class="muted-text">(by <%= a.user %>)</span>
+          </p>
+        <% }) %>
+      <% } %>
+    </div>
+
+    <!-- STUDY MATERIAL -->
+    <div class="card">
+      <h3>📘 Study Material</h3>
+
+      <% if (material && material.studyMaterialUrl) { %>
+        <a href="<%= material.studyMaterialUrl %>" class="btn btn-download">
+          📥 Download Notes
+        </a>
+      <% } else { %>
+        <p class="muted-text">❌ Not uploaded</p>
+      <% } %>
+    </div>
+
+    <!-- FINAL ANSWER -->
+    <div class="card">
+      <h3>✅ Final Answer</h3>
+
+      <% if (isWeekOver) { %>
+        <% if (material && material.finalAnswerPdfUrl) { %>
+          <a href="<%= material.finalAnswerPdfUrl %>" class="btn btn-download">
+            📥 Download Final PDF
+          </a>
+        <% } else { %>
+          <p class="muted-text">❌ Not uploaded</p>
+        <% } %>
+      <% } else { %>
+        <p class="muted-text">⏳ Available after deadline</p>
+      <% } %>
+    </div>
+
+  <% } %>
+
+</div>
+
+<%- include("../partials/footer") %>

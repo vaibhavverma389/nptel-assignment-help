@@ -1,0 +1,57 @@
+<%- include("../partials/header") %>
+
+<h2 class="page-title">🛠 Admin Dashboard</h2>
+<p class="page-subtitle">
+  Manage students, answers, subjects and weekly materials
+</p>
+
+<div class="dashboard-actions">
+
+  <!-- USERS -->
+  <a href="/admin/users" class="dash-card">
+    <h3>👤 Users</h3>
+    <p><strong>Total Users:</strong> <%= usersCount %></p>
+    <div class="card-actions">
+      <span>📋 View all students</span>
+    </div>
+  </a>
+
+  <!-- EXPORT USERS -->
+  <a href="/admin/export/users" class="dash-card">
+    <h3>📥 Export Users</h3>
+    <p>Download students data (Excel)</p>
+  </a>
+
+  <!-- ANSWERS -->
+  <a href="/admin/answers" class="dash-card">
+    <h3>📝 Answers</h3>
+    <p><strong>Total Answers:</strong> <%= answersCount %></p>
+    <div class="card-actions">
+      <span>📊 View submissions</span>
+    </div>
+  </a>
+
+  <!-- WEEK MATERIAL -->
+  <a href="/admin/materials" class="dash-card">
+    <h3>📚 Weekly Materials</h3>
+    <p>Upload notes & final answers (week-wise)</p>
+    <div class="card-actions">
+      <span>📘 Notes</span>
+      <span>✅ Final PDF</span>
+    </div>
+  </a>
+
+  <!-- SUBJECTS -->
+  <a href="/admin/subjects" class="dash-card">
+    <h3>📘 Subjects</h3>
+    <p>Add or manage NPTEL subjects</p>
+  </a>
+  <a href="/submit-bulk" class="dash-card">
+    <h3>Submit Answers</h3>
+    <p>Submit answers for all students</p>
+  </a>
+
+</div>
+
+
+<%- include("../partials/footer") %>
