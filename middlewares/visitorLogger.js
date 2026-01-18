@@ -1,7 +1,5 @@
 const VisitorLog = require("../models/VisitorLog");
-const axios = require("axios");
-
-const ipCache = new Map(); // in-memory cache
+const geoip = require("geoip-lite");
 
 module.exports = async (req, res, next) => {
   try {
@@ -9,45 +7,19 @@ module.exports = async (req, res, next) => {
       req.headers["x-forwarded-for"]?.split(",")[0] ||
       req.socket.remoteAddress;
 
-    let isp = "Unknown";
-    let asn = "Unknown";
-
-    // Skip localhost
-    if (ip && ip !== "::1" && ip !== "127.0.0.1") {
-
-      // 🔥 CACHE HIT
-      if (ipCache.has(ip)) {
-        ({ isp, asn } = ipCache.get(ip));
-      } else {
-        try {
-          const response = await axios.get(`https://ipwho.is/${ip}`, {
-            timeout: 3000
-          });
-
-          if (response.data?.success) {
-            isp = response.data.isp || "Unknown";
-            asn = response.data.asn || "Unknown";
-
-            // cache store
-            ipCache.set(ip, { isp, asn });
-          }
-        } catch (apiErr) {
-          console.warn("⚠️ ISP lookup failed:", apiErr.message);
-        }
-      }
-    }
+    const geo = geoip.lookup(ip) || {};
 
     await VisitorLog.create({
       ip,
-      email: req.user ? req.user.email : null,
-      isp,
-      asn,
+      email: req.user ? req.user.email : null,   // 🔥 EMAIL HERE
+      isp: geo.org || "Unknown",
+      asn: geo.asn || "Unknown",
       userAgent: req.headers["user-agent"],
       path: req.originalUrl
     });
 
   } catch (err) {
-    console.error("❌ Visitor log error:", err.message);
+    console.error("Visitor log error:", err.message);
   }
 
   next();
