@@ -491,3 +491,18 @@ select option {
     width: 90%;
   }
 }
+.back-dashboard {
+  display: inline-block;
+  margin-top: 20px;
+  font-size: 15px;
+  color: #b983ff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.back-dashboard:hover {
+  color: #e0c3ff;
+  text-decoration: underline;
+  transform: translateX(-3px);
+}
