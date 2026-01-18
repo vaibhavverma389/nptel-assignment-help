@@ -7,6 +7,10 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     default: "student"
+  },
+  date: {
+    type: Date,
+    default: Date.now
   }
 });
 

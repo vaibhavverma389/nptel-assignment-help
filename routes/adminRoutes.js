@@ -77,14 +77,16 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
   worksheet.columns = [
     { header: "Name", key: "name", width: 25 },
     { header: "Email", key: "email", width: 30 },
-    { header: "Role", key: "role", width: 15 }
+    { header: "Role", key: "role", width: 15 },
+    { header: "Date", key: "Date", width: 20 }
   ];
 
   users.forEach(u => {
     worksheet.addRow({
       name: u.name,
       email: u.email,
-      role: u.role
+      role: u.role,
+      Date: u.date.toDateString()
     });
   });
 

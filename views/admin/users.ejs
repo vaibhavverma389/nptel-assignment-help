@@ -10,6 +10,7 @@
             <th>Name</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Date</th>
           </tr>
         </thead>
         <tbody>
@@ -23,6 +24,17 @@
               </td>
               <td>
                 <%= u.role %>
+              </td>
+              <td>
+                
+                <% 
+  const d = new Date(u.date);
+  const formatted = d.getDate().toString().padStart(2,'0') + '/' +
+                    (d.getMonth()+1).toString().padStart(2,'0') + '/' +
+                    d.getFullYear();
+%>
+<%= formatted %>
+
               </td>
             </tr>
             <% }) %>
