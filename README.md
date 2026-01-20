@@ -1,214 +1,183 @@
-📘 Student MCQ Submission System
+# 📘 Student MCQ Submission System
+**(Week-based | Deadline Controlled | Bulk Submission)**
 
-(Week-based | Deadline Controlled | Bulk Submission)
+A web-based system where students can submit MCQ answers **week-wise**, with **automatic deadline handling**.  
+This project follows **NPTEL-style weekly assignment logic**.
 
-A web-based system where students can submit MCQ answers week-wise, with automatic deadline handling.
-Designed similar to NPTEL-style weekly assignments.
+---
 
-🚀 Features
-👨‍🎓 Student Features
+## 🚀 Features
 
-Login / Authentication (Passport.js)
+### 👨‍🎓 Student Features
+- Login & Authentication
+- Subject-wise MCQ submission
+- Week-wise submission system
+- Single question submission
+- Bulk MCQ submission
+- Edit answers before deadline
+- Automatic week progression
+- Deadline-based submission lock
+- Dashboard with:
+  - Submitted answers
+  - Study material
+  - Submission deadline
 
-Select Subject + Week
+### 🛡️ Security & Validation
+- Session-based authentication
+- Server-side deadline validation
+- User-specific answer access
+- Protected routes using middleware
 
-Submit answers:
+---
 
-Single Question
+## 🗓️ Week & Deadline Rules
 
-Bulk MCQ Submission
+| Week | Last Date |
+|-----|-----------|
+| Week 1 | 4 Feb 2026 |
+| Week 2 | 4 Feb 2026 |
+| Week 3 | 11 Feb 2026 |
+| Week 4 | 18 Feb 2026 |
+| Next Weeks | +7 days |
 
-Edit answers before deadline
+### Important Rule
+- **4 Feb (including)** → Week 1
+- **5 Feb onwards** → Week 2
+- After that, every 7 days a new week starts
 
-Automatic Week progression
+---
 
-Deadline-based submission lock
+## 🧠 Week Logic
 
-Dashboard with:
-
-Submitted answers
-
-Study material (PDF / link)
-
-Last submission date
-
-🛡️ Security & Logic
-
-Week logic centralized in utils
-
-Server-side deadline validation
-
-User-specific answers
-
-Session-based authentication
-
-Visitor logging
-
-🗓️ Week & Deadline Rules
-Week	Last Date
-Week 1	4 Feb 2026
-Week 2	4 Feb 2026
-Week 3	11 Feb 2026
-Week 4	18 Feb 2026
-...	+7 days each
-
-📌 Important Rule
-
-4 Feb (including) → Week 1
-
-5 Feb onwards → Week 2
-
-After that → every 7 days new week
-
-🧠 Week Logic (Core Concept)
-
-All week & deadline logic is handled in:
+All week and deadline logic is centralized in:
 
 utils/weekUtils.js
 
-Functions:
 
-getWeekInfo(selectedWeek)
+### Functions Used
+- `getWeekInfo(selectedWeek)`
+- `getWeekLastDate(week)`
 
-getWeekLastDate(week)
+These functions are used in:
+- Dashboard
+- Submit routes
+- Bulk submit routes
+- Deadline locking (GET & POST)
 
-Used in:
+---
 
-Dashboard
+## 🛠️ Tech Stack
 
-Submit
+- Backend: Node.js, Express.js
+- Database: MongoDB (Mongoose)
+- Frontend: EJS, HTML, CSS
+- Authentication: Passport.js
+- Session: express-session
+- Timezone: Asia/Kolkata
 
-Submit Bulk
+---
 
-Deadline lock (GET + POST)
+## 📂 Project Structure
 
-🛠️ Tech Stack
-
-Backend: Node.js, Express.js
-
-Database: MongoDB (Mongoose)
-
-Frontend: EJS, HTML, CSS
-
-Auth: Passport.js
-
-Session: express-session
-
-Timezone: Asia/Kolkata
-
-Logging: Custom visitor logger
-
-📂 Project Structure
 project/
 │
 ├── routes/
-│   ├── authRoutes.js
-│   ├── studentRoutes.js
-│   └── adminRoutes.js
+│ ├── authRoutes.js
+│ ├── studentRoutes.js
+│ └── adminRoutes.js
 │
 ├── utils/
-│   ├── db.js
-│   ├── passport.js
-│   └── weekUtils.js
+│ ├── db.js
+│ ├── passport.js
+│ └── weekUtils.js
 │
 ├── models/
-│   ├── User.js
-│   ├── Answer.js
-│   ├── Subject.js
-│   └── WeekMaterial.js
+│ ├── User.js
+│ ├── Answer.js
+│ ├── Subject.js
+│ └── WeekMaterial.js
 │
 ├── middlewares/
-│   ├── auth.js
-│   └── visitorLogger.js
+│ ├── auth.js
+│ └── visitorLogger.js
 │
 ├── views/
-│   ├── student/
-│   ├── admin/
-│   └── partials/
+│ ├── student/
+│ ├── admin/
+│ └── partials/
 │
 ├── public/
 │
 ├── app.js
 └── README.md
 
-⚙️ Installation & Setup
-1️⃣ Clone Repository
-git clone <repo-url>
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Clone the repository
+```bash
+git clone <repository-url>
 cd project
-
-2️⃣ Install Dependencies
+2. Install dependencies
 npm install
-
-3️⃣ Create .env File
+3. Create .env file
 PORT=3000
-MONGO_URI=your_mongodb_url
-SESSION_SECRET=your_secret_key
+MONGO_URI=your_mongodb_connection
+SESSION_SECRET=your_session_secret
 NODE_ENV=development
-
-4️⃣ Start Server
+4. Start the server
 npm start
-
-
-Open browser:
+Open in browser:
 
 http://localhost:3000
-
 🔐 Authentication Flow
+User logs in
 
-Login → Session created
+Session is created
 
-Protected routes using isAuth middleware
+Protected routes checked using middleware
 
 req.user available in all views
 
-🧪 Validation & Protection
+🧪 Validation Rules
+Future weeks cannot be selected
 
-Frontend week select limited
+Submission blocked after deadline
 
-Backend hard validation
+Deadline validated again on POST request
 
-Deadline checked again in POST routes
+One user can edit answers before deadline
 
-Future week selection blocked
-
-🎓 Academic Use
-
+🎓 Academic Usage
 Suitable for:
 
 College mini project
 
 Final year project
 
-Internship demo
+Internship demonstration
 
-Inspired by:
-
-NPTEL
-
-Coursera
-
-SWAYAM portals
+Inspired by NPTEL / Coursera platforms
 
 🧩 Future Enhancements
+Admin deadline override
 
-Admin override deadlines
-
-Week locking after evaluation
-
-Excel / CSV export
-
-Auto grading
-
-Notifications
+Auto evaluation of MCQs
 
 Result analytics
 
-👨‍💻 Developer Notes
+Excel / CSV export
 
-Business logic separated from routes
+Notification system
+
+👨‍💻 Developer Notes
+Business logic separated into utility files
+
 Clean MVC-inspired structure
+
 Production-ready Express setup
 
 📄 License
-
-This project is for educational purposes.
+This project is created for educational purposes only.
