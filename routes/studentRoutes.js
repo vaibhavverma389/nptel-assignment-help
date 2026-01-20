@@ -11,7 +11,8 @@ const router = express.Router();
 /* ===================== DASHBOARD ===================== */
 router.get("/dashboard", isAuth, async (req, res) => {
   try {
-    const { course, week } = req.query;
+    const course = req.query.course;
+    const week = req.query.week ? Number(req.query.week) : null;
 
     const subjects = await Subject.find().sort({ name: 1 });
 
@@ -27,7 +28,6 @@ router.get("/dashboard", isAuth, async (req, res) => {
 
     if (course) {
       answers = await Answer.find({
-        email: req.user.email,
         course,
         week: selectedWeek
       }).sort({ question: 1 });
@@ -55,6 +55,7 @@ router.get("/dashboard", isAuth, async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
 
 /* ===================== SINGLE SUBMIT ===================== */
 router.get("/submit", isAuth, async (req, res) => {
