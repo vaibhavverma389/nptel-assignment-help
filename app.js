@@ -8,7 +8,6 @@ const path = require("path");
 
 const connectDB = require("./utils/db");
 
-// 🔥 ROUTES
 const authRoutes = require("./routes/authRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
@@ -21,7 +20,6 @@ require("./utils/passport");
 
 const app = express();
 
-// Needed for correct IP when behind proxy (Render / Railway / VPS)
 app.set("trust proxy", 1);
 
 /* ================= DATABASE ================= */
@@ -73,7 +71,7 @@ app.use(adminRoutes);
 
 /* ================= DEFAULT ================= */
 app.get("/", (req, res) => {
-  res.redirect("/auth/login");
+  res.redirect("/dashboard");
 });
 
 /* ================= SERVER ================= */
