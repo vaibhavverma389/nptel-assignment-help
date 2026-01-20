@@ -30,7 +30,7 @@ router.get(
         name: req.user.name,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
 
     // Role based redirect
