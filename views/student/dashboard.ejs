@@ -58,19 +58,36 @@
   <% if (course) { %>
 
     <div class="card">
-      <h3>🧑‍🎓 Answers (Week <%= week || currentWeek %>)</h3>
+  <h3>🧑‍🎓 Answers (Week <%= week || currentWeek %>)</h3>
 
-      <% if (!answers || answers.length === 0) { %>
-        <p class="muted-text">No answers yet</p>
-      <% } else { %>
-        <% answers.forEach(a => { %>
-          <p>
-            Q<%= a.question %> → <b><%= a.option %></b>
-            <span class="muted-text">(by <%= a.user %>)</span>
-          </p>
-        <% }) %>
-      <% } %>
+  <% if (!answers || answers.length === 0) { %>
+    <p class="muted-text">No answers yet</p>
+  <% } else { %>
+
+    <div class="table-wrapper">
+      <table class="answer-table">
+        <thead>
+          <tr>
+            <th>Question No.</th>
+            <th>Selected Option</th>
+            <th>Answered By</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% answers.forEach((a, index) => { %>
+            <tr>
+              <td><%= a.question %></td>
+              <td><b><%= a.option %></b></td>
+              <td class="muted-text"><%= a.user %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
     </div>
+
+  <% } %>
+</div>
+
 
     <div class="card">
       <h3>📘 Study Material</h3>
