@@ -13,6 +13,7 @@
             <th>Answer </th>
             <th>User </th>
             <th>Email </th>
+            <th>Time&&Date</th>
             <th>Action </th>
           </tr>
         </thead>
@@ -34,6 +35,9 @@
               </td>
               <td>
                 <%= a.email || "—" %>
+              </td>
+              <td>
+                <%= new Date(a.createdAt).toLocaleString() %>
               </td>
 
               <td>
