@@ -2,25 +2,39 @@
 
 <h2 class="page-title">Submit MCQ Answers</h2>
 
+<!-- ================= FILTER FORM (GET) ================= -->
+<form method="get" action="/submit-bulk" class="form-row">
+
+  <!-- Subject -->
+  <select class="input" name="course" onchange="this.form.submit()" required>
+    <option value="">Select Subject</option>
+    <% subjects.forEach(s => { %>
+      <option value="<%= s.name %>" <%= selectedCourse === s.name ? "selected" : "" %>>
+        <%= s.name %>
+      </option>
+    <% }) %>
+  </select>
+
+  <!-- Week -->
+  <% if (currentWeek > 1) { %>
+    <select class="input" name="week" onchange="this.form.submit()">
+      <% for (let i = 1; i <= currentWeek; i++) { %>
+        <option value="<%= i %>" <%= selectedWeek == i ? "selected" : "" %>>
+          Week <%= i %>
+        </option>
+      <% } %>
+    </select>
+  <% } else { %>
+    <input class="input" value="Week <%= currentWeek %>" readonly />
+  <% } %>
+
+</form>
+
+<!-- ================= SUBMIT FORM (POST) ================= -->
 <form method="post" action="/submit-bulk" class="card">
 
-  <div class="form-row">
-
-    <select class="input" name="course" required>
-      <option value="">Select Subject</option>
-      <% subjects.forEach(s => { %>
-        <option value="<%= s.name %>"
-          <%= existingAnswers && existingAnswers.length && existingAnswers[0].course === s.name ? "selected" : "" %>>
-          <%= s.name %>
-        </option>
-      <% }) %>
-    </select>
-
-    <input class="input" value="Week <%= currentWeek %>" readonly />
-
-    <input type="hidden" name="week" value="<%= currentWeek %>" />
-
-  </div>
+  <input type="hidden" name="course" value="<%= selectedCourse %>">
+  <input type="hidden" name="week" value="<%= selectedWeek %>">
 
   <hr />
 
@@ -31,7 +45,7 @@
     <button type="button" class="btn btn-remove" onclick="removeQuestion()">➖ Remove Last</button>
 
     <button type="submit" class="btn btn-submit">
-      <%= existingAnswers && existingAnswers.length ? "Update Answers" : "Submit All" %>
+      <%= existingAnswers.length ? "Update Answers" : "Submit All" %>
     </button>
   </div>
 
@@ -41,7 +55,6 @@
 
 <script>
   let questionCount = 0;
-
   const existingAnswers = <%- JSON.stringify(existingAnswers || []) %>;
 
   function renderQuestion(questionNo, selectedOption = "") {
@@ -80,7 +93,6 @@
   }
 
   if (existingAnswers.length > 0) {
-    
     existingAnswers.forEach(ans => {
       renderQuestion(ans.question, ans.option);
     });
