@@ -6,12 +6,10 @@ const isAuth = require("../middlewares/auth");
 
 const router = express.Router();
 
-/* ======================================================
-   🔥 SINGLE SOURCE OF TRUTH – WEEK & DEADLINE LOGIC
-====================================================== */
+
 function getWeekInfo(selectedWeek = null) {
-  const COURSE_START_DATE = new Date("2026-01-21"); // 🔴 course start
-  const BASE_DEADLINE = new Date("2026-02-04");     // week 1 & 2 deadline
+  const COURSE_START_DATE = new Date("2026-01-21"); 
+  const BASE_DEADLINE = new Date("2026-02-04");     
   const TODAY = new Date();
 
   const diffDays = Math.floor(
@@ -39,9 +37,7 @@ function getWeekInfo(selectedWeek = null) {
   };
 }
 
-/* ======================================================
-   📊 DASHBOARD
-====================================================== */
+
 router.get("/dashboard", isAuth, async (req, res) => {
   const { course, week } = req.query;
 
@@ -82,9 +78,6 @@ router.get("/dashboard", isAuth, async (req, res) => {
   });
 });
 
-/* ======================================================
-   ✍️ SINGLE SUBMIT
-====================================================== */
 router.get("/submit", isAuth, async (req, res) => {
   const subjects = await Subject.find().sort({ name: 1 });
   const { currentWeek } = getWeekInfo();
@@ -110,25 +103,12 @@ router.post("/submit", isAuth, async (req, res) => {
   res.redirect(`/dashboard?course=${course}&week=${week}`);
 });
 
-/* ======================================================
-   📝 BULK SUBMIT
-====================================================== */
-// router.get("/submit-bulk", isAuth, async (req, res) => {
-//   const subjects = await Subject.find().sort({ name: 1 });
-//   const { currentWeek } = getWeekInfo();
 
-//   res.render("student/submitBulk", {
-//     subjects,
-//     currentWeek,
-//     existingAnswers
-//   });
-// });
 router.get("/submit-bulk", isAuth, async (req, res) => {
   try {
     const subjects = await Subject.find().sort({ name: 1 });
     const { currentWeek } = getWeekInfo();
 
-    // 🔥 FETCH EXISTING ANSWERS OF LOGGED-IN USER
     const existingAnswers = await Answer.find({
       email: req.user.email,
       week: currentWeek
@@ -137,7 +117,7 @@ router.get("/submit-bulk", isAuth, async (req, res) => {
     res.render("student/submitBulk", {
       subjects,
       currentWeek,
-      existingAnswers // ✅ NOW DEFINED
+      existingAnswers 
     });
 
   } catch (err) {

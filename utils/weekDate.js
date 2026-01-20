@@ -1,6 +1,6 @@
-// utils/weekDate.js
+
 function getWeekLastDate(week) {
-  const baseDate = new Date("2026-02-04"); // Week 1 & 2
+  const baseDate = new Date("2026-02-04"); 
   if (week <= 2) return baseDate;
 
   const extraWeeks = week - 2;

@@ -8,12 +8,11 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
 
-      // 🔥 ADD THIS (FINAL FIX)
       callbackURL: "/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        // 🔒 SAFE EMAIL ACCESS
+
         const email =
           profile.emails && profile.emails.length > 0
             ? profile.emails[0].value
@@ -44,7 +43,6 @@ passport.use(
   )
 );
 
-// SESSION SERIALIZE
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });

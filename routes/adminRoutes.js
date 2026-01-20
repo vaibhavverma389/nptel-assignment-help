@@ -5,13 +5,13 @@ const User = require("../models/User");
 const Answer = require("../models/Answer");
 const Subject = require("../models/Subject");
 const WeekMaterial = require("../models/WeekMaterial");
-const VisitorLog = require("../models/VisitorLog"); // ✅ ONLY ONCE
+const VisitorLog = require("../models/VisitorLog"); 
 
 const isAdmin = require("../middlewares/admin");
 
 const router = express.Router();
 
-/* ================= ADMIN DASHBOARD ================= */
+
 router.get("/admin", isAdmin, async (req, res) => {
   try {
     const usersCount = await User.countDocuments();
@@ -38,7 +38,6 @@ router.get("/admin", isAdmin, async (req, res) => {
   }
 });
 
-/* ================= VISITOR LIST ================= */
 router.get("/admin/visitors", isAdmin, async (req, res) => {
   try {
     const logs = await VisitorLog.find()
@@ -65,7 +64,6 @@ router.get("/admin/visitors", isAdmin, async (req, res) => {
   }
 });
 
-//
 router.get("/admin/export/visitors", isAdmin, async (req, res) => {
   try {
     const logs = await VisitorLog.find().sort({ visitedAt: -1 });
@@ -93,7 +91,6 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
       });
     });
 
-    // Header bold
     worksheet.getRow(1).font = { bold: true };
 
     res.setHeader(
@@ -114,7 +111,6 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
   }
 });
 
-/* ================= SUBJECT MANAGEMENT ================= */
 router.get("/admin/subjects", isAdmin, async (req, res) => {
   const subjects = await Subject.find().sort({ name: 1 });
   res.render("admin/subjects", { subjects });
@@ -136,13 +132,11 @@ router.post("/admin/subjects/delete/:id", isAdmin, async (req, res) => {
   res.redirect("/admin/subjects");
 });
 
-/* ================= USERS ================= */
 router.get("/admin/users", isAdmin, async (req, res) => {
   const users = await User.find();
   res.render("admin/users", { users });
 });
 
-/* ================= ANSWERS ================= */
 router.get("/admin/answers", isAdmin, async (req, res) => {
   const answers = await Answer.find().sort({
     course: 1,
@@ -158,7 +152,6 @@ router.post("/admin/answers/delete/:id", isAdmin, async (req, res) => {
   res.redirect("/admin/answers");
 });
 
-/* ================= EXPORT USERS ================= */
 router.get("/admin/export/users", isAdmin, async (req, res) => {
   const users = await User.find({ role: "student" });
 
@@ -196,7 +189,6 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
   res.end();
 });
 
-/* ================= WEEK MATERIAL ================= */
 router.get("/admin/materials", isAdmin, async (req, res) => {
   const subjects = await Subject.find().sort({ name: 1 });
   const materials = await WeekMaterial.find().sort({

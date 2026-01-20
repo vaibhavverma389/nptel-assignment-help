@@ -12,11 +12,9 @@ function getWeekInfo(startDate) {
 
   let lastDate;
 
-  // Week 1 & 2 → same date
   if (currentWeek <= 2) {
     lastDate = new Date("2026-02-04");
   } else {
-    // Week 3 onwards → +7 days logic
     lastDate = new Date("2026-02-04");
     lastDate.setDate(lastDate.getDate() + (currentWeek - 2) * 7);
   }
