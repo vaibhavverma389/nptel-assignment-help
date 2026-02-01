@@ -2,44 +2,37 @@
 
   <h2 class="page-title">All Users</h2>
 
-  <div class="card">
-    <div class="table-wrapper">
-      <table class="answers-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% users.forEach(u=> { %>
-            <tr>
-              <td>
-                <%= u.name %>
-              </td>
-              <td>
-                <%= u.email %>
-              </td>
-              <td>
-                <%= u.role %>
-              </td>
-              <td>
-                
-                <% 
-                
-  const d = new Date(u.date).toLocaleString() 
+  <%
+users.sort((a, b) => a.name.localeCompare(b.name));
 %>
-<%= d %>
 
-              </td>
-            </tr>
-            <% }) %>
-        </tbody>
-      </table>
-    </div>
+<div class="card">
+  <div class="table-wrapper">
+    <table class="answers-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(u => { %>
+          <tr>
+            <td><%= u.name %></td>
+            <td><%= u.email %></td>
+            <td><%= u.role %></td>
+            <td>
+              <%= new Date(u.date).toLocaleString() %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
   </div>
+</div>
+
 
   <a href="/admin" class="back-dashboard">← Back to Dashboard</a>
 
