@@ -46,6 +46,9 @@ module.exports = (req, res, next) => {
 
     res.on("finish", async () => {
       try {
+        if (!req.user || !req.user.email) {
+        return;
+        }
         // fallback to live API if city missing
         if (!location.city) {
           location = await getLocation(ip);
