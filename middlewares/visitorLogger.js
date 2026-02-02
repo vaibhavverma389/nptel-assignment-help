@@ -1,6 +1,28 @@
 const VisitorLog = require("../models/VisitorLog");
 const geoip = require("geoip-lite");
 const UAParser = require("ua-parser-js");
+const axios = require("axios");
+
+/* ---------- helper: live IP location ---------- */
+async function getLocation(ip) {
+  try {
+    const { data } = await axios.get(
+      `http://ip-api.com/json/${ip}`
+    );
+
+    if (data.status !== "success") return {};
+
+    return {
+      country: data.country,
+      region: data.regionName,
+      city: data.city,
+      isp: data.isp,
+      timezone: data.timezone
+    };
+  } catch (err) {
+    return {};
+  }
+}
 
 module.exports = (req, res, next) => {
   try {
@@ -10,7 +32,6 @@ module.exports = (req, res, next) => {
       req.headers["x-forwarded-for"]?.split(",")[0] ||
       req.socket.remoteAddress;
 
-    const geo = geoip.lookup(ip) || {};
     const parser = new UAParser(req.headers["user-agent"]);
     const ua = parser.getResult();
     const path = req.originalUrl;
@@ -20,8 +41,16 @@ module.exports = (req, res, next) => {
       return next();
     }
 
+    /* ---------- LOCATION LOGIC (HYBRID) ---------- */
+    let location = geoip.lookup(ip) || {};
+
     res.on("finish", async () => {
       try {
+        // fallback to live API if city missing
+        if (!location.city) {
+          location = await getLocation(ip);
+        }
+
         await VisitorLog.create({
           ip,
           path,
@@ -35,15 +64,14 @@ module.exports = (req, res, next) => {
           isAuthenticated: !!req.user,
 
           // network info
-          isp: geo.org || "Unknown",
-          asn: geo.asn || "Unknown",
+          isp: location.isp || location.org || "Unknown",
 
           // location
           location: {
-            country: geo.country || "Unknown",
-            region: geo.region || "Unknown",
-            city: geo.city || "Unknown",
-            timezone: geo.timezone || "Unknown"
+            country: location.country || "Unknown",
+            region: location.region || "Unknown",
+            city: location.city || "Unknown",
+            timezone: location.timezone || "Unknown"
           },
 
           // device
