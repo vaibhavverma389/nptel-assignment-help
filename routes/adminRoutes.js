@@ -8,6 +8,7 @@ const WeekMaterial = require("../models/WeekMaterial");
 const VisitorLog = require("../models/VisitorLog");
 
 const isAdmin = require("../middlewares/isAdmin");
+const lastActive = require("../middlewares/lastActive");
 
 const router = express.Router();
 
@@ -188,7 +189,8 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
     { header: "Name", key: "name", width: 25 },
     { header: "Email", key: "email", width: 30 },
     { header: "Role", key: "role", width: 15 },
-    { header: "Date", key: "date", width: 20 }
+    { header: "Date", key: "date", width: 20 },
+    { header: "Last Active", key: "lastActive", width: 20 }
   ];
 
   users.forEach(u => {
@@ -196,7 +198,8 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
       name: u.name,
       email: u.email,
       role: u.role,
-      date: u.date?.toDateString()
+      date: u.date?.toDateString(),
+      lastActive: u.lastActive?.toDateString()
     });
   });
 

@@ -1,6 +1,6 @@
 process.env.TZ = "Asia/Kolkata";
-
 require("dotenv").config();
+
 const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
@@ -12,13 +12,13 @@ const authRoutes = require("./routes/authRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
-// 🔥 VISITOR LOGGER
+const lastActive = require("./middlewares/lastActive");
 const visitorLogger = require("./middlewares/visitorLogger");
 
 // Passport config
 require("./utils/passport");
 
-const app = express();
+const app = express(); // ✅ app FIRST
 
 app.set("trust proxy", 1);
 
@@ -42,7 +42,7 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+      maxAge: 1000 * 60 * 60 * 24 * 7
     }
   })
 );
@@ -57,8 +57,9 @@ app.use((req, res, next) => {
   next();
 });
 
-/* ================= VISITOR LOGGER (🔥 CORRECT PLACE) ================= */
-app.use(visitorLogger);
+/* ================= USER ACTIVITY + VISITOR LOG ================= */
+app.use(lastActive);       // ✅ req.user available
+app.use(visitorLogger);    // ✅ clean logging
 
 /* ================= VIEW ENGINE ================= */
 app.set("view engine", "ejs");
