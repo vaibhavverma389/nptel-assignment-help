@@ -30,6 +30,7 @@
     "mongoose": "^8.0.0",
     "nodemon": "^3.1.11",
     "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0"
+    "passport-google-oauth20": "^2.0.0",
+    "ua-parser-js": "^2.0.8"
   }
 }

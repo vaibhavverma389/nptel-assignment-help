@@ -5,24 +5,24 @@ const User = require("../models/User");
 const Answer = require("../models/Answer");
 const Subject = require("../models/Subject");
 const WeekMaterial = require("../models/WeekMaterial");
-const VisitorLog = require("../models/VisitorLog"); 
+const VisitorLog = require("../models/VisitorLog");
 
-const isAdmin = require("../middlewares/admin");
+const isAdmin = require("../middlewares/isAdmin");
 
 const router = express.Router();
 
-
+/* ===================== ADMIN DASHBOARD ===================== */
 router.get("/admin", isAdmin, async (req, res) => {
   try {
     const usersCount = await User.countDocuments();
     const answersCount = await Answer.countDocuments();
 
     const loggedInUsers = await VisitorLog.countDocuments({
-      email: { $ne: null }
+      isAuthenticated: true
     });
 
     const guests = await VisitorLog.countDocuments({
-      email: null
+      isAuthenticated: false
     });
 
     res.render("admin/dashboard", {
@@ -31,42 +31,53 @@ router.get("/admin", isAdmin, async (req, res) => {
       loggedInUsers,
       guests
     });
-
   } catch (err) {
-    console.error(err);
+    console.error("Admin dashboard error:", err);
     res.status(500).send("Admin dashboard error");
   }
 });
 
+/* ===================== VISITORS ===================== */
 router.get("/admin/visitors", isAdmin, async (req, res) => {
   try {
     const logs = await VisitorLog.find()
       .sort({ visitedAt: -1 })
-      .limit(500);
+      .limit(500)
+      .lean();
 
     const loggedInUsers = await VisitorLog.countDocuments({
-      email: { $ne: null }
+      isAuthenticated: true
     });
 
     const guests = await VisitorLog.countDocuments({
-      email: null
+      isAuthenticated: false
+    });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const todayVisits = await VisitorLog.countDocuments({
+      visitedAt: { $gte: today }
     });
 
     res.render("admin/visitors", {
       logs,
       loggedInUsers,
-      guests
+      guests,
+      todayVisits
     });
-
   } catch (err) {
-    console.error(err);
+    console.error("Visitor list error:", err);
     res.status(500).send("Visitor list error");
   }
 });
 
+/* ===================== EXPORT VISITORS ===================== */
 router.get("/admin/export/visitors", isAdmin, async (req, res) => {
   try {
-    const logs = await VisitorLog.find().sort({ visitedAt: -1 });
+    const logs = await VisitorLog.find()
+      .sort({ visitedAt: -1 })
+      .lean();
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Visitors");
@@ -74,8 +85,16 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
     worksheet.columns = [
       { header: "IP Address", key: "ip", width: 18 },
       { header: "Email", key: "email", width: 30 },
-      { header: "User Agent", key: "userAgent", width: 40 },
-      { header: "Path", key: "path", width: 25 },
+      { header: "Role", key: "role", width: 12 },
+      { header: "Browser", key: "browser", width: 15 },
+      { header: "OS", key: "os", width: 15 },
+      { header: "Device", key: "device", width: 12 },
+      { header: "Country", key: "country", width: 14 },
+      { header: "City", key: "city", width: 14 },
+      { header: "Path", key: "path", width: 30 },
+      { header: "Method", key: "method", width: 10 },
+      { header: "Status", key: "statusCode", width: 10 },
+      { header: "Response Time", key: "responseTime", width: 14 },
       { header: "Visited At", key: "visitedAt", width: 22 }
     ];
 
@@ -83,10 +102,20 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
       worksheet.addRow({
         ip: v.ip,
         email: v.email || "Guest",
-        userAgent: v.userAgent,
+        role: v.role || "guest",
+        browser: v.device?.browser || "Unknown",
+        os: v.device?.os || "Unknown",
+        device: v.device?.device || "desktop",
+        country: v.location?.country || "Unknown",
+        city: v.location?.city || "Unknown",
         path: v.path,
+        method: v.method,
+        statusCode: v.statusCode,
+        responseTime: v.responseTime,
         visitedAt: v.visitedAt
-          ? v.visitedAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+          ? new Date(v.visitedAt).toLocaleString("en-IN", {
+              timeZone: "Asia/Kolkata"
+            })
           : ""
       });
     });
@@ -104,26 +133,21 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
 
     await workbook.xlsx.write(res);
     res.end();
-
   } catch (err) {
-    console.error(err);
+    console.error("Visitor export error:", err);
     res.status(500).send("Visitor export error");
   }
 });
 
+/* ===================== SUBJECTS ===================== */
 router.get("/admin/subjects", isAdmin, async (req, res) => {
   const subjects = await Subject.find().sort({ name: 1 });
   res.render("admin/subjects", { subjects });
 });
 
 router.post("/admin/subjects", isAdmin, async (req, res) => {
-  const { name } = req.body;
-  if (!name) return res.redirect("/admin/subjects");
-
-  try {
-    await Subject.create({ name });
-  } catch (err) {}
-
+  if (!req.body.name) return res.redirect("/admin/subjects");
+  await Subject.create({ name: req.body.name });
   res.redirect("/admin/subjects");
 });
 
@@ -132,18 +156,19 @@ router.post("/admin/subjects/delete/:id", isAdmin, async (req, res) => {
   res.redirect("/admin/subjects");
 });
 
+/* ===================== USERS ===================== */
 router.get("/admin/users", isAdmin, async (req, res) => {
   const users = await User.find();
   res.render("admin/users", { users });
 });
 
+/* ===================== ANSWERS ===================== */
 router.get("/admin/answers", isAdmin, async (req, res) => {
   const answers = await Answer.find().sort({
     course: 1,
     week: 1,
     question: 1
   });
-
   res.render("admin/answers", { answers });
 });
 
@@ -152,6 +177,7 @@ router.post("/admin/answers/delete/:id", isAdmin, async (req, res) => {
   res.redirect("/admin/answers");
 });
 
+/* ===================== EXPORT USERS ===================== */
 router.get("/admin/export/users", isAdmin, async (req, res) => {
   const users = await User.find({ role: "student" });
 
@@ -170,7 +196,7 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
       name: u.name,
       email: u.email,
       role: u.role,
-      date: u.date.toDateString()
+      date: u.date?.toDateString()
     });
   });
 
@@ -189,6 +215,7 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
   res.end();
 });
 
+/* ===================== MATERIALS ===================== */
 router.get("/admin/materials", isAdmin, async (req, res) => {
   const subjects = await Subject.find().sort({ name: 1 });
   const materials = await WeekMaterial.find().sort({
@@ -196,10 +223,7 @@ router.get("/admin/materials", isAdmin, async (req, res) => {
     week: 1
   });
 
-  res.render("admin/materials", {
-    subjects,
-    materials
-  });
+  res.render("admin/materials", { subjects, materials });
 });
 
 router.post("/admin/materials", isAdmin, async (req, res) => {
@@ -215,12 +239,7 @@ router.post("/admin/materials", isAdmin, async (req, res) => {
 
   await WeekMaterial.findOneAndUpdate(
     { subject, week },
-    {
-      subject,
-      week: Number(week),
-      studyMaterialUrl,
-      finalAnswerPdfUrl
-    },
+    { subject, week, studyMaterialUrl, finalAnswerPdfUrl },
     { upsert: true, new: true }
   );
 

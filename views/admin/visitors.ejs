@@ -1,34 +1,67 @@
 <%- include("../partials/header") %>
 
-
 <div class="card">
-    <div class="table-wrapper">
-        <table class="answers-table">
-  <tr>
-    <th>Email</th>
-    <th>IP</th>
-    <th>Path</th>
-    <th>Device</th>
-    <th>Time</th>
-  </tr>
+  <h2 style="margin-bottom:10px;">Visitor Logs</h2>
 
-  <% logs.forEach(v => { %>
-    <tr>
-      <td><%= v.email || "Guest" %></td>
-      <td><%= v.ip %></td>
-      <td title="<%= v.path %>">
-  <%= v.path.length > 60 ? v.path.substring(0, 40) + "..." : v.path %>
-</td>
-<td title="<%= v.userAgent %>">
-  <%= v.userAgent.length > 60 ? v.userAgent.substring(12, 35) + "..." : v.userAgent %>
-</td>
+  <div class="table-wrapper">
+    <table class="answers-table">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>IP</th>
+          <th>Path</th>
+          <th>Device</th>
+          <th>Location</th>
+          <th>Time</th>
+        </tr>
+      </thead>
 
-      <td><%= v.visitedAt.toLocaleString() %></td>
-    </tr>
-  <% }) %>
-</table>
+      <tbody>
+        <% logs.forEach(v => { %>
+          <tr>
+            <!-- Email -->
+            <td>
+              <%= v.email ? v.email : "Guest" %>
+            </td>
 
-    </div>
+            <!-- IP -->
+            <td>
+              <%= v.ip %>
+            </td>
+
+            <!-- Path -->
+            <td title="<%= v.path %>">
+              <%= v.path && v.path.length > 40
+                ? v.path.substring(0, 40) + "..."
+                : v.path %>
+            </td>
+
+            <!-- Device -->
+            <td>
+              <%= v.device?.browser || "Unknown" %> /
+              <%= v.device?.os || "Unknown" %>
+              (<%= v.device?.device || "desktop" %>)
+            </td>
+
+            <!-- Location -->
+            <td>
+              <%= v.location?.city || "Unknown" %>,
+              <%= v.location?.country || "Unknown" %>
+            </td>
+
+            <!-- Time -->
+            <td>
+              <%= v.visitedAt
+                ? new Date(v.visitedAt).toLocaleString("en-IN", {
+                    timeZone: "Asia/Kolkata"
+                  })
+                : "" %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
 </div>
 
- <%- include("../partials/footer") %>
+<%- include("../partials/footer") %>
