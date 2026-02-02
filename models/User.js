@@ -15,10 +15,10 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   },
 
-  // ✅ NEW: last active time
+  // ✅ last active (NO default)
   lastActive: {
     type: Date,
-    default: Date.now
+    default: null
   }
 });
 

@@ -28,10 +28,13 @@
               <%= new Date(u.date).toLocaleString() %>
             </td>
             <td>
-              <%= u.lastActive
-                ? new Date(u.lastActive).toLocaleString()
-                : "Never" %>
-            </td>
+  <%= u.lastActive
+    ? new Date(u.lastActive).toLocaleString("en-IN", {
+        timeZone: "Asia/Kolkata"
+      })
+    : "—" %>
+</td>
+
           </tr>
         <% }) %>
       </tbody>
