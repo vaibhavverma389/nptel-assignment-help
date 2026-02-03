@@ -3,26 +3,31 @@ require("dotenv").config();
 
 const express = require("express");
 const session = require("express-session");
+const MongoStore = require("connect-mongo").default;
 const passport = require("passport");
 const path = require("path");
 
+/* ================= DB ================= */
 const connectDB = require("./utils/db");
 
+/* ================= ROUTES ================= */
 const authRoutes = require("./routes/authRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
+/* ================= MIDDLEWARES ================= */
 const lastActive = require("./middlewares/lastActive");
 const visitorLogger = require("./middlewares/visitorLogger");
 
-// Passport config
+/* ================= PASSPORT CONFIG ================= */
 require("./utils/passport");
 
-const app = express(); // ✅ app FIRST
+const app = express();
 
+/* ================= TRUST PROXY ================= */
 app.set("trust proxy", 1);
 
-/* ================= DATABASE ================= */
+/* ================= DATABASE CONNECT ================= */
 connectDB();
 
 /* ================= BODY PARSER ================= */
@@ -32,17 +37,25 @@ app.use(express.json());
 /* ================= STATIC FILES ================= */
 app.use(express.static(path.join(__dirname, "public")));
 
-/* ================= SESSION ================= */
+/* ================= SESSION (🔥 MOST IMPORTANT) ================= */
 app.use(
   session({
     name: "nptel.sid",
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      collectionName: "sessions",
+      ttl: 60 * 60 * 24 * 7 // 7 days
+    }),
+
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 1000 * 60 * 60 * 24 * 7
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
     }
   })
 );
@@ -57,9 +70,9 @@ app.use((req, res, next) => {
   next();
 });
 
-/* ================= USER ACTIVITY + VISITOR LOG ================= */
-app.use(lastActive);       // ✅ req.user available
-app.use(visitorLogger);    // ✅ clean logging
+/* ================= USER ACTIVITY & VISITOR LOG ================= */
+app.use(lastActive);
+app.use(visitorLogger);
 
 /* ================= VIEW ENGINE ================= */
 app.set("view engine", "ejs");
@@ -70,7 +83,7 @@ app.use("/auth", authRoutes);
 app.use(studentRoutes);
 app.use(adminRoutes);
 
-/* ================= DEFAULT ================= */
+/* ================= DEFAULT ROUTES ================= */
 app.get("/", (req, res) => {
   res.redirect("/dashboard");
 });
