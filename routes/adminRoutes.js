@@ -87,18 +87,36 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
       { header: "IP Address", key: "ip", width: 18 },
       { header: "Email", key: "email", width: 30 },
       { header: "Role", key: "role", width: 12 },
+      { header: "Authenticated", key: "isAuthenticated", width: 14 },
+
+      // device
       { header: "Browser", key: "browser", width: 15 },
       { header: "OS", key: "os", width: 15 },
-      { header: "Device", key: "device", width: 12 },
+      { header: "Device Type", key: "device", width: 14 },
+
+      // network
+      { header: "ISP", key: "isp", width: 18 },
+      { header: "Raw ISP", key: "rawIsp", width: 30 },
+      { header: "ASN", key: "asn", width: 18 },
+      { header: "Network Type", key: "networkType", width: 16 },
+      { header: "Mobile IP (CGNAT)", key: "isMobileIP", width: 18 },
+      { header: "Proxy / VPN", key: "proxy", width: 14 },
+
+      // location
       { header: "Country", key: "country", width: 14 },
       { header: "Region", key: "region", width: 14 },
       { header: "City", key: "city", width: 14 },
+      { header: "Timezone", key: "timezone", width: 16 },
+
+      // request
       { header: "Path", key: "path", width: 30 },
-      { header: "ISP", key: "isp", width: 20 },
       { header: "Method", key: "method", width: 10 },
       { header: "Status", key: "statusCode", width: 10 },
       { header: "Response Time", key: "responseTime", width: 14 },
-      { header: "Visited At", key: "visitedAt", width: 22 }
+
+      // misc
+      { header: "Referrer", key: "referrer", width: 30 },
+      { header: "Visited At (IST)", key: "visitedAt", width: 22 }
     ];
 
     logs.forEach(v => {
@@ -106,17 +124,30 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
         ip: v.ip,
         email: v.email || "Guest",
         role: v.role || "guest",
+        isAuthenticated: v.isAuthenticated ? "Yes" : "No",
+
         browser: v.device?.browser || "Unknown",
         os: v.device?.os || "Unknown",
         device: v.device?.device || "desktop",
+
+        isp: v.isp || "Unknown",
+        rawIsp: v.rawIsp || "",
+        asn: v.asn || "",
+        networkType: v.networkType || "Broadband",
+        isMobileIP: v.isMobileIP ? "Yes" : "No",
+        proxy: v.proxy ? "Yes" : "No",
+
         country: v.location?.country || "Unknown",
         region: v.location?.region || "Unknown",
         city: v.location?.city || "Unknown",
+        timezone: v.location?.timezone || "Unknown",
+
         path: v.path,
-        isp: v.isp || "Unknown",
         method: v.method,
         statusCode: v.statusCode,
         responseTime: v.responseTime,
+        referrer: v.referrer || "Direct",
+
         visitedAt: v.visitedAt
           ? new Date(v.visitedAt).toLocaleString("en-IN", {
               timeZone: "Asia/Kolkata"
@@ -143,6 +174,7 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
     res.status(500).send("Visitor export error");
   }
 });
+
 
 /* ===================== SUBJECTS ===================== */
 router.get("/admin/subjects", isAdmin, async (req, res) => {
