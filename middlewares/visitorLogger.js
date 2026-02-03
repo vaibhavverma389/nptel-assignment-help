@@ -7,17 +7,26 @@ const axios = require("axios");
 async function getLocation(ip) {
   try {
     const { data } = await axios.get(
-      `http://ip-api.com/json/${ip}`
+      `http://ip-api.com/json/${ip}?fields=status,country,regionName,city,isp,org,timezone,mobile,proxy`
     );
 
     if (data.status !== "success") return {};
+
+    // Normalize Indian ISPs
+    let ispName = data.isp || data.org || "Unknown";
+
+    if (/reliance/i.test(ispName)) ispName = "Jio";
+    else if (/airtel/i.test(ispName)) ispName = "Airtel";
+    else if (/vodafone|idea|vi/i.test(ispName)) ispName = "VI";
 
     return {
       country: data.country,
       region: data.regionName,
       city: data.city,
-      isp: data.isp,
-      timezone: data.timezone
+      isp: ispName,
+      timezone: data.timezone,
+      mobile: data.mobile,
+      proxy: data.proxy
     };
   } catch (err) {
     return {};
@@ -29,29 +38,27 @@ module.exports = (req, res, next) => {
     const startTime = Date.now();
 
     const ip =
-      req.headers["x-forwarded-for"]?.split(",")[0] ||
+      req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
       req.socket.remoteAddress;
 
     const parser = new UAParser(req.headers["user-agent"]);
     const ua = parser.getResult();
     const path = req.originalUrl;
 
-    // ❌ admin pages ignore
+    // ❌ ignore admin pages
     if (path === "/admin" || path === "/admin/visitors") {
       return next();
     }
 
-    /* ---------- LOCATION LOGIC (HYBRID) ---------- */
+    /* ---------- LOCATION LOGIC ---------- */
     let location = geoip.lookup(ip) || {};
 
     res.on("finish", async () => {
       try {
-        // if (!req.user || !req.user.email) {
-        // return;
-        // }
-        // fallback to live API if city missing
-        if (!location.city) {
-          location = await getLocation(ip);
+        // Fallback to live API if ISP / city missing
+        if (!location.city || !location.isp) {
+          const liveLocation = await getLocation(ip);
+          location = { ...location, ...liveLocation };
         }
 
         await VisitorLog.create({
@@ -67,7 +74,8 @@ module.exports = (req, res, next) => {
           isAuthenticated: !!req.user,
 
           // network info
-          isp: location.isp || location.org || "Unknown",
+          isp: location.isp || "Unknown",
+          networkType: location.mobile ? "Mobile Network" : "Broadband",
 
           // location
           location: {
@@ -77,7 +85,7 @@ module.exports = (req, res, next) => {
             timezone: location.timezone || "Unknown"
           },
 
-          // device
+          // device info
           device: {
             browser: ua.browser.name || "Unknown",
             os: ua.os.name || "Unknown",
