@@ -44,24 +44,32 @@ module.exports = (req, res, next) => {
       req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
       req.socket.remoteAddress;
 
-    const parser = new UAParser(req.headers["user-agent"]);
-    const ua = parser.getResult();
     const path = req.originalUrl;
 
-    // ❌ ignore admin pages
-    if (path === "/admin" || path === "/admin/visitors") {
+    /* ---------- HARD IGNORE ROUTES ---------- */
+    const IGNORE_PATHS = [
+      "/auth",
+      "/favicon.ico",
+      "/admin"
+    ];
+
+    if (IGNORE_PATHS.some(p => path.startsWith(p))) {
       return next();
     }
 
-    /* ---------- LOCATION LOGIC ---------- */
+    const parser = new UAParser(req.headers["user-agent"]);
+    const ua = parser.getResult();
+
     let location = geoip.lookup(ip) || {};
 
     res.on("finish", async () => {
       try {
-          if (!req.user) {
-        return;
-          }
-        
+        /* ---------- FINAL SAFETY CHECK ---------- */
+        // ❌ Do not save guest OR unauthenticated user
+        if (!req.user || !req.user._id) {
+          return;
+        }
+
         // Fallback to live API if important data missing
         if (!location.city || !location.isp) {
           const liveLocation = await getLocation(ip);
@@ -75,12 +83,12 @@ module.exports = (req, res, next) => {
           statusCode: res.statusCode,
 
           // user info
-          email: req.user?.email || null,
-          userId: req.user?._id || null,
-          role: req.user?.role || "guest",
-          isAuthenticated: !!req.user,
+          email: req.user.email,
+          userId: req.user._id,
+          role: req.user.role,
+          isAuthenticated: true,
 
-          // network info (schema aligned)
+          // network info
           isp: location.isp || "Unknown",
           rawIsp: location.rawIsp || location.isp || "Unknown",
           asn: location.asn || null,
