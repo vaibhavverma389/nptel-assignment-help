@@ -7,26 +7,29 @@ const axios = require("axios");
 async function getLocation(ip) {
   try {
     const { data } = await axios.get(
-      `http://ip-api.com/json/${ip}?fields=status,country,regionName,city,isp,org,timezone,mobile,proxy`
+      `http://ip-api.com/json/${ip}?fields=status,country,regionName,city,isp,org,timezone,mobile,proxy,as`
     );
 
     if (data.status !== "success") return {};
 
-    // Normalize Indian ISPs
-    let ispName = data.isp || data.org || "Unknown";
+    let rawIsp = data.isp || data.org || "Unknown";
+    let ispName = rawIsp;
 
-    if (/reliance/i.test(ispName)) ispName = "Jio";
-    else if (/airtel/i.test(ispName)) ispName = "Airtel";
-    else if (/vodafone|idea|vi/i.test(ispName)) ispName = "VI";
+    // Normalize Indian ISPs
+    if (/reliance/i.test(rawIsp)) ispName = "Jio";
+    else if (/airtel/i.test(rawIsp)) ispName = "Airtel";
+    else if (/vodafone|idea|vi/i.test(rawIsp)) ispName = "VI";
 
     return {
       country: data.country,
       region: data.regionName,
       city: data.city,
       isp: ispName,
+      rawIsp,
+      asn: data.as || null,
       timezone: data.timezone,
-      mobile: data.mobile,
-      proxy: data.proxy
+      mobile: !!data.mobile,
+      proxy: !!data.proxy
     };
   } catch (err) {
     return {};
@@ -55,7 +58,7 @@ module.exports = (req, res, next) => {
 
     res.on("finish", async () => {
       try {
-        // Fallback to live API if ISP / city missing
+        // Fallback to live API if important data missing
         if (!location.city || !location.isp) {
           const liveLocation = await getLocation(ip);
           location = { ...location, ...liveLocation };
@@ -73,9 +76,13 @@ module.exports = (req, res, next) => {
           role: req.user?.role || "guest",
           isAuthenticated: !!req.user,
 
-          // network info
+          // network info (schema aligned)
           isp: location.isp || "Unknown",
+          rawIsp: location.rawIsp || location.isp || "Unknown",
+          asn: location.asn || null,
           networkType: location.mobile ? "Mobile Network" : "Broadband",
+          isMobileIP: !!location.mobile,
+          proxy: !!location.proxy,
 
           // location
           location: {

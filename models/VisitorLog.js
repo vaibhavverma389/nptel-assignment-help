@@ -6,6 +6,7 @@ const VisitorLogSchema = new mongoose.Schema({
   method: String,
   statusCode: Number,
 
+  // user info
   email: String,
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -14,9 +15,25 @@ const VisitorLogSchema = new mongoose.Schema({
   role: String,
   isAuthenticated: Boolean,
 
-  isp: String,
+  // network info
+  isp: String,          // Normalized (Jio / Airtel / VI / Broadband)
+  rawIsp: String,       // Original ISP string from API
   asn: String,
+  networkType: {
+    type: String,
+    enum: ["Mobile Network", "Broadband"],
+    default: "Broadband"
+  },
+  isMobileIP: {
+    type: Boolean,
+    default: false
+  },
+  proxy: {
+    type: Boolean,
+    default: false
+  },
 
+  // location
   location: {
     country: String,
     region: String,
@@ -24,12 +41,14 @@ const VisitorLogSchema = new mongoose.Schema({
     timezone: String
   },
 
+  // device
   device: {
     browser: String,
     os: String,
     device: String
   },
 
+  // misc
   referrer: String,
   responseTime: String,
   visitedAt: {
