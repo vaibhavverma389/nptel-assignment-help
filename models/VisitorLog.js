@@ -16,8 +16,8 @@ const VisitorLogSchema = new mongoose.Schema({
   isAuthenticated: Boolean,
 
   // network info
-  isp: String,          // Normalized (Jio / Airtel / VI / Broadband)
-  rawIsp: String,       // Original ISP string from API
+  isp: String,    
+  rawIsp: String,       
   asn: String,
   networkType: {
     type: String,

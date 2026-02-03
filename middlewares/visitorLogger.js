@@ -58,6 +58,10 @@ module.exports = (req, res, next) => {
 
     res.on("finish", async () => {
       try {
+          if (!req.user) {
+        return;
+          }
+        
         // Fallback to live API if important data missing
         if (!location.city || !location.isp) {
           const liveLocation = await getLocation(ip);
