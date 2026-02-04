@@ -87,47 +87,9 @@
     </div>
 
 
-        <div class="card">
-          <h3>📘 Study Material</h3>
-
-          <% if (material && material.studyMaterialUrl) { %>
-            <a href="<%= material.studyMaterialUrl %>" class="btn btn-download">
-              📥 Download Notes
-            </a>
-          <% } else { %>
-            <p class="muted-text">❌ Not uploaded</p>
-          <% } %>
-        </div>
-
-        <!-- FINAL ANSWER -->
-        <div class="card">
-          <h3>✅ Final Answer</h3>
-
-          <% if (isWeekOver) { %>
-            <% if (material && material.finalAnswerPdfUrl) { %>
-              <a href="<%= material.finalAnswerPdfUrl %>" class="btn btn-download">
-                📥 Download Final PDF
-              </a>
-            <% } else { %>
-              <p class="muted-text">❌ Not uploaded</p>
-            <% } %>
-          <% } else { %>
-            <p class="muted-text">⏳ Available after deadline</p>
-          <% } %>
-        </div>
-
       <% } %>
-      <!-- <div class="card">
-      <h3>📣 Official WhatsApp Group</h3>
-      <p>Important updates, deadlines & final answers yahin milenge.</p>
 
-      <a href="https://chat.whatsapp.com/K2EXp2u1diP863h2HHvXBE"
-        target="_blank">
-        <button class="whatsapp-join-btn btn btn-submit" >💬 Join WhatsApp Group</button>
-      </a>
-    </div> -->
 
-<!-- CONTACT US -->
 <div class="card" style="margin-top:30px;">
   <h3>📞 Contact Us</h3>
   <p class="muted-text">Any issue, doubt or feedback? Send us a message.</p>
