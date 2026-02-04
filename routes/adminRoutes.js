@@ -11,8 +11,8 @@ const isAdmin = require("../middlewares/isAdmin");
 const lastActive = require("../middlewares/lastActive");
 
 const router = express.Router();
+const ContactMessage = require("../models/ContactMessage");
 
-/* ===================== ADMIN DASHBOARD ===================== */
 router.get("/admin", isAdmin, async (req, res) => {
   try {
     const usersCount = await User.countDocuments();
@@ -37,8 +37,6 @@ router.get("/admin", isAdmin, async (req, res) => {
     res.status(500).send("Admin dashboard error");
   }
 });
-
-/* ===================== VISITORS ===================== */
 router.get("/admin/visitors", isAdmin, async (req, res) => {
   try {
     const logs = await VisitorLog.find()
@@ -73,7 +71,6 @@ router.get("/admin/visitors", isAdmin, async (req, res) => {
   }
 });
 
-/* ===================== EXPORT VISITORS ===================== */
 router.get("/admin/export/visitors", isAdmin, async (req, res) => {
   try {
     const logs = await VisitorLog.find()
@@ -191,6 +188,19 @@ router.post("/admin/subjects", isAdmin, async (req, res) => {
 router.post("/admin/subjects/delete/:id", isAdmin, async (req, res) => {
   await Subject.findByIdAndDelete(req.params.id);
   res.redirect("/admin/subjects");
+});
+/* ================= CONTACT MESSAGES ================= */
+router.get("/admin/contact-messages", isAdmin, async (req, res) => {
+  try {
+    const messages = await ContactMessage.find()
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.render("admin/contactMessages", { messages });
+  } catch (err) {
+    console.error(err);
+    res.redirect("/dashboard");
+  }
 });
 
 /* ===================== USERS ===================== */

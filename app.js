@@ -5,6 +5,7 @@ const express = require("express");
 const session = require("express-session");
 const MongoStore = require("connect-mongo").default;
 const passport = require("passport");
+const flash = require("connect-flash");
 const path = require("path");
 
 /* ================= DB ================= */
@@ -14,6 +15,7 @@ const connectDB = require("./utils/db");
 const authRoutes = require("./routes/authRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 
 /* ================= MIDDLEWARES ================= */
 const lastActive = require("./middlewares/lastActive");
@@ -27,7 +29,7 @@ const app = express();
 /* ================= TRUST PROXY ================= */
 app.set("trust proxy", 1);
 
-/* ================= DATABASE CONNECT ================= */
+/* ================= DATABASE ================= */
 connectDB();
 
 /* ================= BODY PARSER ================= */
@@ -37,7 +39,7 @@ app.use(express.json());
 /* ================= STATIC FILES ================= */
 app.use(express.static(path.join(__dirname, "public")));
 
-/* ================= SESSION (🔥 MOST IMPORTANT) ================= */
+/* ================= SESSION ================= */
 app.use(
   session({
     name: "nptel.sid",
@@ -48,29 +50,34 @@ app.use(
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_URI,
       collectionName: "sessions",
-      ttl: 60 * 60 * 24 * 7 // 7 days
+      ttl: 60 * 60 * 24 * 7
     }),
 
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+      maxAge: 1000 * 60 * 60 * 24 * 7
     }
   })
 );
+
+/* ================= FLASH ================= */
+app.use(flash());
 
 /* ================= PASSPORT ================= */
 app.use(passport.initialize());
 app.use(passport.session());
 
-/* ================= GLOBAL USER (EJS) ================= */
+/* ================= GLOBAL VARIABLES ================= */
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
   next();
 });
 
-/* ================= USER ACTIVITY & VISITOR LOG ================= */
+/* ================= USER ACTIVITY ================= */
 app.use(lastActive);
 app.use(visitorLogger);
 
@@ -82,8 +89,9 @@ app.set("views", path.join(__dirname, "views"));
 app.use("/auth", authRoutes);
 app.use(studentRoutes);
 app.use(adminRoutes);
+app.use(contactRoutes);
 
-/* ================= DEFAULT ROUTES ================= */
+/* ================= DEFAULT ================= */
 app.get("/", (req, res) => {
   res.redirect("/dashboard");
 });

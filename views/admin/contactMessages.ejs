@@ -1,0 +1,43 @@
+<%- include("../partials/header") %>
+
+<div class="card">
+  <h2>📩 Student Contact Messages</h2>
+
+  <% if (!messages || messages.length === 0) { %>
+    <p class="muted-text">No messages yet</p>
+  <% } else { %>
+
+    <div class="table-wrapper">
+      <table class="answer-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Message</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% messages.forEach(msg => { %>
+            <tr>
+              <td><%= msg.name %></td>
+              <td><%= msg.email %></td>
+              <td><%= msg.mobile %></td>
+              <td style="max-width:300px;">
+                <%= msg.message %>
+              </td>
+              <td>
+                <%= new Date(msg.createdAt).toLocaleString("en-IN") %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+  <% } %>
+</div>
+
+<%- include("../partials/footer") %>
