@@ -1,16 +1,13 @@
 const User = require("../models/User");
 
-const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes
+const UPDATE_INTERVAL = 2 * 60 * 1000; 
 
 module.exports = async (req, res, next) => {
   try {
-    // ❌ no user
     if (!req.user) return next();
 
-    // ❌ admin browsing admin panel
     if (req.user.role === "admin") return next();
 
-    // ❌ ignore admin routes
     if (req.originalUrl.startsWith("/admin")) return next();
 
     const last = req.user.lastActive
@@ -24,7 +21,7 @@ module.exports = async (req, res, next) => {
         lastActive: new Date()
       });
 
-      req.user.lastActive = new Date(); // keep session in sync
+      req.user.lastActive = new Date(); 
     }
   } catch (err) {
     console.error("lastActive error:", err.message);

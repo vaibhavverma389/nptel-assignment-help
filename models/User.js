@@ -15,7 +15,6 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   },
 
-  // ✅ last active (NO default)
   lastActive: {
     type: Date,
     default: null

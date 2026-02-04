@@ -1,4 +1,4 @@
-// models/WeekMaterial.js
+
 const mongoose = require("mongoose");
 
 const weekMaterialSchema = new mongoose.Schema({

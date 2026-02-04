@@ -6,7 +6,6 @@ const VisitorLogSchema = new mongoose.Schema({
   method: String,
   statusCode: Number,
 
-  // user info
   email: String,
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -15,7 +14,6 @@ const VisitorLogSchema = new mongoose.Schema({
   role: String,
   isAuthenticated: Boolean,
 
-  // network info
   isp: String,    
   rawIsp: String,       
   asn: String,

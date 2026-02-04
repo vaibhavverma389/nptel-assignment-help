@@ -6,7 +6,7 @@ const answerSchema = new mongoose.Schema({
   question: Number,
   option: String,
   user: String,
-  email: String,        // ✅ ADD THIS
+  email: String,        
   createdAt: {
     type: Date,
     default: Date.now

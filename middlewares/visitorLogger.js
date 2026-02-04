@@ -64,8 +64,6 @@ module.exports = (req, res, next) => {
 
     res.on("finish", async () => {
       try {
-        /* ---------- FINAL SAFETY CHECK ---------- */
-        // ❌ Do not save guest OR unauthenticated user
         if (!req.user || !req.user._id) {
           return;
         }
@@ -73,7 +71,6 @@ module.exports = (req, res, next) => {
           return next(); 
         }
 
-        // Fallback to live API if important data missing
         if (!location.city || !location.isp) {
           const liveLocation = await getLocation(ip);
           location = { ...location, ...liveLocation };
@@ -85,13 +82,11 @@ module.exports = (req, res, next) => {
           method: req.method,
           statusCode: res.statusCode,
 
-          // user info
           email: req.user.email,
           userId: req.user._id,
           role: req.user.role,
           isAuthenticated: true,
 
-          // network info
           isp: location.isp || "Unknown",
           rawIsp: location.rawIsp || location.isp || "Unknown",
           asn: location.asn || null,
@@ -99,7 +94,6 @@ module.exports = (req, res, next) => {
           isMobileIP: !!location.mobile,
           proxy: !!location.proxy,
 
-          // location
           location: {
             country: location.country || "Unknown",
             region: location.region || "Unknown",
@@ -107,14 +101,12 @@ module.exports = (req, res, next) => {
             timezone: location.timezone || "Unknown"
           },
 
-          // device info
           device: {
             browser: ua.browser.name || "Unknown",
             os: ua.os.name || "Unknown",
             device: ua.device.type || "desktop"
           },
 
-          // misc
           referrer: req.headers.referer || "Direct",
           responseTime: `${Date.now() - startTime}ms`,
           visitedAt: new Date()
