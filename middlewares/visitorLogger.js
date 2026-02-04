@@ -69,6 +69,9 @@ module.exports = (req, res, next) => {
         if (!req.user || !req.user._id) {
           return;
         }
+        if(req.user.role==="admin"){ 
+          return next(); 
+        }
 
         // Fallback to live API if important data missing
         if (!location.city || !location.isp) {
