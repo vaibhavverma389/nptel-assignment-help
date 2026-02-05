@@ -244,8 +244,16 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
       name: u.name,
       email: u.email,
       role: u.role,
-      date: u.date?.toDateString(),
-      lastActive: u.lastActive?.toDateString()
+      date: u.date? new Date(u.date).toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata"
+          })
+        : "",
+      lastActive: u.lastActive
+        ? new Date(u.lastActive).toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata"
+          })
+        : ""
+
     });
   });
 
