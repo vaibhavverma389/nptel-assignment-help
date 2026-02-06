@@ -1,40 +1,28 @@
 const express = require("express");
-const Answer = require("../models/Answer");
-const Subject = require("../models/Subject");
-const WeekMaterial = require("../models/WeekMaterial");
-const isAuth = require("../middlewares/auth");
-
-const { getWeekInfo } = require("../utils/weekUtils");
-
+const Answer = require("../models/Answer"); 
+const Subject = require("../models/Subject"); 
+const WeekMaterial = require("../models/WeekMaterial"); 
+const isAuth = require("../middlewares/auth"); 
 const router = express.Router();
-
-/* ===================== DASHBOARD ===================== */
 router.get("/dashboard", isAuth, async (req, res) => {
   try {
-    const course = req.query.course;
+    const course = req.query.course || "";
     const week = req.query.week ? Number(req.query.week) : null;
 
     const subjects = await Subject.find().sort({ name: 1 });
 
-    const {
-      currentWeek,
-      week: selectedWeek,
-      lastDate,
-      isWeekOver
-    } = getWeekInfo(week);
-
     let answers = [];
     let material = null;
 
-    if (course) {
+    if (course && week) {
       answers = await Answer.find({
         course,
-        week: selectedWeek
+        week
       }).sort({ question: 1 });
 
       material = await WeekMaterial.findOne({
         subject: course,
-        week: selectedWeek
+        week
       });
     }
 
@@ -42,10 +30,7 @@ router.get("/dashboard", isAuth, async (req, res) => {
       user: req.user,
       subjects,
       course,
-      week: selectedWeek,
-      currentWeek,
-      lastDate,
-      isWeekOver,
+      week,
       answers,
       material
     });
@@ -56,17 +41,14 @@ router.get("/dashboard", isAuth, async (req, res) => {
   }
 });
 
-
-/* ===================== SINGLE SUBMIT ===================== */
 router.get("/submit", isAuth, async (req, res) => {
   try {
     const subjects = await Subject.find().sort({ name: 1 });
-    const { currentWeek } = getWeekInfo();
 
     res.render("student/submit", {
-      subjects,
-      currentWeek
+      subjects
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).send("Server Error");
@@ -77,9 +59,9 @@ router.post("/submit", isAuth, async (req, res) => {
   try {
     const { course, week, question, option } = req.body;
 
-    const { isWeekOver } = getWeekInfo(week);
-    if (isWeekOver) {
-      return res.status(403).send("⛔ Submission deadline over");
+    // basic validation
+    if (week < 1 || week > 12) {
+      return res.status(400).send("Invalid Week");
     }
 
     await Answer.create({
@@ -99,18 +81,12 @@ router.post("/submit", isAuth, async (req, res) => {
   }
 });
 
-/* ===================== BULK SUBMIT (GET) ===================== */
 router.get("/submit-bulk", isAuth, async (req, res) => {
   try {
     const subjects = await Subject.find().sort({ name: 1 });
 
-    const {
-      currentWeek,
-      week: selectedWeek,
-      isWeekOver
-    } = getWeekInfo(req.query.week);
-
     const selectedCourse = req.query.course || "";
+    const selectedWeek = Number(req.query.week) || 1;
 
     let existingAnswers = [];
 
@@ -124,10 +100,8 @@ router.get("/submit-bulk", isAuth, async (req, res) => {
 
     res.render("student/submitBulk", {
       subjects,
-      currentWeek,
-      selectedWeek,
       selectedCourse,
-      isWeekOver,
+      selectedWeek,
       existingAnswers
     });
 
@@ -137,7 +111,6 @@ router.get("/submit-bulk", isAuth, async (req, res) => {
   }
 });
 
-/* ===================== BULK SUBMIT (POST) ===================== */
 router.post("/submit-bulk", isAuth, async (req, res) => {
   try {
     let { course, week, questions, options } = req.body;
@@ -146,18 +119,16 @@ router.post("/submit-bulk", isAuth, async (req, res) => {
       return res.status(400).send("Invalid Data");
     }
 
-    const { isWeekOver } = getWeekInfo(week);
-    if (isWeekOver) {
-      return res.status(403).send("⛔ Submission deadline over");
+    week = Number(week);
+
+    if (week < 1 || week > 12) {
+      return res.status(400).send("Invalid Week");
     }
 
     // ensure arrays
     if (!Array.isArray(questions)) questions = [questions];
     if (!Array.isArray(options)) options = [options];
 
-    week = Number(week);
-
-    // delete old answers
     await Answer.deleteMany({
       email: req.user.email,
       course,

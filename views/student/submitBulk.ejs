@@ -15,24 +15,21 @@
     <% }) %>
   </select>
 
-  <!-- Week -->
-  <% if (currentWeek > 1) { %>
-    <select class="input" name="week" onchange="this.form.submit()">
-      <% for (let i = 1; i <= currentWeek; i++) { %>
-        <option value="<%= i %>" <%= selectedWeek == i ? "selected" : "" %>>
-          Week <%= i %>
-        </option>
-      <% } %>
-    </select>
-  <% } else { %>
-    <input class="input" value="Week <%= currentWeek %>" readonly />
-  <% } %>
+  <!-- Week (MANUAL 1–12, NO AUTO) -->
+  <select class="input" name="week" onchange="this.form.submit()" required>
+    <% for (let i = 1; i <= 12; i++) { %>
+      <option value="<%= i %>" <%= selectedWeek == i ? "selected" : "" %>>
+        Week <%= i %>
+      </option>
+    <% } %>
+  </select>
 
 </form>
 
 <!-- ================= SUBMIT FORM (POST) ================= -->
 <form method="post" action="/submit-bulk" class="card">
 
+  <!-- hidden fields -->
   <input type="hidden" name="course" value="<%= selectedCourse %>">
   <input type="hidden" name="week" value="<%= selectedWeek %>">
 
@@ -74,6 +71,8 @@
         <option value="B" ${selectedOption === "B" ? "selected" : ""}>B</option>
         <option value="C" ${selectedOption === "C" ? "selected" : ""}>C</option>
         <option value="D" ${selectedOption === "D" ? "selected" : ""}>D</option>
+        <option value="True" ${selectedOption === "True" ? "selected" : ""}>T</option>
+        <option value="False" ${selectedOption === "False" ? "selected" : ""}>F</option>        
       </select>
     `;
 
@@ -86,12 +85,13 @@
 
   function removeQuestion() {
     const container = document.getElementById("questions-container");
-    if (questionCount > 0) {
+    if (questionCount > 1) {
       container.removeChild(container.lastElementChild);
       questionCount--;
     }
   }
 
+  // preload existing answers
   if (existingAnswers.length > 0) {
     existingAnswers.forEach(ans => {
       renderQuestion(ans.question, ans.option);

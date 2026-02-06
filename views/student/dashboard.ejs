@@ -43,7 +43,6 @@
           </select>
 
           <select name="week" class="input">
-            <option value="">Current Week (Auto)</option>
             <% for(let i=1;i<=12;i++){ %>
               <option value="<%= i %>" <%= Number(week) === i ? "selected" : "" %>>
                 Week <%= i %>
@@ -70,6 +69,7 @@
               <tr>
                 <th>Question No.</th>
                 <th>Selected Option</th>
+                <!-- <th>Submit By</th> -->
               </tr>
             </thead>
             <tbody>
@@ -77,6 +77,7 @@
                 <tr>
                   <td><%= a.question %></td>
                   <td><b><%= a.option %></b></td>
+                  <!-- <td><b>Vaibhav Verma</b></td> -->
                 </tr>
               <% }) %>
             </tbody>
