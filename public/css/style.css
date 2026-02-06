@@ -507,3 +507,8 @@ select option {
   background: #25d366;
 }
 
+#check-info
+{
+  color: #b8c2cc;   /* soft grey-blue */
+  font-size: 14px;
+}

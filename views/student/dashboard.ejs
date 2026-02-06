@@ -20,12 +20,7 @@
 
       
       </div>
-        <!-- <div class="stats-row">
-          <a href="/submit-bulk" class="stat-box highlight-date dash-card">
-            <h3>Submit Answers</h3>
-            <p>Submit answers for all students</p>
-          </a>
-        </div> -->
+        
 
 
       <div class="card" style="margin-top:30px;">
@@ -60,7 +55,8 @@
       <h3>🧑‍🎓 Answers (Week <%= week || currentWeek %>)</h3>
 
       <% if (!answers || answers.length === 0) { %>
-        <p class="muted-text">No answers yet</p>
+        <p class="muted-text" id="check-info">Yahin aayega, thoda sabr rakho 😂</p>
+
       <% } else { %>
 
         <div class="table-wrapper">
@@ -141,6 +137,8 @@
 </div>
 
     </div>
+
+   
 
 
 
