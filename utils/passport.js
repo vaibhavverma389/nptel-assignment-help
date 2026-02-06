@@ -7,12 +7,10 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-
       callbackURL: "/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-
         const email =
           profile.emails && profile.emails.length > 0
             ? profile.emails[0].value
@@ -22,16 +20,19 @@ passport.use(
           return done(new Error("No email found from Google"), null);
         }
 
+        const photo =
+          profile.photos && profile.photos.length > 0
+            ? profile.photos[0].value
+            : null;
+
         let user = await User.findOne({ email });
 
         if (!user) {
           user = await User.create({
             name: profile.displayName,
             email,
-            role:
-              email === "studentcodercampus@gmail.com"
-                ? "admin"
-                : "student",
+            role: "student",
+            photo, // 👈 Google profile photo
           });
         }
 

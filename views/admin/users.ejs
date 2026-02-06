@@ -11,6 +11,8 @@
     <table class="answers-table">
       <thead>
         <tr>
+          <th>SR no.</th>
+          <th>Img</th>
           <th>Name</th>
           <th>Email</th>
           <th>Role</th>
@@ -18,9 +20,20 @@
           <th>Last Active</th>
         </tr>
       </thead>
+      <% let i=1; %>
       <tbody>
+        
         <% users.forEach(u => { %>
           <tr>
+            <td><%= i++ %></td>
+            <td>
+          <img
+            src="<%= u.photo || '/images/default-avatar.png' %>"
+            alt="User Photo"
+            class="user-pic"
+          />
+        </td>
+
             <td><%= u.name %></td>
             <td><%= u.email %></td>
             <td><%= u.role %></td>
@@ -37,6 +50,7 @@
 
           </tr>
         <% }) %>
+
       </tbody>
     </table>
   </div>

@@ -18,7 +18,12 @@ const userSchema = new mongoose.Schema({
   lastActive: {
     type: Date,
     default: null
-  }
+  },
+  photo: {
+  type: String,
+  default: null,
+}
+
 });
 
 module.exports = mongoose.model("User", userSchema);

@@ -512,3 +512,9 @@ select option {
   color: #b8c2cc;   /* soft grey-blue */
   font-size: 14px;
 }
+.user-pic {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
