@@ -63,6 +63,7 @@
           <table class="answer-table">
             <thead>
               <tr>
+                <th style="width: 150px"></th>
                 <th>Question No.</th>
                 <th>Selected Option</th>
                 <!-- <th>Submit By</th> -->
@@ -71,6 +72,7 @@
             <tbody>
               <% answers.forEach((a, index) => { %>
                 <tr>
+                  <td style="width: 150px">Week <%= week || a.week || currentWeek %></td>
                   <td><%= a.question %></td>
                   <td><b><%= a.option %></b></td>
                   <!-- <td><b>Vaibhav Verma</b></td> -->
