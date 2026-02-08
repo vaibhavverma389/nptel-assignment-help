@@ -1,10 +1,7 @@
 const mongoose = require("mongoose");
 
 const VisitorLogSchema = new mongoose.Schema({
-  ip: {
-    type: String,
-    index: true
-  },
+  ip: String,
   path: String,
   method: String,
   statusCode: Number,
@@ -12,14 +9,13 @@ const VisitorLogSchema = new mongoose.Schema({
   email: String,
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    index: true
+    ref: "User"
   },
   role: String,
   isAuthenticated: Boolean,
 
-  isp: String,
-  rawIsp: String,
+  isp: String,    
+  rawIsp: String,       
   asn: String,
   networkType: {
     type: String,
@@ -35,6 +31,7 @@ const VisitorLogSchema = new mongoose.Schema({
     default: false
   },
 
+  // location
   location: {
     country: String,
     region: String,
@@ -42,36 +39,19 @@ const VisitorLogSchema = new mongoose.Schema({
     timezone: String
   },
 
+  // device
   device: {
-    type: {
-      type: String,
-      default: "desktop"
-    },
-    brand: {
-      type: String,
-      default: "Unknown"
-    },
-    model: {
-      type: String,
-      default: "Unknown"
-    },
-    browser: {
-      type: String,
-      default: "Unknown"
-    },
-    os: {
-      type: String,
-      default: "Unknown"
-    }
+    browser: String,
+    os: String,
+    device: String
   },
 
+  // misc
   referrer: String,
-  responseTime: Number,
-
+  responseTime: String,
   visitedAt: {
     type: Date,
-    default: Date.now,
-    index: true
+    default: Date.now
   }
 });
 
