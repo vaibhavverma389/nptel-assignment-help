@@ -102,9 +102,11 @@ module.exports = (req, res, next) => {
           },
 
           device: {
-            browser: ua.browser.name || "Unknown",
-            os: ua.os.name || "Unknown",
-            device: ua.device.type || "desktop"
+          type: ua.device.type || "desktop",
+          brand: ua.device.vendor || "Unknown",
+          model: ua.device.model || "Unknown",
+          browser: ua.browser.name || "Unknown",
+          os: ua.os.name || "Unknown"
           },
 
           referrer: req.headers.referer || "Direct",

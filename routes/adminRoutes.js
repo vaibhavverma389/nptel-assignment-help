@@ -75,6 +75,7 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
   try {
     const logs = await VisitorLog.find()
       .sort({ visitedAt: -1 })
+      .limit(10000) // safety limit
       .lean();
 
     const workbook = new ExcelJS.Workbook();
@@ -86,10 +87,12 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
       { header: "Role", key: "role", width: 12 },
       { header: "Authenticated", key: "isAuthenticated", width: 14 },
 
-      // device
+      // ✅ device (UPDATED)
+      { header: "Device Type", key: "deviceType", width: 14 },
+      { header: "Brand", key: "brand", width: 14 },
+      { header: "Model", key: "model", width: 20 },
       { header: "Browser", key: "browser", width: 15 },
       { header: "OS", key: "os", width: 15 },
-      { header: "Device Type", key: "device", width: 14 },
 
       // network
       { header: "ISP", key: "isp", width: 18 },
@@ -109,7 +112,7 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
       { header: "Path", key: "path", width: 30 },
       { header: "Method", key: "method", width: 10 },
       { header: "Status", key: "statusCode", width: 10 },
-      { header: "Response Time", key: "responseTime", width: 14 },
+      { header: "Response Time (ms)", key: "responseTime", width: 16 },
 
       // misc
       { header: "Referrer", key: "referrer", width: 30 },
@@ -123,9 +126,12 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
         role: v.role || "guest",
         isAuthenticated: v.isAuthenticated ? "Yes" : "No",
 
+        // ✅ device (UPDATED mapping)
+        deviceType: v.device?.type || "desktop",
+        brand: v.device?.brand || "Unknown",
+        model: v.device?.model || "Unknown",
         browser: v.device?.browser || "Unknown",
         os: v.device?.os || "Unknown",
-        device: v.device?.device || "desktop",
 
         isp: v.isp || "Unknown",
         rawIsp: v.rawIsp || "",
@@ -142,9 +148,9 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
         path: v.path,
         method: v.method,
         statusCode: v.statusCode,
-        responseTime: v.responseTime,
-        referrer: v.referrer || "Direct",
+        responseTime: v.responseTime ?? "",
 
+        referrer: v.referrer || "Direct",
         visitedAt: v.visitedAt
           ? new Date(v.visitedAt).toLocaleString("en-IN", {
               timeZone: "Asia/Kolkata"
@@ -171,6 +177,7 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
     res.status(500).send("Visitor export error");
   }
 });
+
 
 
 /* ===================== SUBJECTS ===================== */
