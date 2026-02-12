@@ -15,7 +15,6 @@ async function getLocation(ip) {
     let rawIsp = data.isp || data.org || "Unknown";
     let ispName = rawIsp;
 
-    // Normalize Indian ISPs
     if (/reliance/i.test(rawIsp)) ispName = "Jio";
     else if (/airtel/i.test(rawIsp)) ispName = "Airtel";
     else if (/vodafone|idea|vi/i.test(rawIsp)) ispName = "VI";
@@ -37,83 +36,79 @@ async function getLocation(ip) {
 }
 
 module.exports = (req, res, next) => {
-  try {
-    const startTime = Date.now();
+  const startTime = Date.now();
 
-    const ip =
-      req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
-      req.socket.remoteAddress;
+  const ip =
+    req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress;
 
-    const path = req.originalUrl;
+  const path = req.originalUrl;
 
-    /* ---------- HARD IGNORE ROUTES ---------- */
-    const IGNORE_PATHS = [
-      "/favicon.ico",
-      "/admin"
-    ];
+  const IGNORE_PATHS = ["/favicon.ico", "/admin"];
 
-    if (IGNORE_PATHS.some(p => path.startsWith(p))) {
-      return next();
-    }
-
-    const parser = new UAParser(req.headers["user-agent"]);
-    const ua = parser.getResult();
-
-    let location = geoip.lookup(ip) || {};
-
-    res.on("finish", async () => {
-      try {
-        if(req.user.role==="admin"){ 
-          return next(); 
-        }
-
-        if (!location.city || !location.isp) {
-          const liveLocation = await getLocation(ip);
-          location = { ...location, ...liveLocation };
-        }
-
-        await VisitorLog.create({
-          ip,
-          path,
-          method: req.method,
-          statusCode: res.statusCode,
-
-          email: req.user.email,
-          userId: req.user._id,
-          role: req.user.role,
-          isAuthenticated: true,
-
-          isp: location.isp || "Unknown",
-          rawIsp: location.rawIsp || location.isp || "Unknown",
-          asn: location.asn || null,
-          networkType: location.mobile ? "Mobile Network" : "Broadband",
-          isMobileIP: !!location.mobile,
-          proxy: !!location.proxy,
-
-          location: {
-            country: location.country || "Unknown",
-            region: location.region || "Unknown",
-            city: location.city || "Unknown",
-            timezone: location.timezone || "Unknown"
-          },
-
-          device: {
-            browser: ua.browser.name || "Unknown",
-            os: ua.os.name || "Unknown",
-            device: ua.device.type || "desktop"
-          },
-
-          referrer: req.headers.referer || "Direct",
-          responseTime: `${Date.now() - startTime}ms`,
-          visitedAt: new Date()
-        });
-      } catch (err) {
-        console.error("Visitor DB error:", err.message);
-      }
-    });
-  } catch (err) {
-    console.error("Visitor log error:", err.message);
+  if (IGNORE_PATHS.some(p => path.startsWith(p))) {
+    return next();
   }
+
+  const parser = new UAParser(req.headers["user-agent"]);
+  const ua = parser.getResult();
+
+  let location = geoip.lookup(ip) || {};
+
+  res.on("finish", async () => {
+    try {
+      const isAuthenticated = !!req.user;
+
+      // Skip admin logs (optional)
+      if (isAuthenticated && req.user.role === "admin") {
+        return;
+      }
+
+      if (!location.city || !location.isp) {
+        const liveLocation = await getLocation(ip);
+        location = { ...location, ...liveLocation };
+      }
+
+      await VisitorLog.create({
+        ip,
+        path,
+        method: req.method,
+        statusCode: res.statusCode,
+
+        email: isAuthenticated ? req.user.email : null,
+        userId: isAuthenticated ? req.user._id : null,
+        role: isAuthenticated ? req.user.role : "guest",
+        isAuthenticated,
+
+        isp: location.isp || "Unknown",
+        rawIsp: location.rawIsp || location.isp || "Unknown",
+        asn: location.asn || null,
+        networkType: location.mobile ? "Mobile Network" : "Broadband",
+        isMobileIP: !!location.mobile,
+        proxy: !!location.proxy,
+
+        location: {
+          country: location.country || "Unknown",
+          region: location.region || "Unknown",
+          city: location.city || "Unknown",
+          timezone: location.timezone || "Unknown"
+        },
+
+        device: {
+          browser: ua.browser.name || "Unknown",
+          os: ua.os.name || "Unknown",
+          device: ua.device.type || "desktop"
+        },
+
+        referrer: req.headers.referer || "Direct",
+        responseTime: `${Date.now() - startTime}ms`,
+        visitedAt: new Date()
+      });
+
+    } catch (err) {
+      console.error("Visitor DB error:", err.message);
+    }
+  });
 
   next();
 };
