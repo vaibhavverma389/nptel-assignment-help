@@ -48,7 +48,6 @@ module.exports = (req, res, next) => {
 
     /* ---------- HARD IGNORE ROUTES ---------- */
     const IGNORE_PATHS = [
-      "/auth",
       "/favicon.ico",
       "/admin"
     ];
@@ -64,9 +63,6 @@ module.exports = (req, res, next) => {
 
     res.on("finish", async () => {
       try {
-        if (!req.user || !req.user._id) {
-          return;
-        }
         if(req.user.role==="admin"){ 
           return next(); 
         }
