@@ -81,6 +81,7 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
     const worksheet = workbook.addWorksheet("Visitors");
 
     worksheet.columns = [
+       { header: "S.N.", key: "sn", width: 8 }, 
       { header: "IP Address", key: "ip", width: 18 },
       { header: "Email", key: "email", width: 30 },
       { header: "Role", key: "role", width: 12 },
@@ -116,8 +117,9 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
       { header: "Visited At (IST)", key: "visitedAt", width: 22 }
     ];
 
-    logs.forEach(v => {
+    logs.forEach((v,index)=> {
       worksheet.addRow({
+         sn: index + 1, 
         ip: v.ip,
         email: v.email || "Guest",
         role: v.role || "guest",
