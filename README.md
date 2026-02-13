@@ -30,33 +30,7 @@ This project follows **NPTEL-style weekly assignment logic**.
 
 ---
 
-## 🗓️ Week & Deadline Rules
 
-| Week | Last Date |
-|-----|-----------|
-| Week 1 | 4 Feb 2026 |
-| Week 2 | 4 Feb 2026 |
-| Week 3 | 11 Feb 2026 |
-| Week 4 | 18 Feb 2026 |
-| Next Weeks | +7 days |
-
-### Important Rule
-- **4 Feb (including)** → Week 1
-- **5 Feb onwards** → Week 2
-- After that, every 7 days a new week starts
-
----
-
-## 🧠 Week Logic
-
-All week and deadline logic is centralized in:
-
-utils/weekUtils.js
-
-
-### Functions Used
-- `getWeekInfo(selectedWeek)`
-- `getWeekLastDate(week)`
 
 These functions are used in:
 - Dashboard
@@ -88,14 +62,13 @@ project/
 │
 ├── utils/
 │ ├── db.js
-│ ├── passport.js
-│ └── weekUtils.js
+│ └── passport.js
 │
 ├── models/
 │ ├── User.js
 │ ├── Answer.js
-│ ├── Subject.js
-│ └── WeekMaterial.js
+│ └── Subject.js
+│ 
 │
 ├── middlewares/
 │ ├── auth.js
