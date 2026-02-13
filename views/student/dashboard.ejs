@@ -75,7 +75,15 @@
                   <td style="width: 150px">Week <%= week || a.week || currentWeek %></td>
                   <td><%= a.question %></td>
                   <td><b><%= a.option %></b></td>
-                  <!-- <td><b>Vaibhav Verma</b></td> -->
+                  <!-- <td>
+  <b>
+    <%= a.email && a.email.toLowerCase() === "vaibhavverma6393@gmail.com"
+        ? "Vaibhav Verma"
+        : "Kshtiz Tiwari"
+    %>
+  </b>
+</td> -->
+
                 </tr>
               <% }) %>
             </tbody>
@@ -87,6 +95,24 @@
 
 
       <% } %>
+
+  <!-- <div class="card" style="margin-top:30px;">
+  <h3>🚌 Exam Center Bus Group</h3>
+  <p class="muted-text">
+    Agar aapko exam center jaane ke liye bus chahiye,
+    to neeche WhatsApp group join karein.
+  </p>
+
+  <div style="text-align:center; margin-top:15px;">
+    <a href="https://chat.whatsapp.com/DrWvgM3r48XFmRfmtWmU3p?mode=gi_c"
+       target="_blank"
+       class="btn btn-submit"
+       style="background:#25D366; border:none;">
+       📲 Join WhatsApp Group
+    </a>
+  </div>
+</div> -->
+
 
 
 <div class="card" style="margin-top:30px;">
