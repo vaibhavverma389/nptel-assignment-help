@@ -58,6 +58,11 @@ module.exports = (req, res, next) => {
   res.on("finish", async () => {
     try {
       const isAuthenticated = !!req.user;
+      if (!isAuthenticated) {
+      return;
+    }
+
+      
 
       // Skip admin logs (optional)
       if (isAuthenticated && req.user.role === "admin") {
