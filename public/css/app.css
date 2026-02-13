@@ -1,0 +1,332 @@
+/* =========================================================
+   SMART BUS BOOKING SYSTEM
+   FULL COLORFUL UI – GRADIENT + NEON + GLASS
+   ========================================================= */
+
+/* ===== ROOT COLORS ===== */
+:root {
+  --neon-blue: #00e5ff;
+  --neon-purple: #b983ff;
+  --neon-pink: #ff4ecd;
+  --neon-green: #00e676;
+  --neon-yellow: #ffd93d;
+  --neon-orange: #ff9f1c;
+  --neon-red: #ff5252;
+
+  --grad-main: linear-gradient(135deg, #00e5ff, #b983ff, #ff4ecd);
+  --grad-success: linear-gradient(135deg, #00e676, #6effb7);
+  --grad-danger: linear-gradient(135deg, #ff5252, #ff1744);
+  --grad-warning: linear-gradient(135deg, #ffd93d, #ff9f1c);
+  --grad-blue: linear-gradient(135deg, #4facfe, #00c6ff);
+
+  --glass-bg: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.25);
+}
+
+/* ===== BODY ===== */
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 10% 20%, #ff4ecd33, transparent 40%),
+    radial-gradient(circle at 90% 30%, #00e5ff33, transparent 40%),
+    radial-gradient(circle at 50% 90%, #00e67633, transparent 40%),
+    linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #ffffff;
+}
+
+/* ===== CONTAINER ===== */
+.container {
+  width: 92%;
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* ===== HEADER ===== */
+.header {
+  background: var(--glass-bg);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 18px 0;
+}
+
+.header-flex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  background: var(--grad-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ===== NAV ===== */
+.nav-links {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  text-decoration: none;
+  font-weight: 600;
+  color: #e0f7ff;
+  position: relative;
+}
+
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: var(--grad-main);
+  transition: 0.3s;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+/* ===== USER CHIP ===== */
+.user-chip {
+  padding: 6px 14px;
+  border-radius: 30px;
+  background: var(--grad-blue);
+  color: #002233;
+  font-weight: 600;
+}
+
+/* ===== PAGE TITLE ===== */
+.page-title {
+  margin: 35px 0 20px;
+  font-size: 34px;
+  font-weight: 900;
+  text-align: center;
+  background: linear-gradient(90deg,
+    #00e5ff,
+    #b983ff,
+    #ff4ecd,
+    #00e676,
+    #ffd93d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ===== CARDS ===== */
+.card,
+.welcome-card,
+.stat-box,
+.dash-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border-radius: 22px;
+  padding: 26px;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  margin-bottom: 25px;
+}
+
+/* ===== FORM ===== */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.input,
+.select {
+  padding: 15px;
+  border-radius: 14px;
+  border: 1px solid var(--glass-border);
+  background: rgba(0,0,0,0.25);
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.input::placeholder {
+  color: #bcd9e6;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 0 2px #00e5ff55;
+}
+
+/* ===== QUESTION ROW ===== */
+.question-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffffff10, #ffffff05);
+}
+
+.q-label {
+  font-weight: 700;
+  color: var(--neon-yellow);
+}
+
+/* ===== BUTTONS ===== */
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn {
+  padding: 14px 28px;
+  border-radius: 40px;
+  font-weight: 800;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.btn-submit {
+  background: var(--grad-main);
+  color: #002233;
+}
+
+.btn-add {
+  background: var(--grad-success);
+  color: #00331a;
+}
+
+.btn-remove {
+  background: var(--grad-danger);
+  color: #ffffff;
+}
+
+.btn-download {
+  background: var(--grad-blue);
+  color: #002233;
+}
+
+.btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+}
+
+/* ===== DASHBOARD ===== */
+.dashboard-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.dash-card:nth-child(1) {
+  background: linear-gradient(135deg, #00e5ff33, #ffffff10);
+}
+.dash-card:nth-child(2) {
+  background: linear-gradient(135deg, #ff4ecd33, #ffffff10);
+}
+.dash-card:nth-child(3) {
+  background: linear-gradient(135deg, #00e67633, #ffffff10);
+}
+.dash-card:nth-child(4) {
+  background: linear-gradient(135deg, #ffd93d33, #ffffff10);
+}
+
+.dash-card:hover {
+  transform: translateY(-8px);
+}
+
+/* ===== STATS ===== */
+.stats-row {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.stat-box p {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.highlight-week {
+  border-left: 6px solid var(--neon-blue);
+}
+.highlight-date {
+  border-left: 6px solid var(--neon-red);
+}
+
+/* ===== TABLE ===== */
+.answers-table {
+  width: 100%;
+  min-width: 500px;
+  border-collapse: collapse;
+}
+
+.answers-table th {
+  padding: 14px;
+  background: var(--grad-main);
+  color: #002233;
+}
+
+.answers-table td {
+  padding: 12px;
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid #ffffff22;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  margin-top: 50px;
+  padding: 24px;
+  text-align: center;
+  background: var(--glass-bg);
+  border-top: 1px solid var(--glass-border);
+  font-size: 13px;
+}
+
+/* ===== WHATSAPP ===== */
+.whatsapp-join-btn {
+  background: linear-gradient(135deg, #25d366, #6effb7);
+  color: #00331a;
+}
+
+/* ===== USER PIC ===== */
+.user-pic {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid var(--neon-blue);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (min-width: 768px) {
+  .header-flex {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .btn-group {
+    flex-direction: row;
+  }
+
+  .dashboard-actions {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+
+  .stats-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .stat-box {
+    flex: 1;
+    min-width: 240px;
+  }
+}
