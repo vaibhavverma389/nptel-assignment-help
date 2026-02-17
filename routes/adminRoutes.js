@@ -73,80 +73,40 @@ router.get("/admin/visitors", isAdmin, async (req, res) => {
 
 router.get("/admin/export/visitors", isAdmin, async (req, res) => {
   try {
+    // Optional limit (avoid huge export crash)
+    const limit = 5000;
+
     const logs = await VisitorLog.find()
+      .select("ip email role path method statusCode responseTime visitedAt")
       .sort({ visitedAt: -1 })
+      .limit(limit)
       .lean();
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Visitors");
 
     worksheet.columns = [
-       { header: "S.N.", key: "sn", width: 8 }, 
+      { header: "S.N.", key: "sn", width: 8 },
       { header: "IP Address", key: "ip", width: 18 },
       { header: "Email", key: "email", width: 30 },
       { header: "Role", key: "role", width: 12 },
-      { header: "Authenticated", key: "isAuthenticated", width: 14 },
-
-      // device
-      { header: "Browser", key: "browser", width: 15 },
-      { header: "OS", key: "os", width: 15 },
-      { header: "Device Type", key: "device", width: 14 },
-
-      // network
-      { header: "ISP", key: "isp", width: 18 },
-      { header: "Raw ISP", key: "rawIsp", width: 30 },
-      { header: "ASN", key: "asn", width: 18 },
-      { header: "Network Type", key: "networkType", width: 16 },
-      { header: "Mobile IP (CGNAT)", key: "isMobileIP", width: 18 },
-      { header: "Proxy / VPN", key: "proxy", width: 14 },
-
-      // location
-      { header: "Country", key: "country", width: 14 },
-      { header: "Region", key: "region", width: 14 },
-      { header: "City", key: "city", width: 14 },
-      { header: "Timezone", key: "timezone", width: 16 },
-
-      // request
       { header: "Path", key: "path", width: 30 },
       { header: "Method", key: "method", width: 10 },
       { header: "Status", key: "statusCode", width: 10 },
-      { header: "Response Time", key: "responseTime", width: 14 },
-
-      // misc
-      { header: "Referrer", key: "referrer", width: 30 },
+      { header: "Response Time (ms)", key: "responseTime", width: 18 },
       { header: "Visited At (IST)", key: "visitedAt", width: 22 }
     ];
 
-    logs.forEach((v,index)=> {
+    logs.forEach((v, index) => {
       worksheet.addRow({
-         sn: index + 1, 
+        sn: index + 1,
         ip: v.ip,
         email: v.email || "Guest",
-        role: v.role || "guest",
-        isAuthenticated: v.isAuthenticated ? "Yes" : "No",
-
-        browser: v.device?.browser || "Unknown",
-        os: v.device?.os || "Unknown",
-        device: v.device?.device || "desktop",
-
-        isp: v.isp || "Unknown",
-        rawIsp: v.rawIsp || "",
-        asn: v.asn || "",
-        networkType: v.networkType || "Broadband",
-        isMobileIP: v.isMobileIP ? "Yes" : "No",
-        proxy: v.proxy ? "Yes" : "No",
-
-        country: v.location?.country || "Unknown",
-        region: v.location?.region || "Unknown",
-        city: v.location?.city || "Unknown",
-        timezone: v.location?.timezone || "Unknown",
-
+        role: v.role || "user",
         path: v.path,
         method: v.method,
         statusCode: v.statusCode,
         responseTime: v.responseTime,
-        referrer: v.referrer || "Direct",
-
         visitedAt: v.visitedAt
           ? new Date(v.visitedAt).toLocaleString("en-IN", {
               timeZone: "Asia/Kolkata"
@@ -163,17 +123,17 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
     );
     res.setHeader(
       "Content-Disposition",
-      "attachment; filename=visitors.xlsx"
+      "attachment; filename=visitor.xlsx"
     );
 
     await workbook.xlsx.write(res);
     res.end();
+
   } catch (err) {
     console.error("Visitor export error:", err);
     res.status(500).send("Visitor export error");
   }
 });
-
 
 
 /* ===================== SUBJECTS ===================== */
