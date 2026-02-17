@@ -10,7 +10,7 @@
           <th>Email</th>
           <th>IP</th>
           <th>Path</th>
-          <th>Response Time (ms)</th>
+          <th>Response</th>
           <th>Time</th>
         </tr>
       </thead>
@@ -30,8 +30,8 @@
 
             <!-- Path -->
             <td title="<%= v.path %>">
-              <%= v.path && v.path.length > 40
-                ? v.path.substring(0, 40) + "..."
+              <%= v.path && v.path.length > 20
+                ? v.path.substring(0, 20) + "..."
                 : v.path %>
             </td>
             <!-- responce time -->
