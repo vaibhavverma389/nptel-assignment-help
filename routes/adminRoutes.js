@@ -15,28 +15,56 @@ const ContactMessage = require("../models/ContactMessage");
 
 router.get("/admin", isAdmin, async (req, res) => {
   try {
+    const now = new Date();
+    const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    // Basic counts
     const usersCount = await User.countDocuments();
     const answersCount = await Answer.countDocuments();
 
     const loggedInUsers = await VisitorLog.countDocuments({
-      isAuthenticated: true
+      role: { $ne: "admin" }
     });
 
-    const guests = await VisitorLog.countDocuments({
-      isAuthenticated: false
+    const guests = 0; // since minimal schema me guest logging nahi hai
+
+    // Last 24h logs
+    const logsLast24h = await VisitorLog.countDocuments({
+      visitedAt: { $gte: last24Hours }
     });
+
+    // Last 24h new users
+    const newUsersLast24h = await User.countDocuments({
+      date: { $gte: last24Hours }
+    });
+
+    // Top 5 routes (last 7 days)
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const topRoutes = await VisitorLog.aggregate([
+      { $match: { visitedAt: { $gte: oneWeekAgo } } },
+      { $group: { _id: "$path", total: { $sum: 1 } } },
+      { $sort: { total: -1 } },
+      { $limit: 5 }
+    ]);
 
     res.render("admin/dashboard", {
       usersCount,
       answersCount,
       loggedInUsers,
-      guests
+      guests,
+      logsLast24h,
+      newUsersLast24h,
+      topRoutes
     });
+
   } catch (err) {
     console.error("Admin dashboard error:", err);
     res.status(500).send("Admin dashboard error");
   }
 });
+
 router.get("/admin/visitors", isAdmin, async (req, res) => {
   try {
     const logs = await VisitorLog.find()
@@ -245,7 +273,6 @@ router.get("/admin/materials", isAdmin, async (req, res) => {
 
   res.render("admin/materials", { subjects, materials });
 });
-
 router.post("/admin/materials", isAdmin, async (req, res) => {
   const { subject, week, studyMaterialId, finalAnswerId } = req.body;
 
