@@ -10,8 +10,6 @@
           <th>Email</th>
           <th>IP</th>
           <th>Path</th>
-          <th>Device</th>
-          <th>Location</th>
           <th>Time</th>
         </tr>
       </thead>
@@ -35,20 +33,6 @@
                 ? v.path.substring(0, 40) + "..."
                 : v.path %>
             </td>
-
-            <!-- Device -->
-            <td>
-              <%= v.device?.browser || "Unknown" %> /
-              <%= v.device?.os || "Unknown" %>
-              (<%= v.device?.device || "desktop" %>)
-            </td>
-
-            <!-- Location -->
-            <td>
-              <%= v.location?.city || "Unknown" %>,
-              <%= v.location?.country || "Unknown" %>
-            </td>
-
             <!-- Time -->
             <td>
               <%= v.visitedAt
