@@ -8,7 +8,7 @@ const passport = require("passport");
 const flash = require("connect-flash");
 const path = require("path");
 
-/* ================= DB ================= */
+/* ================= DATABASE ================= */
 const connectDB = require("./utils/db");
 
 /* ================= ROUTES ================= */
@@ -21,7 +21,7 @@ const contactRoutes = require("./routes/contactRoutes");
 const lastActive = require("./middlewares/lastActive");
 const visitorLogger = require("./middlewares/visitorLogger");
 
-/* ================= PASSPORT CONFIG ================= */
+/* ================= PASSPORT ================= */
 require("./utils/passport");
 
 const app = express();
@@ -44,20 +44,21 @@ app.use(
   session({
     name: "nptel.sid",
     secret: process.env.SESSION_SECRET,
+
     resave: false,
     saveUninitialized: false,
 
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_URI,
       collectionName: "sessions",
-      ttl: 60 * 60 * 24 * 7
+      ttl: 60 * 60 * 24 * 7 // 7 days
     }),
 
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 1000 * 60 * 60 * 24 * 30
+      maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
     }
   })
 );
@@ -91,20 +92,34 @@ app.use(studentRoutes);
 app.use(adminRoutes);
 app.use(contactRoutes);
 
-/* ================= DEFAULT ================= */
+/* ================= DEFAULT ROUTES ================= */
+
 app.get("/", (req, res) => {
   res.redirect("/dashboard");
-});
-app.get("/join-bus-group", (req, res) => {
-  res.redirect("https://chat.whatsapp.com/FBkYDFwrqW80q2qC9zSdqC?mode=gi_t");
 });
 
 app.get("/login", (req, res) => {
   res.redirect("/dashboard");
 });
 
+app.get("/join-bus-group", (req, res) => {
+  res.redirect(
+    "https://chat.whatsapp.com/FBkYDFwrqW80q2qC9zSdqC?mode=gi_t"
+  );
+});
+
+/* ================= 404 HANDLER ================= */
+
+app.use((req, res) => {
+  res.status(404).render("404", {
+    title: "Page Not Found"
+  });
+});
+
 /* ================= SERVER ================= */
+
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

@@ -1,67 +1,145 @@
 <%- include("../partials/header") %>
 
 <h2 class="page-title">🛠 Admin Dashboard</h2>
+
 <p class="page-subtitle">
   Manage students, answers, subjects and weekly materials
 </p>
 
 <div class="dashboard-actions">
 
+  <!-- USERS -->
   <a href="/admin/users" class="dash-card">
     <h3>👤 Users</h3>
     <p><strong>Total Users:</strong> <%= usersCount %></p>
+
     <div class="card-actions">
       <span>📋 View all students</span>
     </div>
   </a>
 
+  <!-- EXPORT USERS -->
   <a href="/admin/export/users" class="dash-card">
     <h3>📥 Export Users</h3>
     <p>Download students data (Excel)</p>
   </a>
 
+  <!-- ANSWERS -->
   <a href="/admin/answers" class="dash-card">
     <h3>📝 Answers</h3>
-    <p><strong>Total Answers:</strong> <%= answersCount %></p>
+
+    <p>
+      <strong>Total Answers:</strong>
+      <%= answersCount %>
+    </p>
+
     <div class="card-actions">
       <span>📊 View submissions</span>
     </div>
   </a>
 
-  <!-- Admin Bulk Submit -->
+  <!-- BULK SUBMIT -->
   <a href="/submit-bulk" class="dash-card">
     <h3>📝 Submit Answers</h3>
-    <p>Submit / Update answers (Admin)</p>
+
+    <p>
+      Submit / Update answers (Admin)
+    </p>
   </a>
 
+  <!-- VISITORS -->
   <a href="/admin/visitors" class="dash-card">
     <h3>👁️ Visitors</h3>
-    <p>View IP, Email & Activity</p>
+
+    <p>
+      View IP, Email & Activity
+    </p>
   </a>
 
+  <!-- EXPORT VISITORS -->
   <a href="/admin/export/visitors" class="dash-card">
     <h3>📤 Export Visitors</h3>
-    <p>Export visitors data (Excel)</p>
+
+    <p>
+      Export visitors data (Excel)
+    </p>
   </a>
 
+  <!-- CONTACT MESSAGES -->
   <a href="/admin/contact-messages" class="dash-card">
     <h3>📩 Contact Messages</h3>
-    <p>View all student queries</p>
+
+    <p>
+      View all student queries
+    </p>
   </a>
 
+  <!-- LOGGED IN USERS -->
   <div class="dash-card">
-    <h3>🟢 Logged-in Visitors</h3>
-    <p><%= loggedInUsers %></p>
-  </div>
-<div class="dash-card">
-  <h3>📊 Activity (Last 24h)</h3>
-  <p><strong>Total Logs:</strong> <%= logsLast24h %></p>
-</div>
 
-<div class="dash-card">
-  <h3>🆕 New Users (Last 24h)</h3>
-  <p><strong>Registrations:</strong> <%= newUsersLast24h %></p>
-</div>
+    <h3>🟢 Logged-in Visitors</h3>
+
+    <p>
+      <strong><%= loggedInUsers %></strong>
+    </p>
+
+  </div>
+
+  <!-- ACTIVITY 24H -->
+  <div class="dash-card">
+
+    <h3>📊 Activity (Last 24h)</h3>
+
+    <p>
+      <strong>Total Logs:</strong>
+      <%= logsLast24h %>
+    </p>
+
+  </div>
+
+  <!-- NEW USERS -->
+  <div class="dash-card">
+
+    <h3>🆕 New Users (Last 24h)</h3>
+
+    <p>
+      <strong>Registrations:</strong>
+      <%= newUsersLast24h %>
+    </p>
+
+  </div>
+
+  <!-- TOP ROUTES -->
+  <div class="dash-card">
+
+    <h3>🔥 Top Pages (7 Days)</h3>
+
+    <% if (!topRoutes || topRoutes.length === 0) { %>
+
+      <p>No data available</p>
+
+    <% } else { %>
+
+      <ul>
+
+        <% topRoutes.forEach(route => { %>
+
+          <li>
+            <strong>
+  <%= route._id.length > 30 
+      ? route._id.substring(0, 30) + "..." 
+      : route._id %>
+</strong>
+            — <%= route.total %> visits
+          </li>
+
+        <% }) %>
+
+      </ul>
+
+    <% } %>
+
+  </div>
 
 </div>
 

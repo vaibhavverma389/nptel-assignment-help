@@ -6,19 +6,19 @@ const Answer = require("../models/Answer");
 const Subject = require("../models/Subject");
 const WeekMaterial = require("../models/WeekMaterial");
 const VisitorLog = require("../models/VisitorLog");
+const ContactMessage = require("../models/ContactMessage");
 
 const isAdmin = require("../middlewares/isAdmin");
-const lastActive = require("../middlewares/lastActive");
 
 const router = express.Router();
-const ContactMessage = require("../models/ContactMessage");
+
+/* ===================== ADMIN DASHBOARD ===================== */
 
 router.get("/admin", isAdmin, async (req, res) => {
   try {
     const now = new Date();
     const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-    // Basic counts
     const usersCount = await User.countDocuments();
     const answersCount = await Answer.countDocuments();
 
@@ -26,19 +26,16 @@ router.get("/admin", isAdmin, async (req, res) => {
       role: { $ne: "admin" }
     });
 
-    const guests = 0; // since minimal schema me guest logging nahi hai
+    const guests = 0;
 
-    // Last 24h logs
     const logsLast24h = await VisitorLog.countDocuments({
       visitedAt: { $gte: last24Hours }
     });
 
-    // Last 24h new users
     const newUsersLast24h = await User.countDocuments({
       date: { $gte: last24Hours }
     });
 
-    // Top 5 routes (last 7 days)
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
@@ -65,6 +62,8 @@ router.get("/admin", isAdmin, async (req, res) => {
   }
 });
 
+/* ===================== VISITORS ===================== */
+
 router.get("/admin/visitors", isAdmin, async (req, res) => {
   try {
     const logs = await VisitorLog.find()
@@ -73,12 +72,10 @@ router.get("/admin/visitors", isAdmin, async (req, res) => {
       .lean();
 
     const loggedInUsers = await VisitorLog.countDocuments({
-      isAuthenticated: true
+      role: { $ne: "admin" }
     });
 
-    const guests = await VisitorLog.countDocuments({
-      isAuthenticated: false
-    });
+    const guests = 0;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -93,11 +90,14 @@ router.get("/admin/visitors", isAdmin, async (req, res) => {
       guests,
       todayVisits
     });
+
   } catch (err) {
     console.error("Visitor list error:", err);
     res.status(500).send("Visitor list error");
   }
 });
+
+/* ===================== EXPORT VISITORS ===================== */
 
 router.get("/admin/export/visitors", isAdmin, async (req, res) => {
   try {
@@ -130,7 +130,6 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
         method: v.method,
         statusCode: v.statusCode,
         responseTime: v.responseTime,
-
         visitedAt: v.visitedAt
           ? new Date(v.visitedAt).toLocaleString("en-IN", {
               timeZone: "Asia/Kolkata"
@@ -153,12 +152,15 @@ router.get("/admin/export/visitors", isAdmin, async (req, res) => {
 
     await workbook.xlsx.write(res);
     res.end();
+
   } catch (err) {
     console.error("Visitor export error:", err);
     res.status(500).send("Visitor export error");
   }
 });
+
 /* ===================== SUBJECTS ===================== */
+
 router.get("/admin/subjects", isAdmin, async (req, res) => {
   const subjects = await Subject.find().sort({ name: 1 });
   res.render("admin/subjects", { subjects });
@@ -166,7 +168,9 @@ router.get("/admin/subjects", isAdmin, async (req, res) => {
 
 router.post("/admin/subjects", isAdmin, async (req, res) => {
   if (!req.body.name) return res.redirect("/admin/subjects");
+
   await Subject.create({ name: req.body.name });
+
   res.redirect("/admin/subjects");
 });
 
@@ -174,7 +178,9 @@ router.post("/admin/subjects/delete/:id", isAdmin, async (req, res) => {
   await Subject.findByIdAndDelete(req.params.id);
   res.redirect("/admin/subjects");
 });
+
 /* ================= CONTACT MESSAGES ================= */
+
 router.get("/admin/contact-messages", isAdmin, async (req, res) => {
   try {
     const messages = await ContactMessage.find()
@@ -182,6 +188,7 @@ router.get("/admin/contact-messages", isAdmin, async (req, res) => {
       .lean();
 
     res.render("admin/contactMessages", { messages });
+
   } catch (err) {
     console.error(err);
     res.redirect("/dashboard");
@@ -189,18 +196,21 @@ router.get("/admin/contact-messages", isAdmin, async (req, res) => {
 });
 
 /* ===================== USERS ===================== */
+
 router.get("/admin/users", isAdmin, async (req, res) => {
   const users = await User.find();
   res.render("admin/users", { users });
 });
 
 /* ===================== ANSWERS ===================== */
+
 router.get("/admin/answers", isAdmin, async (req, res) => {
   const answers = await Answer.find().sort({
     course: 1,
     week: 1,
     question: 1
   });
+
   res.render("admin/answers", { answers });
 });
 
@@ -210,6 +220,7 @@ router.post("/admin/answers/delete/:id", isAdmin, async (req, res) => {
 });
 
 /* ===================== EXPORT USERS ===================== */
+
 router.get("/admin/export/users", isAdmin, async (req, res) => {
   const users = await User.find({ role: "student" });
 
@@ -229,7 +240,8 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
       name: u.name,
       email: u.email,
       role: u.role,
-      date: u.date? new Date(u.date).toLocaleString("en-IN", {
+      date: u.date
+        ? new Date(u.date).toLocaleString("en-IN", {
             timeZone: "Asia/Kolkata"
           })
         : "",
@@ -238,7 +250,6 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
             timeZone: "Asia/Kolkata"
           })
         : ""
-
     });
   });
 
@@ -248,6 +259,7 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
     "Content-Type",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
   );
+
   res.setHeader(
     "Content-Disposition",
     "attachment; filename=students.xlsx"
@@ -258,8 +270,10 @@ router.get("/admin/export/users", isAdmin, async (req, res) => {
 });
 
 /* ===================== MATERIALS ===================== */
+
 router.get("/admin/materials", isAdmin, async (req, res) => {
   const subjects = await Subject.find().sort({ name: 1 });
+
   const materials = await WeekMaterial.find().sort({
     subject: 1,
     week: 1
@@ -267,6 +281,7 @@ router.get("/admin/materials", isAdmin, async (req, res) => {
 
   res.render("admin/materials", { subjects, materials });
 });
+
 router.post("/admin/materials", isAdmin, async (req, res) => {
   const { subject, week, studyMaterialId, finalAnswerId } = req.body;
 
