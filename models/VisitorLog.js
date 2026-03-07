@@ -1,36 +1,58 @@
 const mongoose = require("mongoose");
 
 const VisitorLogSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    index: true
-  },
-
-  email: {
-    type: String,
-    index: true
-  },
-
-  role: String,
-
   ip: String,
-  path: {
-    type: String,
-    index: true
-  },
-
+  path: String,
   method: String,
   statusCode: Number,
 
-  responseTime: Number,
+  email: String,
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  },
+  role: String,
+  isAuthenticated: Boolean,
 
+  isp: String,    
+  rawIsp: String,       
+  asn: String,
+  networkType: {
+    type: String,
+    enum: ["Mobile Network", "Broadband"],
+    default: "Broadband"
+  },
+  isMobileIP: {
+    type: Boolean,
+    default: false
+  },
+  proxy: {
+    type: Boolean,
+    default: false
+  },
+
+  // location
+  location: {
+    country: String,
+    region: String,
+    city: String,
+    timezone: String
+  },
+
+  // device
+  device: {
+    browser: String,
+    os: String,
+    device: String
+  },
+
+  // misc
+  referrer: String,
+  responseTime: String,
   visitedAt: {
     type: Date,
-    default: Date.now,
-    index: true
+    default: Date.now
   }
-
-}, { versionKey: false });
+});
 
 module.exports = mongoose.model("VisitorLog", VisitorLogSchema);
