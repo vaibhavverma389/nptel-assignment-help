@@ -1,57 +1,82 @@
 <%- include("../partials/header") %>
 
 <div class="card">
+
   <h2 style="margin-bottom:10px;">Visitor Logs</h2>
 
   <div class="table-wrapper">
+
     <table class="answers-table">
+
       <thead>
         <tr>
           <th>Email</th>
           <th>IP</th>
           <th>Path</th>
-          <th>Response</th>
+          <th>Response Time</th>
           <th>Time</th>
         </tr>
       </thead>
 
       <tbody>
-        <% logs.forEach(v => { %>
+
+        <% if (!logs || logs.length === 0) { %>
+
           <tr>
-            <!-- Email -->
-            <td>
-              <%= v.email ? v.email : "Guest" %>
-            </td>
-
-            <!-- IP -->
-            <td>
-              <%= v.ip %>
-            </td>
-
-            <!-- Path -->
-            <td title="<%= v.path %>">
-              <%= v.path && v.path.length > 20
-                ? v.path.substring(0, 20) + "..."
-                : v.path %>
-            </td>
-            <!-- responce time -->
-             
-            <td>
-              <%= v.responseTime || 0 %> 
-            </td>
-            <!-- Time -->
-            <td>
-              <%= v.visitedAt
-                ? new Date(v.visitedAt).toLocaleString("en-IN", {
-                    timeZone: "Asia/Kolkata"
-                  })
-                : "" %>
+            <td colspan="5" style="text-align:center;">
+              No visitor logs found
             </td>
           </tr>
-        <% }) %>
+
+        <% } else { %>
+
+          <% logs.forEach(v => { %>
+
+            <tr>
+
+              <!-- Email -->
+              <td>
+                <%= v.email || "Guest" %>
+              </td>
+
+              <!-- IP -->
+              <td>
+                <%= v.ip %>
+              </td>
+
+              <!-- Path -->
+              <td title="<%= v.path %>">
+                <%= v.path && v.path.length > 30
+                  ? v.path.slice(0, 30) + "..."
+                  : v.path %>
+              </td>
+
+              <!-- Response Time -->
+              <td>
+                <%= v.responseTime ? v.responseTime + " ms" : "0 ms" %>
+              </td>
+
+              <!-- Time -->
+              <td>
+                <%= v.visitedAt
+                  ? new Date(v.visitedAt).toLocaleString("en-IN", {
+                      timeZone: "Asia/Kolkata"
+                    })
+                  : "" %>
+              </td>
+
+            </tr>
+
+          <% }) %>
+
+        <% } %>
+
       </tbody>
+
     </table>
+
   </div>
+
 </div>
 
 <%- include("../partials/footer") %>
