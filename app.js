@@ -95,6 +95,9 @@ app.use(contactRoutes);
 app.get("/", (req, res) => {
   res.redirect("/dashboard");
 });
+app.get("/join-bus-group", (req, res) => {
+  res.redirect("https://chat.whatsapp.com/FBkYDFwrqW80q2qC9zSdqC?mode=gi_t");
+});
 
 app.get("/login", (req, res) => {
   res.redirect("/dashboard");
