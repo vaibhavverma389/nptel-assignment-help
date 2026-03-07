@@ -5,24 +5,21 @@ module.exports = (req, res, next) => {
 
   const ip =
     req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
-    req.socket.remoteAddress ||
-    "Unknown";
+    req.socket.remoteAddress;
 
   const path = req.originalUrl;
 
-  // Skip static files
-  if (/\.(css|js|png|jpg|jpeg|gif|svg|ico)$/.test(path)) {
+  const IGNORE_PATHS = ["/favicon.ico", "/admin"];
+
+  if (IGNORE_PATHS.some(p => path.startsWith(p))) {
     return next();
   }
 
   res.on("finish", () => {
     setImmediate(() => {
       try {
-        // Only logged-in users
-        if (!req.user) return;
-
-        // Skip admin
-        if (req.user.role === "admin") return;
+        if (!req.user) return; // only logged in users
+        if (req.user.role === "admin") return; // skip admin
 
         VisitorLog.create({
           userId: req.user._id,
