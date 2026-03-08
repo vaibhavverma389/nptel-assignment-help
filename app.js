@@ -144,9 +144,15 @@ app.use((req, res) => {
 
 /* ================= SOCKET SERVER ================= */
 
+/* ================= SOCKET SERVER ================= */
+
 const server = http.createServer(app);
 
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: "*"
+  }
+});
 
 app.set("io", io);
 
@@ -154,20 +160,23 @@ let onlineUsers = 0;
 
 io.on("connection", (socket) => {
 
+  console.log("User connected:", socket.id);
+
   onlineUsers++;
 
   io.emit("liveUsers", onlineUsers);
 
   socket.on("disconnect", () => {
 
-    onlineUsers--;
+    console.log("User disconnected:", socket.id);
+
+    if (onlineUsers > 0) onlineUsers--;
 
     io.emit("liveUsers", onlineUsers);
 
   });
 
 });
-
 /* ================= SERVER ================= */
 
 const PORT = process.env.PORT || 3000;
