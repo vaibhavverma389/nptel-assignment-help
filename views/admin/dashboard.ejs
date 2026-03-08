@@ -11,7 +11,11 @@
   <!-- USERS -->
   <a href="/admin/users" class="dash-card">
     <h3>👤 Users</h3>
-    <p><strong>Total Users:</strong> <%= usersCount %></p>
+
+    <p>
+      <strong>Total Users:</strong>
+      <%= usersCount %>
+    </p>
 
     <div class="card-actions">
       <span>📋 View all students</span>
@@ -85,6 +89,17 @@
 
   </div>
 
+  <!-- LIVE USERS -->
+  <div class="dash-card">
+
+    <h3>⚡ Live Users</h3>
+
+    <p>
+      <strong id="liveUsers">0</strong>
+    </p>
+
+  </div>
+
   <!-- ACTIVITY 24H -->
   <div class="dash-card">
 
@@ -97,39 +112,34 @@
 
   </div>
 
+  <!-- NEW USERS -->
+  <div class="dash-card">
 
-  <!-- TOP ROUTES -->
-  <!--<div class="dash-card">
+    <h3>🆕 New Users (24h)</h3>
 
-    <h3>🔥 Top Pages (7 Days)</h3>
-
-    <% if (!topRoutes || topRoutes.length === 0) { %>
-
-      <p>No data available</p>
-
-    <% } else { %>
-
-      <ul>
-
-        <% topRoutes.forEach(route => { %>
-
-          <li>
-            <strong>
-  <%= route._id.length > 30 
-      ? route._id.substring(0, 30) + "..." 
-      : route._id %>
-</strong>
-            — <%= route.total %> visits
-          </li>
-
-        <% }) %>
-
-      </ul>
-
-    <% } %>
+    <p>
+      <strong><%= newUsersLast24h %></strong>
+    </p>
 
   </div>
 
-</div> -->
+
+</div>
+
+<!-- SOCKET.IO -->
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+const socket = io();
+
+socket.on("liveUsers", function(count){
+
+  document.getElementById("liveUsers").innerText = count;
+
+});
+
+</script>
 
 <%- include("../partials/footer") %>

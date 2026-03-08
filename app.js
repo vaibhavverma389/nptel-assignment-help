@@ -10,6 +10,8 @@ const path = require("path");
 const helmet = require("helmet");
 const compression = require("compression");
 
+const http = require("http");
+const { Server } = require("socket.io");
 
 /* ================= DATABASE ================= */
 const connectDB = require("./utils/db");
@@ -28,26 +30,36 @@ const visitorLogger = require("./middlewares/visitorLogger");
 require("./utils/passport");
 
 const app = express();
+
+/* ================= SECURITY ================= */
+
 app.use(
   helmet({
     contentSecurityPolicy: false
   })
 );
+
 app.use(compression());
+
 /* ================= TRUST PROXY ================= */
+
 app.set("trust proxy", 1);
 
 /* ================= DATABASE ================= */
+
 connectDB();
 
 /* ================= BODY PARSER ================= */
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 /* ================= STATIC FILES ================= */
+
 app.use(express.static(path.join(__dirname, "public")));
 
 /* ================= SESSION ================= */
+
 app.use(
   session({
     name: "nptel.sid",
@@ -59,26 +71,29 @@ app.use(
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_URI,
       collectionName: "sessions",
-      ttl: 60 * 60 * 24 * 7 // 7 days
+      ttl: 60 * 60 * 24 * 7
     }),
 
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
+      maxAge: 1000 * 60 * 60 * 24 * 30
     }
   })
 );
 
 /* ================= FLASH ================= */
+
 app.use(flash());
 
 /* ================= PASSPORT ================= */
+
 app.use(passport.initialize());
 app.use(passport.session());
 
 /* ================= GLOBAL VARIABLES ================= */
+
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
   res.locals.success = req.flash("success");
@@ -87,14 +102,17 @@ app.use((req, res, next) => {
 });
 
 /* ================= USER ACTIVITY ================= */
+
 app.use(lastActive);
 app.use(visitorLogger);
 
 /* ================= VIEW ENGINE ================= */
+
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 /* ================= ROUTES ================= */
+
 app.use("/auth", authRoutes);
 app.use(studentRoutes);
 app.use(adminRoutes);
@@ -116,7 +134,7 @@ app.get("/join-bus-group", (req, res) => {
   );
 });
 
-/* ================= 404 HANDLER ================= */
+/* ================= 404 ================= */
 
 app.use((req, res) => {
   res.status(404).render("404", {
@@ -124,10 +142,36 @@ app.use((req, res) => {
   });
 });
 
+/* ================= SOCKET SERVER ================= */
+
+const server = http.createServer(app);
+
+const io = new Server(server);
+
+app.set("io", io);
+
+let onlineUsers = 0;
+
+io.on("connection", (socket) => {
+
+  onlineUsers++;
+
+  io.emit("liveUsers", onlineUsers);
+
+  socket.on("disconnect", () => {
+
+    onlineUsers--;
+
+    io.emit("liveUsers", onlineUsers);
+
+  });
+
+});
+
 /* ================= SERVER ================= */
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

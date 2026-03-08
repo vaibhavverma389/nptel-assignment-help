@@ -1,5 +1,4 @@
 const express = require("express");
-const ExcelJS = require("exceljs");
 
 const User = require("../models/User");
 const Answer = require("../models/Answer");
@@ -10,279 +9,268 @@ const ContactMessage = require("../models/ContactMessage");
 
 const isAdmin = require("../middlewares/isAdmin");
 
+const asyncHandler = require("../utils/asyncHandler");
+const exportExcel = require("../utils/exportExcel");
+
 const router = express.Router();
 
 /* ===================== ADMIN DASHBOARD ===================== */
 
-router.get("/admin", isAdmin, async (req, res) => {
-  try {
-    const now = new Date();
-    const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+router.get("/admin", isAdmin, asyncHandler(async (req, res) => {
 
-    const usersCount = await User.countDocuments();
-    const answersCount = await Answer.countDocuments();
+  const now = new Date();
+  const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-    const loggedInUsers = await VisitorLog.countDocuments({
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+  const [
+    usersCount,
+    answersCount,
+    loggedInUsers,
+    logsLast24h,
+    newUsersLast24h,
+    topRoutes
+  ] = await Promise.all([
+
+    User.countDocuments(),
+
+    Answer.countDocuments(),
+
+    VisitorLog.countDocuments({
       role: { $ne: "admin" }
-    });
+    }),
 
-    const guests = 0;
-
-    const logsLast24h = await VisitorLog.countDocuments({
+    VisitorLog.countDocuments({
       visitedAt: { $gte: last24Hours }
-    });
+    }),
 
-    const newUsersLast24h = await User.countDocuments({
+    User.countDocuments({
       date: { $gte: last24Hours }
-    });
+    }),
 
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-    const topRoutes = await VisitorLog.aggregate([
+    VisitorLog.aggregate([
       { $match: { visitedAt: { $gte: oneWeekAgo } } },
       { $group: { _id: "$path", total: { $sum: 1 } } },
       { $sort: { total: -1 } },
       { $limit: 5 }
-    ]);
+    ])
 
-    res.render("admin/dashboard", {
-      usersCount,
-      answersCount,
-      loggedInUsers,
-      guests,
-      logsLast24h,
-      newUsersLast24h,
-      topRoutes
-    });
+  ]);
 
-  } catch (err) {
-    console.error("Admin dashboard error:", err);
-    res.status(500).send("Admin dashboard error");
-  }
-});
+  res.render("admin/dashboard", {
+    usersCount,
+    answersCount,
+    loggedInUsers,
+    guests: 0,
+    logsLast24h,
+    newUsersLast24h,
+    topRoutes
+  });
+
+}));
 
 /* ===================== VISITORS ===================== */
 
-router.get("/admin/visitors", isAdmin, async (req, res) => {
-  try {
-    const logs = await VisitorLog.find()
-      .sort({ visitedAt: -1 })
-      .limit(500)
-      .lean();
+router.get("/admin/visitors", isAdmin, asyncHandler(async (req, res) => {
 
-    const loggedInUsers = await VisitorLog.countDocuments({
+  const logs = await VisitorLog.find()
+    .sort({ visitedAt: -1 })
+    .limit(500)
+    .lean();
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const [loggedInUsers, todayVisits] = await Promise.all([
+
+    VisitorLog.countDocuments({
       role: { $ne: "admin" }
-    });
+    }),
 
-    const guests = 0;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const todayVisits = await VisitorLog.countDocuments({
+    VisitorLog.countDocuments({
       visitedAt: { $gte: today }
-    });
+    })
 
-    res.render("admin/visitors", {
-      logs,
-      loggedInUsers,
-      guests,
-      todayVisits
-    });
+  ]);
 
-  } catch (err) {
-    console.error("Visitor list error:", err);
-    res.status(500).send("Visitor list error");
-  }
-});
+  res.render("admin/visitors", {
+    logs,
+    loggedInUsers,
+    guests: 0,
+    todayVisits
+  });
+
+}));
 
 /* ===================== EXPORT VISITORS ===================== */
 
-router.get("/admin/export/visitors", isAdmin, async (req, res) => {
-  try {
-    const logs = await VisitorLog.find()
-      .sort({ visitedAt: -1 })
-      .lean();
+router.get("/admin/export/visitors", isAdmin, asyncHandler(async (req, res) => {
 
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("Visitors");
+  const logs = await VisitorLog.find()
+    .sort({ visitedAt: -1 })
+    .lean();
 
-    worksheet.columns = [
-      { header: "S.N.", key: "sn", width: 8 },
-      { header: "IP Address", key: "ip", width: 18 },
-      { header: "Email", key: "email", width: 30 },
-      { header: "Role", key: "role", width: 12 },
-      { header: "Path", key: "path", width: 30 },
-      { header: "Method", key: "method", width: 10 },
-      { header: "Status Code", key: "statusCode", width: 12 },
-      { header: "Response Time (ms)", key: "responseTime", width: 18 },
-      { header: "Visited At (IST)", key: "visitedAt", width: 22 }
-    ];
+  const rows = logs.map((v, i) => ({
+    sn: i + 1,
+    ip: v.ip,
+    email: v.email || "Guest",
+    role: v.role || "guest",
+    path: v.path,
+    method: v.method,
+    statusCode: v.statusCode,
+    responseTime: v.responseTime,
+    visitedAt: v.visitedAt
+      ? new Date(v.visitedAt).toLocaleString("en-IN", {
+          timeZone: "Asia/Kolkata"
+        })
+      : ""
+  }));
 
-    logs.forEach((v, index) => {
-      worksheet.addRow({
-        sn: index + 1,
-        ip: v.ip,
-        email: v.email || "Guest",
-        role: v.role || "guest",
-        path: v.path,
-        method: v.method,
-        statusCode: v.statusCode,
-        responseTime: v.responseTime,
-        visitedAt: v.visitedAt
-          ? new Date(v.visitedAt).toLocaleString("en-IN", {
-              timeZone: "Asia/Kolkata"
-            })
-          : ""
-      });
-    });
+  const columns = [
 
-    worksheet.getRow(1).font = { bold: true };
+    { header: "S.N.", key: "sn", width: 8 },
+    { header: "IP Address", key: "ip", width: 18 },
+    { header: "Email", key: "email", width: 30 },
+    { header: "Role", key: "role", width: 12 },
+    { header: "Path", key: "path", width: 30 },
+    { header: "Method", key: "method", width: 10 },
+    { header: "Status Code", key: "statusCode", width: 12 },
+    { header: "Response Time (ms)", key: "responseTime", width: 18 },
+    { header: "Visited At (IST)", key: "visitedAt", width: 22 }
 
-    res.setHeader(
-      "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    );
+  ];
 
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=visitors.xlsx"
-    );
+  await exportExcel(res, "Visitors", columns, rows, "visitors.xlsx");
 
-    await workbook.xlsx.write(res);
-    res.end();
-
-  } catch (err) {
-    console.error("Visitor export error:", err);
-    res.status(500).send("Visitor export error");
-  }
-});
+}));
 
 /* ===================== SUBJECTS ===================== */
 
-router.get("/admin/subjects", isAdmin, async (req, res) => {
-  const subjects = await Subject.find().sort({ name: 1 });
-  res.render("admin/subjects", { subjects });
-});
+router.get("/admin/subjects", isAdmin, asyncHandler(async (req, res) => {
 
-router.post("/admin/subjects", isAdmin, async (req, res) => {
+  const subjects = await Subject.find().sort({ name: 1 }).lean();
+
+  res.render("admin/subjects", { subjects });
+
+}));
+
+router.post("/admin/subjects", isAdmin, asyncHandler(async (req, res) => {
+
   if (!req.body.name) return res.redirect("/admin/subjects");
 
   await Subject.create({ name: req.body.name });
 
   res.redirect("/admin/subjects");
-});
 
-router.post("/admin/subjects/delete/:id", isAdmin, async (req, res) => {
+}));
+
+router.post("/admin/subjects/delete/:id", isAdmin, asyncHandler(async (req, res) => {
+
   await Subject.findByIdAndDelete(req.params.id);
+
   res.redirect("/admin/subjects");
-});
+
+}));
 
 /* ================= CONTACT MESSAGES ================= */
 
-router.get("/admin/contact-messages", isAdmin, async (req, res) => {
-  try {
-    const messages = await ContactMessage.find()
-      .sort({ createdAt: -1 })
-      .lean();
+router.get("/admin/contact-messages", isAdmin, asyncHandler(async (req, res) => {
 
-    res.render("admin/contactMessages", { messages });
+  const messages = await ContactMessage.find()
+    .sort({ createdAt: -1 })
+    .lean();
 
-  } catch (err) {
-    console.error(err);
-    res.redirect("/dashboard");
-  }
-});
+  res.render("admin/contactMessages", { messages });
+
+}));
 
 /* ===================== USERS ===================== */
 
-router.get("/admin/users", isAdmin, async (req, res) => {
-  const users = await User.find();
+router.get("/admin/users", isAdmin, asyncHandler(async (req, res) => {
+
+  const users = await User.find().lean();
+
   res.render("admin/users", { users });
-});
+
+}));
 
 /* ===================== ANSWERS ===================== */
 
-router.get("/admin/answers", isAdmin, async (req, res) => {
-  const answers = await Answer.find().sort({
-    course: 1,
-    week: 1,
-    question: 1
-  });
+router.get("/admin/answers", isAdmin, asyncHandler(async (req, res) => {
+
+  const answers = await Answer.find()
+    .sort({ course: 1, week: 1, question: 1 })
+    .lean();
 
   res.render("admin/answers", { answers });
-});
 
-router.post("/admin/answers/delete/:id", isAdmin, async (req, res) => {
+}));
+
+router.post("/admin/answers/delete/:id", isAdmin, asyncHandler(async (req, res) => {
+
   await Answer.findByIdAndDelete(req.params.id);
+
   res.redirect("/admin/answers");
-});
+
+}));
 
 /* ===================== EXPORT USERS ===================== */
 
-router.get("/admin/export/users", isAdmin, async (req, res) => {
-  const users = await User.find({ role: "student" });
+router.get("/admin/export/users", isAdmin, asyncHandler(async (req, res) => {
 
-  const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet("Students");
+  const users = await User.find({ role: "student" }).lean();
 
-  worksheet.columns = [
+  const rows = users.map(u => ({
+
+    name: u.name,
+    email: u.email,
+    role: u.role,
+
+    date: u.date
+      ? new Date(u.date).toLocaleString("en-IN", {
+          timeZone: "Asia/Kolkata"
+        })
+      : "",
+
+    lastActive: u.lastActive
+      ? new Date(u.lastActive).toLocaleString("en-IN", {
+          timeZone: "Asia/Kolkata"
+        })
+      : ""
+
+  }));
+
+  const columns = [
+
     { header: "Name", key: "name", width: 25 },
     { header: "Email", key: "email", width: 30 },
     { header: "Role", key: "role", width: 15 },
     { header: "Date", key: "date", width: 20 },
     { header: "Last Active", key: "lastActive", width: 20 }
+
   ];
 
-  users.forEach(u => {
-    worksheet.addRow({
-      name: u.name,
-      email: u.email,
-      role: u.role,
-      date: u.date
-        ? new Date(u.date).toLocaleString("en-IN", {
-            timeZone: "Asia/Kolkata"
-          })
-        : "",
-      lastActive: u.lastActive
-        ? new Date(u.lastActive).toLocaleString("en-IN", {
-            timeZone: "Asia/Kolkata"
-          })
-        : ""
-    });
-  });
+  await exportExcel(res, "Students", columns, rows, "students.xlsx");
 
-  worksheet.getRow(1).font = { bold: true };
-
-  res.setHeader(
-    "Content-Type",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-  );
-
-  res.setHeader(
-    "Content-Disposition",
-    "attachment; filename=students.xlsx"
-  );
-
-  await workbook.xlsx.write(res);
-  res.end();
-});
+}));
 
 /* ===================== MATERIALS ===================== */
 
-router.get("/admin/materials", isAdmin, async (req, res) => {
-  const subjects = await Subject.find().sort({ name: 1 });
+router.get("/admin/materials", isAdmin, asyncHandler(async (req, res) => {
 
-  const materials = await WeekMaterial.find().sort({
-    subject: 1,
-    week: 1
-  });
+  const subjects = await Subject.find().sort({ name: 1 }).lean();
+
+  const materials = await WeekMaterial.find()
+    .sort({ subject: 1, week: 1 })
+    .lean();
 
   res.render("admin/materials", { subjects, materials });
-});
 
-router.post("/admin/materials", isAdmin, async (req, res) => {
+}));
+
+router.post("/admin/materials", isAdmin, asyncHandler(async (req, res) => {
+
   const { subject, week, studyMaterialId, finalAnswerId } = req.body;
 
   const studyMaterialUrl = studyMaterialId
@@ -294,17 +282,25 @@ router.post("/admin/materials", isAdmin, async (req, res) => {
     : "";
 
   await WeekMaterial.findOneAndUpdate(
+
     { subject, week },
+
     { subject, week, studyMaterialUrl, finalAnswerPdfUrl },
+
     { upsert: true, new: true }
+
   );
 
   res.redirect("/admin/materials");
-});
 
-router.post("/admin/materials/delete/:id", isAdmin, async (req, res) => {
+}));
+
+router.post("/admin/materials/delete/:id", isAdmin, asyncHandler(async (req, res) => {
+
   await WeekMaterial.findByIdAndDelete(req.params.id);
+
   res.redirect("/admin/materials");
-});
+
+}));
 
 module.exports = router;
