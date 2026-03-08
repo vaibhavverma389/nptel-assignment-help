@@ -7,6 +7,9 @@ const MongoStore = require("connect-mongo").default;
 const passport = require("passport");
 const flash = require("connect-flash");
 const path = require("path");
+const helmet = require("helmet");
+const compression = require("compression");
+
 
 /* ================= DATABASE ================= */
 const connectDB = require("./utils/db");
@@ -25,7 +28,12 @@ const visitorLogger = require("./middlewares/visitorLogger");
 require("./utils/passport");
 
 const app = express();
-
+app.use(
+  helmet({
+    contentSecurityPolicy: false
+  })
+);
+app.use(compression());
 /* ================= TRUST PROXY ================= */
 app.set("trust proxy", 1);
 
