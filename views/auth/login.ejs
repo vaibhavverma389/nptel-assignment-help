@@ -1,16 +1,24 @@
 <%- include("../partials/header") %>
+
 <% if (user) { %>
   <script>
-    window.location.href = "/";
+    const role = "<%= user.role %>";
+
+    if (role === "admin") {
+      window.location.href = "/admin";
+    } else {
+      window.location.href = "/dashboard";
+    }
   </script>
-  <% } %>
-  <div class="card centered-card">
-    <h2>Login</h2>
-    <p>Continue using your Google account</p>
+<% } %>
 
-    <a href="/auth/google" class="google-btn">
-      Continue with Google
-    </a>
-  </div>
+<div class="card centered-card">
+  <h2>Login</h2>
+  <p>Continue using your Google account</p>
 
-  <%- include("../partials/footer") %>
+  <a href="/auth/google" class="google-btn">
+    Continue with Google
+  </a>
+</div>
+
+<%- include("../partials/footer") %>
