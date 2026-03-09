@@ -1,20 +1,31 @@
 <%- include("../partials/header") %>
- if user is already logged in, redirect to home
 
-  <div class="card centered-card">
-    <h2>Register</h2>
-    <p>Create a new account</p>
+<% if (user) { %>
+  <script>
+    const role = "<%= user.role %>";
 
-    <form method="post" action="/register" class="form-row" style="margin-top: 20px;">
-      <input name="name" class="input" placeholder="Name" required />
-      <input name="email" class="input" placeholder="Email" required />
-      <input name="password" class="input" type="password" placeholder="Password" required />
-      <button class="btn btn-submit">Register</button>
-    </form>
+    if (role === "admin") {
+      window.location.href = "/admin";
+    } else {
+      window.location.href = "/dashboard";
+    }
+  </script>
+<% } %>
 
-    <p class="muted-text" style="margin-top: 15px;">
-      Already have an account? <a href="/auth/login" style="color: var(--accent-blue);">Login</a>
-    </p>
-  </div>
+<div class="card centered-card">
+  <h2>Register</h2>
+  <p>Create a new account</p>
 
-  <%- include("../partials/footer") %>
+  <form method="post" action="/register" class="form-row" style="margin-top: 20px;">
+    <input name="name" class="input" placeholder="Name" required />
+    <input name="email" class="input" placeholder="Email" required />
+    <input name="password" class="input" type="password" placeholder="Password" required />
+    <button class="btn btn-submit">Register</button>
+  </form>
+
+  <p class="muted-text" style="margin-top: 15px;">
+    Already have an account? <a href="/auth/login" style="color: var(--accent-blue);">Login</a>
+  </p>
+</div>
+
+<%- include("../partials/footer") %>

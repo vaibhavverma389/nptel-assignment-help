@@ -176,19 +176,8 @@ const week = params.get("week");
 
 if(course && week){
 
-  localStorage.setItem("course", course);
-  localStorage.setItem("week", week);
-
+  // URL clean
   window.history.replaceState({}, "", "/dashboard");
-
-}else{
-
-  const savedCourse = localStorage.getItem("course");
-  const savedWeek = localStorage.getItem("week");
-
-  if(savedCourse && savedWeek){
-    window.location.href = `/dashboard?course=${savedCourse}&week=${savedWeek}`;
-  }
 
 }
 
