@@ -37,6 +37,27 @@ module.exports = (req,res,next)=>{
 
 const startTime = Date.now()
 
+const path = req.originalUrl || ""
+
+const IGNORE_PATHS = [
+"/ping",
+"/favicon.ico",
+"/robots.txt",
+"/manifest.json"
+]
+
+const IGNORE_EXT = [
+".css",".js",".png",".jpg",".jpeg",".gif",".svg",".ico",".map",".woff",".woff2",".ttf"
+]
+
+if(IGNORE_PATHS.some(p => path.startsWith(p))){
+return next()
+}
+
+if(IGNORE_EXT.some(ext => path.endsWith(ext))){
+return next()
+}
+
 let ip =
 req.headers["cf-connecting-ip"] ||
 req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
@@ -50,8 +71,6 @@ if(ip === "::1") ip="127.0.0.1"
 if(ip.startsWith("::ffff:")){
 ip = ip.replace("::ffff:","")
 }
-
-const path = req.originalUrl
 
 res.on("finish",()=>{
 
