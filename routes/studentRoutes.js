@@ -93,6 +93,7 @@ router.get("/submit-bulk", isAuth, async (req, res) => {
     if (selectedCourse) {
       existingAnswers = await Answer.find({
         email: req.user.email,
+        user: req.user.name,
         course: selectedCourse,
         week: selectedWeek
       }).sort({ question: 1 });
@@ -131,12 +132,14 @@ router.post("/submit-bulk", isAuth, async (req, res) => {
 
     await Answer.deleteMany({
       email: req.user.email,
+      user: req.user.name,
       course,
       week
     });
 
     const answerDocs = questions.map((q, i) => ({
       email: req.user.email,
+      user: req.user.name,
       course,
       week,
       question: Number(q),

@@ -13,7 +13,7 @@ const compression = require("compression");
 const http = require("http");
 const { Server } = require("socket.io");
 
-/* ================= DATABASE ================= */
+
 const connectDB = require("./utils/db");
 
 /* ================= ROUTES ================= */
@@ -26,12 +26,10 @@ const contactRoutes = require("./routes/contactRoutes");
 const lastActive = require("./middlewares/lastActive");
 const visitorLogger = require("./middlewares/visitorLogger");
 
-/* ================= PASSPORT ================= */
 require("./utils/passport");
 
 const app = express();
 
-/* ================= SECURITY ================= */
 
 app.use(
   helmet({
@@ -41,24 +39,15 @@ app.use(
 
 app.use(compression());
 
-/* ================= TRUST PROXY ================= */
 
 app.set("trust proxy", 1);
 
-/* ================= DATABASE ================= */
-
 connectDB();
-
-/* ================= BODY PARSER ================= */
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-/* ================= STATIC FILES ================= */
-
 app.use(express.static(path.join(__dirname, "public")));
-
-/* ================= SESSION ================= */
 
 app.use(
   session({
@@ -83,16 +72,10 @@ app.use(
   })
 );
 
-/* ================= FLASH ================= */
-
 app.use(flash());
-
-/* ================= PASSPORT ================= */
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-/* ================= GLOBAL VARIABLES ================= */
 
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
@@ -101,24 +84,16 @@ app.use((req, res, next) => {
   next();
 });
 
-/* ================= USER ACTIVITY ================= */
-
 app.use(lastActive);
 app.use(visitorLogger);
 
-/* ================= VIEW ENGINE ================= */
-
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-
-/* ================= ROUTES ================= */
 
 app.use("/auth", authRoutes);
 app.use(studentRoutes);
 app.use(adminRoutes);
 app.use(contactRoutes);
-
-/* ================= DEFAULT ROUTES ================= */
 
 app.get("/", (req, res) => {
   res.redirect("/dashboard");
@@ -134,17 +109,11 @@ app.get("/join-bus-group", (req, res) => {
   );
 });
 
-/* ================= 404 ================= */
-
 app.use((req, res) => {
   res.status(404).render("404", {
     title: "Page Not Found"
   });
 });
-
-/* ================= SOCKET SERVER ================= */
-
-/* ================= SOCKET SERVER ================= */
 
 const server = http.createServer(app);
 
@@ -168,8 +137,6 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
 
-    // console.log("User disconnected:", socket.id);
-
     if (onlineUsers > 0) onlineUsers--;
 
     io.emit("liveUsers", onlineUsers);
@@ -177,7 +144,6 @@ io.on("connection", (socket) => {
   });
 
 });
-/* ================= SERVER ================= */
 
 const PORT = process.env.PORT || 3000;
 
