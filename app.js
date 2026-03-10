@@ -120,13 +120,13 @@ app.use(contactRoutes);
 
 /* ================= DEFAULT ROUTES ================= */
 
-app.get("/", (req, res) => {
-  res.redirect("/dashboard");
-});
+// app.get("/", (req, res) => {
+//   res.redirect("/dashboard");
+// });
 
-app.get("/login", (req, res) => {
-  res.redirect("/dashboard");
-});
+// app.get("/login", (req, res) => {
+//   res.redirect("/dashboard");
+// });
 
 app.get("/join-bus-group", (req, res) => {
   res.redirect(
@@ -136,11 +136,11 @@ app.get("/join-bus-group", (req, res) => {
 
 /* ================= 404 ================= */
 
-app.use((req, res) => {
-  res.status(404).render("404", {
-    title: "Page Not Found"
-  });
-});
+// app.use((req, res) => {
+//   res.status(404).render("404", {
+//     title: "Page Not Found"
+//   });
+// });
 
 /* ================= SOCKET SERVER ================= */
 
