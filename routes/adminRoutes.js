@@ -107,43 +107,101 @@ router.get("/admin/visitors", isAdmin, asyncHandler(async (req, res) => {
 
 router.get("/admin/export/visitors", isAdmin, asyncHandler(async (req, res) => {
 
-  const logs = await VisitorLog.find()
-    .sort({ visitedAt: -1 })
-    .lean();
+const logs = await VisitorLog.find()
+.sort({ visitedAt: -1 })
+.lean()
 
-  const rows = logs.map((v, i) => ({
-    sn: i + 1,
-    ip: v.ip,
-    email: v.email || "Guest",
-    role: v.role || "guest",
-    path: v.path,
-    method: v.method,
-    statusCode: v.statusCode,
-    responseTime: v.responseTime,
-    visitedAt: v.visitedAt
-      ? new Date(v.visitedAt).toLocaleString("en-IN", {
-          timeZone: "Asia/Kolkata"
-        })
-      : ""
-  }));
+const rows = logs.map((v, i) => ({
 
-  const columns = [
+sn: i + 1,
 
-    { header: "S.N.", key: "sn", width: 8 },
-    { header: "IP Address", key: "ip", width: 18 },
-    { header: "Email", key: "email", width: 30 },
-    { header: "Role", key: "role", width: 12 },
-    { header: "Path", key: "path", width: 30 },
-    { header: "Method", key: "method", width: 10 },
-    { header: "Status Code", key: "statusCode", width: 12 },
-    { header: "Response Time (ms)", key: "responseTime", width: 18 },
-    { header: "Visited At (IST)", key: "visitedAt", width: 22 }
+ip: v.ip,
 
-  ];
+email: v.email || "Guest",
 
-  await exportExcel(res, "Visitors", columns, rows, "visitors.xlsx");
+role: v.role || "guest",
 
-}));
+country: v.country || "",
+
+city: v.city || "",
+
+device: v.device || "",
+
+browser: v.browser || "",
+
+os: v.os || "",
+
+path: v.path,
+
+method: v.method,
+
+statusCode: v.statusCode,
+
+responseTime: v.responseTime,
+
+referer: v.referer || "",
+
+language: v.language || "",
+
+screen: v.screenWidth && v.screenHeight
+? `${v.screenWidth}x${v.screenHeight}`
+: "",
+
+connection: v.connectionType || "",
+
+sessionId: v.sessionId || "",
+
+visitedAt: v.visitedAt
+? new Date(v.visitedAt).toLocaleString("en-IN",{ timeZone:"Asia/Kolkata" })
+: ""
+
+}))
+
+const columns = [
+
+{ header:"S.N.", key:"sn", width:8 },
+
+{ header:"IP Address", key:"ip", width:18 },
+
+{ header:"Email", key:"email", width:28 },
+
+{ header:"Role", key:"role", width:12 },
+
+{ header:"Country", key:"country", width:12 },
+
+{ header:"City", key:"city", width:18 },
+
+{ header:"Device", key:"device", width:12 },
+
+{ header:"Browser", key:"browser", width:14 },
+
+{ header:"OS", key:"os", width:14 },
+
+{ header:"Path", key:"path", width:35 },
+
+{ header:"Method", key:"method", width:10 },
+
+{ header:"Status Code", key:"statusCode", width:12 },
+
+{ header:"Response Time (ms)", key:"responseTime", width:18 },
+
+{ header:"Referer", key:"referer", width:30 },
+
+{ header:"Language", key:"language", width:14 },
+
+{ header:"Screen Size", key:"screen", width:16 },
+
+{ header:"Connection", key:"connection", width:14 },
+
+{ header:"Session ID", key:"sessionId", width:25 },
+
+{ header:"Visited At (IST)", key:"visitedAt", width:22 }
+
+]
+
+await exportExcel(res,"Visitors",columns,rows,"visitors.xlsx")
+
+}))
 
 /* ===================== SUBJECTS ===================== */
 
