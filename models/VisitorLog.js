@@ -1,59 +1,54 @@
-const mongoose = require("mongoose");
+const mongoose = require("mongoose")
 
-const VisitorLogSchema = new mongoose.Schema({
-  ip: String,
-  path: String,
-  method: String,
-  statusCode: Number,
+const visitorLogSchema = new mongoose.Schema({
 
-  email: String,
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
-  },
-  role: String,
+userId: mongoose.Schema.Types.ObjectId,
+email: String,
+role: String,
 
-  responseTime: Number,
+ip: { type: String, index:true },
 
-  isp: String,    
-  rawIsp: String,       
-  asn: String,
-  networkType: {
-    type: String,
-    enum: ["Mobile Network", "Broadband"],
-    default: "Broadband"
-  },
-  isMobileIP: {
-    type: Boolean,
-    default: false
-  },
-  proxy: {
-    type: Boolean,
-    default: false
-  },
+country: String,
+city: String,
+region: String,
+timezone: String,
+lat: Number,
+lon: Number,
 
-  // location
-  location: {
-    country: String,
-    region: String,
-    city: String,
-    timezone: String
-  },
+path: String,
+method: String,
+statusCode: Number,
+protocol: String,
 
-  // device
-  device: {
-    browser: String,
-    os: String,
-    device: String
-  },
+responseTime: Number,
 
-  // misc
-  referrer: String,
-  responseTime: String,
-  visitedAt: {
-    type: Date,
-    default: Date.now
-  }
-});
+device: String,
+browser: String,
+os: String,
 
-module.exports = mongoose.model("VisitorLog", VisitorLogSchema);
+userAgent: String,
+
+referer: String,
+language: String,
+encoding: String,
+
+screenWidth: Number,
+screenHeight: Number,
+viewportWidth: Number,
+viewportHeight: Number,
+
+connectionType: String,
+cpuCores: Number,
+deviceMemory: Number,
+
+sessionId: String,
+
+visitedAt:{
+type:Date,
+default:Date.now,
+index:true
+}
+
+})
+
+module.exports = mongoose.model("VisitorLog",visitorLogSchema)
