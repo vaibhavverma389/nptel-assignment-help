@@ -3,7 +3,7 @@
     <div class="dashboard">
 
       <div class="welcome-card">
-        <h2>Welcome <span><%= user.name %></span></h2>
+        <h2>Welcome <span><%= user ? user.name : "" %></span></h2>
         <p>NPTEL Assignment Dashboard</p>
       </div>
 
@@ -130,7 +130,7 @@
     <input
   type="hidden"
   name="email"
-  value="<%= user.email %>"
+  value=" <%= user ? user.email : " " %>"
 />
 
 
