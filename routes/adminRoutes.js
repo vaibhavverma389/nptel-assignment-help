@@ -66,7 +66,7 @@ router.get("/admin", isAdmin, asyncHandler(async (req, res) => {
     logsLast24h,
     newUsersLast24h,
     topRoutes
-  });
+  });  
 
 }));
 
