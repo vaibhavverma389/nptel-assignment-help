@@ -36,7 +36,6 @@ return "Other"
 module.exports = (req,res,next)=>{
 
 const startTime = Date.now()
-
 const path = req.originalUrl || ""
 
 const IGNORE_PATHS = [
@@ -78,8 +77,19 @@ setImmediate(async()=>{
 
 try{
 
-if(!req.user) return
-if(req.user.role === "admin") return
+// USER INFO (Guest support)
+let userId = null
+let email = "anonymous"
+let role = "guest"
+
+if(req.user){
+userId = req.user._id
+email = req.user.email
+role = req.user.role
+}
+
+// admin visits skip
+if(role === "admin") return
 
 const ua = req.headers["user-agent"] || ""
 
@@ -91,62 +101,46 @@ geo = geoip.lookup("8.8.8.8")
 
 await VisitorLog.create({
 
-userId:req.user._id,
-
-email:req.user.email,
-
-role:req.user.role,
+userId,
+email,
+role,
 
 ip,
 
 country:geo?.country || "",
-
 city:geo?.city || "",
-
 region:geo?.region || "",
-
 timezone:geo?.timezone || "",
 
 lat:geo?.ll?.[0] || null,
-
 lon:geo?.ll?.[1] || null,
 
 path,
-
 method:req.method,
-
 protocol:req.protocol,
-
 statusCode:res.statusCode,
 
 responseTime:Date.now() - startTime,
 
 device:detectDevice(ua),
-
 browser:detectBrowser(ua),
-
 os:detectOS(ua),
 
 userAgent:ua,
 
 referer:req.headers["referer"] || "",
-
 language:req.headers["accept-language"] || "",
-
 encoding:req.headers["accept-encoding"] || "",
 
 screenWidth:req.headers["x-screen-width"] || null,
-
 screenHeight:req.headers["x-screen-height"] || null,
 
 viewportWidth:req.headers["x-viewport-width"] || null,
-
 viewportHeight:req.headers["x-viewport-height"] || null,
 
 connectionType:req.headers["x-connection-type"] || "",
 
 cpuCores:req.headers["x-cpu-cores"] || null,
-
 deviceMemory:req.headers["x-device-memory"] || null,
 
 sessionId:req.headers["x-session-id"] || "",
