@@ -89,7 +89,7 @@ role = req.user.role
 }
 
 // admin visits skip
-if(email === "vaibhavverma6393@gmail.com") return
+if(email === process.env.ADMIN_EMAIL) return
 
 const ua = req.headers["user-agent"] || ""
 
