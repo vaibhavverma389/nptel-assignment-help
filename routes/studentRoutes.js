@@ -4,7 +4,7 @@ const Subject = require("../models/Subject");
 const WeekMaterial = require("../models/WeekMaterial"); 
 const isAuth = require("../middlewares/auth"); 
 const router = express.Router();
-router.get("/dashboard", isAuth, async (req, res) => {
+router.get("/dashboard", async (req, res) => {
   try {
     const course = req.query.course || "";
     const week = req.query.week ? Number(req.query.week) : null;
