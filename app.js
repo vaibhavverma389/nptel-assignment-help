@@ -104,11 +104,11 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/join-bus-nonac", (req, res) => {
-  res.redirect("https://chat.whatsapp.com/FBkYDFwrqW80q2qC9zSdqC");
+  res.redirect(process.env.GROUP_LINKNONAC);
 });
 
 app.get("/join-bus-ac", (req, res) => {
-  res.redirect("https://chat.whatsapp.com/HLVvzD4iC8K3GwOCwwWFtS");
+  res.redirect(process.env.GROUP_LINKAC);
 });
 
 app.use((req, res) => {
