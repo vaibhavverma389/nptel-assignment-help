@@ -103,10 +103,12 @@ app.get("/login", (req, res) => {
   res.redirect("/dashboard");
 });
 
-app.get("/join-bus-group", (req, res) => {
-  res.redirect(
-    "https://chat.whatsapp.com/FBkYDFwrqW80q2qC9zSdqC?mode=gi_t"
-  );
+app.get("/join-bus-nonac", (req, res) => {
+  res.redirect("https://chat.whatsapp.com/FBkYDFwrqW80q2qC9zSdqC");
+});
+
+app.get("/join-bus-ac", (req, res) => {
+  res.redirect("https://chat.whatsapp.com/HLVvzD4iC8K3GwOCwwWFtS");
 });
 
 app.use((req, res) => {
