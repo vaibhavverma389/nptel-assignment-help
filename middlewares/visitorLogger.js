@@ -78,16 +78,13 @@ setImmediate(async()=>{
 try{
 
 // USER INFO (Guest support)
-let userId = null
-let email = "anonymous"
-let role = "guest"
+let userId = req.user._id
+let email = req.user.email
+let role = req.user.role
 
-if(req.user){
-userId = req.user._id
-email = req.user.email
-role = req.user.role
+if(!req.user){
+return;
 }
-
 // admin visits skip
 if(email === process.env.ADMIN_EMAIL) return
 
