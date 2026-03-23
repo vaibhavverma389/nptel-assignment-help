@@ -110,14 +110,10 @@ app.get("/join-bus-nonac", (req, res) => {
 app.get("/join-bus-ac", (req, res) => {
   res.redirect(process.env.GROUP_LINKAC);
 });
-app.get("/404",(req,res)=>{
-res.status(404).render("404", {
-    title: "Page Not Found"
-  });
-})
+
 
 app.use((req, res) => {
-  res.redirect("/404")
+  res.render("404")
   
 });
 
