@@ -1,8 +1,19 @@
 const VisitorLog = require("../models/VisitorLog");
 const axios = require("axios");
+const crypto = require("crypto");
 
 const IPINFO_TOKEN = process.env.IPINFO_TOKEN;
 const IPAPI_URL = "https://ipapi.co";
+
+// ================= CONFIG =================
+const IGNORE_PATHS = ["/ping", "/favicon.ico", "/robots.txt"];
+const IGNORE_EXT = [".css", ".js", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico"];
+
+// Reduce DB load (log only 70% requests)
+const SAMPLE_RATE = 0.7;
+
+// Cache for geo data
+const geoCache = new Map();
 
 // ================= HELPERS =================
 
@@ -36,9 +47,17 @@ function detectOS(ua) {
   return "Other";
 }
 
+function detectBot(ua) {
+  return /bot|crawler|spider|crawling|curl|wget|headless/i.test(ua);
+}
+
+function hashIP(ip) {
+  return crypto.createHash("sha256").update(ip).digest("hex");
+}
+
 // ================= GEO =================
 
-async function getGeoData(ip) {
+async function fetchGeo(ip) {
   try {
     const res = await axios.get(`https://ipinfo.io/${ip}?token=${IPINFO_TOKEN}`);
     const data = res.data;
@@ -76,27 +95,35 @@ async function getGeoData(ip) {
   }
 }
 
+async function getGeoData(ip) {
+  if (geoCache.has(ip)) return geoCache.get(ip);
+
+  const geo = await fetchGeo(ip);
+  geoCache.set(ip, geo);
+
+  return geo;
+}
+
 // ================= MIDDLEWARE =================
 
 module.exports = (req, res, next) => {
   const startTime = Date.now();
   const path = req.originalUrl || "";
 
-  const IGNORE_PATHS = ["/ping", "/favicon.ico", "/robots.txt"];
-  const IGNORE_EXT = [".css",".js",".png",".jpg",".jpeg",".gif",".svg",".ico"];
-
+  // Ignore static and system routes
   if (IGNORE_PATHS.some(p => path.startsWith(p))) return next();
   if (IGNORE_EXT.some(ext => path.endsWith(ext))) return next();
 
-  let ip =
-    req.headers["cf-connecting-ip"] ||
-    req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
-    req.socket.remoteAddress ||
-    req.ip;
+  // Sampling (reduce DB writes)
+  if (Math.random() > SAMPLE_RATE) return next();
 
-  if (!ip) ip = "0.0.0.0";
+  // Correct IP handling (proxy safe)
+  let ip = req.ip || req.connection.remoteAddress || "0.0.0.0";
+
   if (ip === "::1") ip = "127.0.0.1";
   if (ip.startsWith("::ffff:")) ip = ip.replace("::ffff:", "");
+
+  const hashedIP = hashIP(ip);
 
   res.on("finish", () => {
     setImmediate(async () => {
@@ -104,6 +131,8 @@ module.exports = (req, res, next) => {
         if (!req.user) return;
 
         const { _id: userId, email, role } = req.user;
+
+        // Ignore admin
         if (email === process.env.ADMIN_EMAIL) return;
 
         const ua = req.headers["user-agent"] || "";
@@ -115,7 +144,7 @@ module.exports = (req, res, next) => {
           email,
           role,
 
-          ip,
+          ip: hashedIP, // hashed for privacy
 
           country: geo.country || "",
           city: geo.city || "",
@@ -135,7 +164,7 @@ module.exports = (req, res, next) => {
           browser: detectBrowser(ua),
           os: detectOS(ua),
 
-          isBot: /bot|crawler|spider/i.test(ua),
+          isBot: detectBot(ua),
 
           referer: req.headers["referer"] || "",
           language: req.headers["accept-language"] || "",
@@ -144,7 +173,7 @@ module.exports = (req, res, next) => {
         });
 
       } catch (err) {
-        console.log("Visitor log error:", err.message);
+        console.error("Visitor log error:", err);
       }
     });
   });
