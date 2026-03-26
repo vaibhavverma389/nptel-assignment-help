@@ -1,161 +1,153 @@
-const VisitorLog = require("../models/VisitorLog")
-const geoip = require("geoip-lite")
+const VisitorLog = require("../models/VisitorLog");
+const axios = require("axios");
 
-function detectDevice(ua){
-if(!ua) return "Unknown"
+const IPINFO_TOKEN = process.env.IPINFO_TOKEN;
+const IPAPI_URL = "https://ipapi.co";
 
-if(/mobile/i.test(ua)) return "Mobile"
-if(/tablet/i.test(ua)) return "Tablet"
+// ================= HELPERS =================
 
-return "Desktop"
+function detectDevice(ua) {
+  if (!ua) return "Unknown";
+  if (/tablet|ipad/i.test(ua)) return "Tablet";
+  if (/mobile|android|iphone/i.test(ua)) return "Mobile";
+  return "Desktop";
 }
 
-function detectBrowser(ua){
-if(!ua) return "Unknown"
+function detectBrowser(ua) {
+  if (!ua) return "Unknown";
 
-if(ua.includes("Chrome")) return "Chrome"
-if(ua.includes("Firefox")) return "Firefox"
-if(ua.includes("Safari") && !ua.includes("Chrome")) return "Safari"
-if(ua.includes("Edge")) return "Edge"
+  if (ua.includes("Edg")) return "Edge";
+  if (ua.includes("Chrome") && !ua.includes("Edg")) return "Chrome";
+  if (ua.includes("Firefox")) return "Firefox";
+  if (ua.includes("Safari") && !ua.includes("Chrome")) return "Safari";
 
-return "Other"
+  return "Other";
 }
 
-function detectOS(ua){
-if(!ua) return "Unknown"
+function detectOS(ua) {
+  if (!ua) return "Unknown";
 
-if(ua.includes("Windows")) return "Windows"
-if(ua.includes("Android")) return "Android"
-if(ua.includes("iPhone") || ua.includes("iPad")) return "iOS"
-if(ua.includes("Mac")) return "MacOS"
-if(ua.includes("Linux")) return "Linux"
+  if (ua.includes("Windows")) return "Windows";
+  if (ua.includes("Android")) return "Android";
+  if (ua.includes("iPhone") || ua.includes("iPad")) return "iOS";
+  if (ua.includes("Mac")) return "MacOS";
+  if (ua.includes("Linux")) return "Linux";
 
-return "Other"
+  return "Other";
 }
 
-module.exports = (req,res,next)=>{
+// ================= GEO =================
 
-const startTime = Date.now()
-const path = req.originalUrl || ""
+async function getGeoData(ip) {
+  try {
+    const res = await axios.get(`https://ipinfo.io/${ip}?token=${IPINFO_TOKEN}`);
+    const data = res.data;
 
-const IGNORE_PATHS = [
-"/ping",
-"/favicon.ico",
-"/robots.txt",
-"/manifest.json"
-]
+    const [lat, lon] = data.loc ? data.loc.split(",") : [];
 
-const IGNORE_EXT = [
-".css",".js",".png",".jpg",".jpeg",".gif",".svg",".ico",".map",".woff",".woff2",".ttf"
-]
+    return {
+      country: data.country || "",
+      city: data.city || "",
+      region: data.region || "",
+      timezone: data.timezone || "",
+      lat: lat ? Number(lat) : null,
+      lon: lon ? Number(lon) : null,
+      isp: data.org || "",
+    };
 
-if(IGNORE_PATHS.some(p => path.startsWith(p))){
-return next()
+  } catch {
+    try {
+      const res = await axios.get(`${IPAPI_URL}/${ip}/json/`);
+      const data = res.data;
+
+      return {
+        country: data.country || "",
+        city: data.city || "",
+        region: data.region || "",
+        timezone: data.timezone || "",
+        lat: data.latitude || null,
+        lon: data.longitude || null,
+        isp: data.org || "",
+      };
+
+    } catch {
+      return {};
+    }
+  }
 }
 
-if(IGNORE_EXT.some(ext => path.endsWith(ext))){
-return next()
-}
+// ================= MIDDLEWARE =================
 
-let ip =
-req.headers["cf-connecting-ip"] ||
-req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
-req.socket.remoteAddress ||
-req.ip
+module.exports = (req, res, next) => {
+  const startTime = Date.now();
+  const path = req.originalUrl || "";
 
-if(!ip) ip="0.0.0.0"
+  const IGNORE_PATHS = ["/ping", "/favicon.ico", "/robots.txt"];
+  const IGNORE_EXT = [".css",".js",".png",".jpg",".jpeg",".gif",".svg",".ico"];
 
-if(ip === "::1") ip="127.0.0.1"
+  if (IGNORE_PATHS.some(p => path.startsWith(p))) return next();
+  if (IGNORE_EXT.some(ext => path.endsWith(ext))) return next();
 
-if(ip.startsWith("::ffff:")){
-ip = ip.replace("::ffff:","")
-}
+  let ip =
+    req.headers["cf-connecting-ip"] ||
+    req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
+    req.socket.remoteAddress ||
+    req.ip;
 
-res.on("finish",()=>{
+  if (!ip) ip = "0.0.0.0";
+  if (ip === "::1") ip = "127.0.0.1";
+  if (ip.startsWith("::ffff:")) ip = ip.replace("::ffff:", "");
 
-setImmediate(async()=>{
+  res.on("finish", () => {
+    setImmediate(async () => {
+      try {
+        if (!req.user) return;
 
-try{
+        const { _id: userId, email, role } = req.user;
+        if (email === process.env.ADMIN_EMAIL) return;
 
-// USER INFO (Guest support)
-let userId = req.user._id
-let email = req.user.email
-let role = req.user.role
+        const ua = req.headers["user-agent"] || "";
 
-if(!req.user){
-return;
-}
-// admin visits skip
-if(email === process.env.ADMIN_EMAIL) return
+        const geo = await getGeoData(ip);
 
-const ua = req.headers["user-agent"] || ""
+        await VisitorLog.create({
+          userId,
+          email,
+          role,
 
-let geo = geoip.lookup(ip)
+          ip,
 
-if(!geo && ip === "127.0.0.1"){
-geo = geoip.lookup("8.8.8.8")
-}
+          country: geo.country || "",
+          city: geo.city || "",
+          region: geo.region || "",
+          timezone: geo.timezone || "",
+          lat: geo.lat,
+          lon: geo.lon,
+          isp: geo.isp || "",
 
-await VisitorLog.create({
+          path,
+          method: req.method,
+          statusCode: res.statusCode,
 
-userId,
-email,
-role,
+          responseTime: Date.now() - startTime,
 
-ip,
+          device: detectDevice(ua),
+          browser: detectBrowser(ua),
+          os: detectOS(ua),
 
-country:geo?.country || "",
-city:geo?.city || "",
-region:geo?.region || "",
-timezone:geo?.timezone || "",
+          isBot: /bot|crawler|spider/i.test(ua),
 
-lat:geo?.ll?.[0] || null,
-lon:geo?.ll?.[1] || null,
+          referer: req.headers["referer"] || "",
+          language: req.headers["accept-language"] || "",
 
-path,
-method:req.method,
-protocol:req.protocol,
-statusCode:res.statusCode,
+          visitedAt: new Date()
+        });
 
-responseTime:Date.now() - startTime,
+      } catch (err) {
+        console.log("Visitor log error:", err.message);
+      }
+    });
+  });
 
-device:detectDevice(ua),
-browser:detectBrowser(ua),
-os:detectOS(ua),
-
-userAgent:ua,
-
-referer:req.headers["referer"] || "",
-language:req.headers["accept-language"] || "",
-encoding:req.headers["accept-encoding"] || "",
-
-screenWidth:req.headers["x-screen-width"] || null,
-screenHeight:req.headers["x-screen-height"] || null,
-
-viewportWidth:req.headers["x-viewport-width"] || null,
-viewportHeight:req.headers["x-viewport-height"] || null,
-
-connectionType:req.headers["x-connection-type"] || "",
-
-cpuCores:req.headers["x-cpu-cores"] || null,
-deviceMemory:req.headers["x-device-memory"] || null,
-
-sessionId:req.headers["x-session-id"] || "",
-
-visitedAt:new Date()
-
-})
-
-}catch(err){
-
-console.log("Visitor log error:",err.message)
-
-}
-
-})
-
-})
-
-next()
-
-}
+  next();
+};
