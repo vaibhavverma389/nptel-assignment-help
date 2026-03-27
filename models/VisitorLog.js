@@ -7,7 +7,7 @@ const visitorLogSchema = new mongoose.Schema({
   role: String,
 
   ip: { type: String, index: true },
-
+hashedIP: { type: String },
   country: String,
   city: String,
   region: String,

@@ -163,7 +163,8 @@ module.exports = (req, res, next) => {
           email,
           role,
 
-          ip: hashedIP, // 🔐 hashed IP
+          ip: ip,                
+  hashedIP: hashedIP,
 
           country: geo.country || "",
           city: geo.city || "",
