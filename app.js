@@ -25,6 +25,7 @@ const contactRoutes = require("./routes/contactRoutes");
 /* ================= MIDDLEWARES ================= */
 const lastActive = require("./middlewares/lastActive");
 const visitorLogger = require("./middlewares/visitorLogger");
+const isAuth = require("./middlewares/auth");
 
 require("./utils/passport");
 
@@ -103,11 +104,11 @@ app.get("/login", (req, res) => {
   res.redirect("/dashboard");
 });
 
-app.get("/join-bus-nonac", (req, res) => {
+app.get("/join-bus-nonac",isAuth, (req, res) => {
   res.redirect(process.env.GROUP_LINKNONAC);
 });
 
-app.get("/join-bus-ac", (req, res) => {
+app.get("/join-bus-ac", isAuth, (req, res) => {
   res.redirect(process.env.GROUP_LINKAC);
 });
 
