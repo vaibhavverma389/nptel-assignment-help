@@ -111,7 +111,9 @@ app.get("/join-bus-nonac",isAuth, (req, res) => {
 app.get("/join-bus-ac", isAuth, (req, res) => {
   res.redirect(process.env.GROUP_LINKAC);
 });
-
+app.get("/admit-card", isAuth, (req, res) => {
+  res.redirect("https://internalapp.nptel.ac.in/");
+});
 
 app.use((req, res) => {
   res.render("404")
