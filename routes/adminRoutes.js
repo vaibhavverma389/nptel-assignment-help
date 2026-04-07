@@ -137,22 +137,101 @@ router.get(
 
 // ================= EXPORT VISITORS =================
 
-router.get(
-  "/admin/export/visitors",
-  isAdmin,
-  asyncHandler(async (req, res) => {
-    const logs = await VisitorLog.find().lean();
-    const rows = formatVisitorLog(logs);
+router.get("/admin/export/visitors", isAdmin, asyncHandler(async (req, res) => {
 
-    await exportExcel(
-      res,
-      "Visitors",
-      EXCEL_COLUMNS.VISITORS,
-      rows,
-      "visitors.xlsx"
-    );
-  })
-);
+  const { from, to } = req.query;
+
+  const query = {};
+
+  if (from && to) {
+    query.visitedAt = {
+      $gte: new Date(from),
+      $lte: new Date(to)
+    };
+  }
+
+  const logs = await VisitorLog.find(query)
+    .select("ip email role country city device browser os path method statusCode responseTime referer language isBot sessionId visitedAt isp eventType")
+    .sort({ visitedAt: -1 })
+    .limit(10000)
+    .lean();
+
+  const rows = logs.map((v, i) => ({
+
+    sn: i + 1,
+
+    ip: v.ip,
+
+    email: v.email || "Guest",
+
+    role: v.role || "guest",
+
+    country: v.country || "",
+
+    city: v.city || "",
+
+    isp: v.isp || "",
+
+    device: v.device || "",
+
+    browser: v.browser || "",
+
+    os: v.os || "",
+
+    path: v.path,
+
+    method: v.method,
+
+    statusCode: v.statusCode,
+
+    responseTime: v.responseTime,
+
+    referer: v.referer || "",
+
+    language: v.language || "",
+
+    isBot: v.isBot ? "Yes" : "No",
+
+    sessionId: v.sessionId || "",
+
+    eventType: v.eventType || "visit",
+
+    visitedAt: v.visitedAt
+      ? new Date(v.visitedAt).toLocaleString("en-IN", {
+          timeZone: "Asia/Kolkata"
+        })
+      : ""
+
+  }));
+
+  const columns = [
+
+    { header: "S.N.", key: "sn", width: 8 },
+    { header: "IP Address", key: "ip", width: 18 },
+    { header: "Email", key: "email", width: 28 },
+    { header: "Role", key: "role", width: 12 },
+    { header: "Country", key: "country", width: 12 },
+    { header: "City", key: "city", width: 18 },
+    { header: "ISP", key: "isp", width: 18 },
+    { header: "Device", key: "device", width: 12 },
+    { header: "Browser", key: "browser", width: 14 },
+    { header: "OS", key: "os", width: 14 },
+    { header: "Path", key: "path", width: 35 },
+    { header: "Method", key: "method", width: 10 },
+    { header: "Status Code", key: "statusCode", width: 12 },
+    { header: "Response Time (ms)", key: "responseTime", width: 18 },
+    { header: "Referer", key: "referer", width: 30 },
+    { header: "Language", key: "language", width: 14 },
+    { header: "Bot", key: "isBot", width: 10 },
+    { header: "Session ID", key: "sessionId", width: 25 },
+    { header: "Event Type", key: "eventType", width: 18 },
+    { header: "Visited At (IST)", key: "visitedAt", width: 22 }
+
+  ];
+
+  await exportExcel(res, "Visitors", columns, rows, "visitors.xlsx");
+
+}));
 
 // ================= MATERIALS =================
 
