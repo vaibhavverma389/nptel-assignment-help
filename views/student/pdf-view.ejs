@@ -1,0 +1,123 @@
+<%- include("../partials/header") %>
+
+<div class="dashboard">
+
+  <!-- ================= HEADER ================= -->
+  <div class="card header-card">
+    <h2>
+      Week <%= week %> 
+      (<%= type === "assignment" ? "Assignment" : "Study Material" %>)
+    </h2>
+
+    <div class="navigation-buttons">
+
+      <!-- BACK (FIXED) -->
+      
+
+      <!-- PREVIOUS -->
+      <% if(Number(week) > 1) { %>
+        <a 
+          href="/pdf/<%= type === 'assignment' ? 'assi' : 'study' %>/<%= Number(week) - 1 %>?subject=<%= encodeURIComponent(subject) %>" 
+          class="btn btn-primary">
+          ⬅ Previous
+        </a>
+      <% } %>
+
+      <!-- NEXT -->
+      <% if(Number(week) < 12) { %>
+        <a 
+          href="/pdf/<%= type === 'assignment' ? 'assi' : 'study' %>/<%= Number(week) + 1 %>?subject=<%= encodeURIComponent(subject) %>" 
+          class="btn btn-primary">
+          Next ➡
+        </a>
+      <% } %>
+
+    </div>
+  </div>
+
+  <!-- ================= PDF VIEWER ================= -->
+  <% if(!material) { %>
+
+    <div class="card empty-state">
+      <div class="empty-content">
+        <p class="empty-icon">📭</p>
+        <p class="muted-text">No PDF available for Week <%= week %></p>
+
+        <a href="/study-material?subject=<%= encodeURIComponent(subject) %>" class="btn btn-secondary">
+          Browse Other Weeks
+        </a>
+      </div>
+    </div>
+
+  <% } else { %>
+
+    <div class="card pdf-container">
+
+      <!-- Top Bar -->
+      <div class="pdf-header">
+        <h3><%= material.fileName || `Week ${week}` %></h3>
+
+        <div class="btn-group">
+          <a href="<%= secureUrl %>" target="_blank" class="btn btn-sm">Open</a>
+        </div>
+      </div>
+
+      <!-- PDF -->
+      <div class="pdf-viewer">
+        <iframe 
+          src="<%= secureUrl %>" 
+          class="pdf-frame">
+        </iframe>
+      </div>
+
+    </div>
+
+  <% } %>
+
+</div>
+<a href="/study-material?subject=<%= encodeURIComponent(subject) %>" class="btn btn-secondary">
+        ← Back
+      </a>
+
+<style>
+.pdf-container {
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.pdf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+.pdf-viewer {
+  width: 100%;
+  height: calc(100vh - 200px);
+}
+
+.pdf-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+@media (max-width: 768px) {
+  .pdf-viewer {
+    height: calc(100vh - 150px);
+  }
+}
+</style>
+
+<script>
+document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+document.addEventListener("keydown", function(e) {
+  if ((e.ctrlKey || e.metaKey) && ["s", "p"].includes(e.key.toLowerCase())) {
+    e.preventDefault();
+  }
+});
+</script>
+
+<%- include("../partials/footer") %>

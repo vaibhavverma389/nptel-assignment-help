@@ -1,0 +1,78 @@
+<%- include("./partials/header") %>
+
+<div class="dashboard">
+
+  <!-- ================= SUBJECT SELECT ================= -->
+  <div class="card">
+    <h2> Select Subject</h2>
+
+    <form method="get" action="/study-material">
+      <select name="subject" class="input" required onchange="this.form.submit()">
+        <option value="">-- Select Subject --</option>
+        <% subjects.forEach(s => { %>
+          <option value="<%= s.name %>" <%= subject === s.name ? "selected" : "" %>>
+            <%= s.name %>
+          </option>
+        <% }) %>
+      </select>
+    </form>
+  </div>
+
+  <!-- ================= ASSIGNMENT ================= -->
+  <div class="card">
+    <h2> Assignment</h2>
+    <p class="muted-text">Click a week to open assignment PDF</p>
+
+    <% if(!subject){ %>
+      <p class="warning-text" style="color: red;">⚠ Please select subject first</p>
+    <% } else { %>
+      <p class="success-text">✓ Subject: <strong><%= subject %></strong></p>
+    <% } %>
+
+    <div class="grid-box">
+      <% for(let i = 1; i <= 12; i++) { %>
+        <% if(subject){ %>
+          <a 
+            href="/pdf/assi/<%= i %>?subject=<%= encodeURIComponent(subject) %>" 
+            class="grid-item"
+            title="Assignment Week <%= i %>"
+          >
+            Week <%= i %>
+          </a>
+        <% } else { %>
+          <div class="grid-item disabled">Week <%= i %></div>
+        <% } %>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- ================= STUDY MATERIAL ================= -->
+  <div class="card">
+    <h2> Study Material</h2>
+    <p class="muted-text">Click a week to open study PDF</p>
+    <% if(!subject){ %>
+      <p class="warning-text" style="color: red;">⚠ Please select subject first</p>
+    <% } else { %>
+      <p class="success-text">✓ Subject: <strong><%= subject %></strong></p>
+    <% } %>
+
+    <div class="grid-box">
+      <% for(let i = 1; i <= 12; i++) { %>
+        <% if(subject){ %>
+          <a 
+            href="/pdf/study/<%= i %>?subject=<%= encodeURIComponent(subject) %>" 
+            class="grid-item"
+            title="Study Material Week <%= i %>"
+          >
+            Week <%= i %>
+          </a>
+        <% } else { %>
+          <div class="grid-item disabled">Week <%= i %></div>
+        <% } %>
+      <% } %>
+    </div>
+  </div>
+
+</div>
+
+<%- include("./partials/footer") %>

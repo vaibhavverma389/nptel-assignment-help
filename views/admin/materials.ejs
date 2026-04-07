@@ -1,109 +1,145 @@
 <%- include("../partials/header") %>
 
-  <h2 class="page-title">📚 Week-wise Study Material</h2>
+<div class="dashboard">
 
-  <!-- ================= ADD / UPDATE FORM ================= -->
-  <form method="post" action="/admin/materials" class="card">
-
-    <label>📘 Subject</label>
-    <select name="subject" class="input" required>
-      <option value="">Select Subject</option>
-      <% subjects.forEach(s=> { %>
-        <option value="<%= s.name %>">
-          <%= s.name %>
-        </option>
-        <% }) %>
-    </select>
-
-    <br /><br />
-
-    <label>📅 Week</label>
-    <select name="week" class="input" required>
-      <option value="">Select Week</option>
-      <% for(let i=1;i<=12;i++){ %>
-        <option value="<%= i %>">Week <%= i %>
-        </option>
-        <% } %>
-    </select>
-
-    <br /><br />
-
-    <label>📘 Study Material (Google Drive FILE ID)</label>
-    <input class="input" type="text" name="studyMaterialId" placeholder="e.g. 1AbCDeFgHiJKlmn" />
-
-    <p class="muted-text">
-      👉 Only FILE_ID paste karein (auto convert ho jayega)
-    </p>
-
-    <br />
-
-    <label>✅ Final Answer PDF (Google Drive FILE ID)</label>
-    <input class="input" type="text" name="finalAnswerId" placeholder="e.g. 1XyZAbC123" />
-
-    <br /><br />
-
-    <button class="btn btn-submit">
-      💾 Save / Update Material
-    </button>
-  </form>
-
-  <hr style="margin:40px 0;" />
-
-  <h3>🗂 Upload History</h3>
-
+  <!-- ================= UPLOAD FORM ================= -->
   <div class="card">
-    <% if (materials.length===0) { %>
-      <p class="muted-text">No materials uploaded yet.</p>
-      <% } else { %>
+    <h2> Upload Study Material / Assignment</h2>
 
-        <div class="table-wrapper">
-          <table class="answers-table">
-            <thead>
-              <tr>
-                <th>Subject</th>
-                <th>Week</th>
-                <th>Notes</th>
-                <th>Final Answer</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% materials.forEach(m=> { %>
-                <tr>
-                  <td>
-                    <%= m.subject %>
-                  </td>
-                  <td>Week <%= m.week %>
-                  </td>
+    <form action="/admin/materials" method="post" enctype="multipart/form-data" class="form-upload">
 
-                  <td>
-                    <% if (m.studyMaterialUrl) { %>
-                      <a href="<%= m.studyMaterialUrl %>" target="_blank">📘 Preview</a>
-                      <% } else { %>
-                        ❌
-                        <% } %>
-                  </td>
+      <!-- TYPE -->
+      <div class="form-group">
+        <label>Select Type *</label>
+        <select name="type" class="input" required>
+          <option value="">-- Select Type --</option>
+          <option value="material"> Study Material</option>
+          <option value="assignment">Assignment PDF</option>
+        </select>
+      </div>
 
-                  <td>
-                    <% if (m.finalAnswerPdfUrl) { %>
-                      <a href="<%= m.finalAnswerPdfUrl %>" target="_blank">✅ Preview</a>
-                      <% } else { %>
-                        ❌
-                        <% } %>
-                  </td>
+      <!-- SUBJECT -->
+      <div class="form-group">
+        <label>Select Subject *</label>
+        <select name="subject" class="input" required>
+          <option value="">-- Select Subject --</option>
+          <% subjects.forEach(s => { %>
+            <option value="<%= s.name %>"><%= s.name %></option>
+          <% }) %>
+        </select>
+      </div>
 
-                  <td>
-                    <form method="post" action="/admin/materials/delete/<%= m._id %>" style="display:inline;">
-                      <button class="btn btn-remove">🗑 Delete</button>
-                    </form>
-                  </td>
-                </tr>
-                <% }) %>
-            </tbody>
-          </table>
-        </div>
+      <!-- WEEK -->
+      <div class="form-group">
+        <label>Week *</label>
+        <input 
+          type="number" 
+          name="week" 
+          placeholder="Enter Week (1-12)" 
+          min="1" 
+          max="12"
+          required 
+          class="input"
+        >
+      </div>
 
-        <% } %>
+      <!-- FILE -->
+      <div class="form-group">
+        <label>Upload PDF *</label>
+        <input 
+          type="file" 
+          name="pdf" 
+          accept="application/pdf" 
+          required 
+          class="input"
+        >
+        <small class="help-text">Max file size: 50MB</small>
+      </div>
+
+      <button type="submit" class="btn btn-primary">
+        📤 Upload Material
+      </button>
+
+    </form>
   </div>
-<a href="/dashboard" class="back-dashboard">← Back to Dashboard</a>
-  <%- include("../partials/footer") %>
+
+  <!-- ================= MATERIALS LIST ================= -->
+  <div class="card">
+    <h3> Uploaded Materials (<%= materials.length %>)</h3>
+
+    <% if(materials.length === 0) { %>
+      <p class="muted-text"> No materials uploaded yet</p>
+
+    <% } else { %>
+      <div class="materials-list">
+
+        <% materials.forEach(m => { %>
+          <div class="material-item">
+
+            <!-- INFO -->
+            <div>
+              <strong><%= m.subject %></strong> | Week <%= m.week %> <br>
+              <small>
+                <%= m.type === "assignment" ? "📝 Assignment" : "📚 Study Material" %>
+              </small><br>
+
+              <% if(m.fileName) { %>
+                <small> <%= m.fileName %></small>
+              <% } %>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="material-actions">
+
+              <!-- ✅ FIXED VIEW BUTTON -->
+              <a 
+                href="/pdf/<%= m.type === 'assignment' ? 'assi' : 'study' %>/<%= m.week %>?subject=<%= encodeURIComponent(m.subject) %>" 
+                target="_blank"
+                class="btn btn-secondary btn-sm"
+              >
+                 View
+              </a>
+
+              <!-- DELETE -->
+              <form 
+                action="/admin/materials/delete/<%= m._id %>" 
+                method="post"
+                onsubmit="return confirm('Delete this material?');"
+              >
+                <button class="btn btn-danger btn-sm">
+                   Delete
+                </button>
+              </form>
+
+            </div>
+
+          </div>
+        <% }) %>
+
+      </div>
+    <% } %>
+  </div>
+
+  <!-- ================= BACK ================= -->
+  <div class="card">
+    <a href="/admin" class="btn btn-secondary">← Back</a>
+  </div>
+
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+  const fileInput = document.querySelector('input[name="pdf"]');
+
+  fileInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const maxSize = 50 * 1024 * 1024;
+
+    if (file && file.size > maxSize) {
+      alert("File too large (Max 50MB)");
+      this.value = "";
+    }
+  });
+</script>
+
+<%- include("../partials/footer") %>

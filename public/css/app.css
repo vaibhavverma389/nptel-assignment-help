@@ -850,3 +850,54 @@ select option {
     transition-duration: 0.01ms !important;
   }
 }
+/* GRID CONTAINER */
+.grid-box {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 boxes per row */
+  gap: 15px;
+  margin-top: 15px;
+}
+
+/* GRID ITEM (BOX) */
+.grid-item {
+  display: block;
+  text-align: center;
+  padding: 14px;
+  border: 2px solid #000;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #000;
+  font-weight: 600;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+/* HOVER EFFECT 🔥 */
+.grid-item:hover {
+  background: #000;
+  color: #fff;
+  transform: translateY(-3px);
+}
+
+/* ACTIVE / SELECTED WEEK */
+.grid-item.active {
+  background: #000;
+  color: #fff;
+}
+
+/* RESPONSIVE (MOBILE) */
+@media (max-width: 768px) {
+  .grid-box {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-box {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
