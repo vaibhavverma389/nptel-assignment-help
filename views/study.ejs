@@ -8,7 +8,6 @@
 
     <form method="get" action="/study-material">
       <select name="subject" class="input" required onchange="this.form.submit()">
-        <option value="">-- Select Subject --</option>
         <% subjects.forEach(s => { %>
           <option value="<%= s.name %>" <%= subject === s.name ? "selected" : "" %>>
             <%= s.name %>
@@ -47,7 +46,7 @@
   </div>
 
   <!-- ================= STUDY MATERIAL ================= -->
-  <!-- <div class="card">
+   <div class="card">
     <h2> Study Material</h2>
     <p class="muted-text">Click a week to open study PDF</p>
     <% if(!subject){ %>
@@ -70,8 +69,8 @@
           <div class="grid-item disabled">Week <%= i %></div>
         <% } %>
       <% } %>
-    </div> -->
-  <!-- </div> -->
+    </div> 
+   </div>
 
 </div>
 

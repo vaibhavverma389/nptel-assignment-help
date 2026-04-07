@@ -12,7 +12,6 @@
       <div class="form-group">
         <label>Select Type *</label>
         <select name="type" class="input" required>
-          <option value="">-- Select Type --</option>
           <option value="material"> Study Material</option>
           <option value="assignment">Assignment PDF</option>
         </select>
@@ -22,7 +21,6 @@
       <div class="form-group">
         <label>Select Subject *</label>
         <select name="subject" class="input" required>
-          <option value="">-- Select Subject --</option>
           <% subjects.forEach(s => { %>
             <option value="<%= s.name %>"><%= s.name %></option>
           <% }) %>
