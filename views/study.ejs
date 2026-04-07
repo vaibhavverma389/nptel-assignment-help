@@ -8,6 +8,7 @@
 
     <form method="get" action="/study-material">
       <select name="subject" class="input" required onchange="this.form.submit()">
+        <option value="">-- Select Subject --</option>
         <% subjects.forEach(s => { %>
           <option value="<%= s.name %>" <%= subject === s.name ? "selected" : "" %>>
             <%= s.name %>
