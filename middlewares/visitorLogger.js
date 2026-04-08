@@ -8,7 +8,6 @@ const IPAPI_URL = "https://ipapi.co";
 const IGNORE_PATHS = ["/ping", "/favicon.ico", "/robots.txt"];
 const IGNORE_EXT = [".css", ".js", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico"];
 
-const SAMPLE_RATE = 0.7;
 const geoCache = new Map();
 
 // 🔐 Hash IP
@@ -55,7 +54,6 @@ function detectBot(ua) {
   return /bot|crawler|spider|crawling|curl|wget|headless/i.test(ua);
 }
 
-// 🔥 ISP formatter (NEW)
 function formatISP(isp) {
   if (!isp) return "Unknown";
   if (isp.includes("Jio")) return "Jio";
@@ -102,10 +100,14 @@ async function fetchGeo(ip) {
   }
 }
 
-// 📦 Cache
+// 📦 Cache (with limit)
 async function getGeoData(ip) {
   if (geoCache.has(ip)) return geoCache.get(ip);
+
   const geo = await fetchGeo(ip);
+
+  if (geoCache.size > 5000) geoCache.clear(); // prevent memory leak
+
   geoCache.set(ip, geo);
   return geo;
 }
@@ -119,9 +121,6 @@ module.exports = (req, res, next) => {
   // ❌ Ignore static
   if (IGNORE_PATHS.some(p => path.startsWith(p))) return next();
   if (IGNORE_EXT.some(ext => path.endsWith(ext))) return next();
-
-  // 🎯 Sampling
-  if (Math.random() > SAMPLE_RATE) return next();
 
   // 🌐 IP detection
   let ip =
@@ -137,63 +136,55 @@ module.exports = (req, res, next) => {
 
   const hashedIP = hashIP(ip);
 
-  res.on("finish", () => {
-    setImmediate(async () => {
+  res.on("finish", async () => {
+    try {
+      const user = req.user || {};
+
+      const ua = req.headers["user-agent"] || "";
+
+      let geo = {};
       try {
-        const user = req.user || {};
-        const isGuest = !req.user;
+        geo = await getGeoData(ip);
+      } catch {}
 
-        // 🔥 Guest → only /admit-card
-        if (isGuest && !path.includes("/admit-card")) return;
+      // 🚀 Fire & forget (NO BLOCKING)
+      VisitorLog.create({
+        userId: user._id || null,
+        email: user.email || "guest",
+        role: user.role || "guest",
 
-        const email = user.email || "guest";
-        const role = user.role || "guest";
-        const userId = user._id || null;
+        ip,
+        hashedIP,
 
-        // ❌ Admin ignore
-        if (email === process.env.ADMIN_EMAIL) return;
+        country: geo.country || "",
+        city: geo.city || "",
+        region: geo.region || "",
+        isp: geo.isp || "",
 
-        const ua = req.headers["user-agent"] || "";
-        const geo = await getGeoData(ip);
+        path,
+        method: req.method,
+        statusCode: res.statusCode,
 
-        await VisitorLog.create({
-          userId,
-          email,
-          role,
+        responseTime: Date.now() - startTime,
 
-          ip,
-          hashedIP,
+        device: detectDevice(ua),
+        browser: detectBrowser(ua),
+        os: detectOS(ua),
 
-          country: geo.country || "",
-          city: geo.city || "",
-          region: geo.region || "",
-          isp: geo.isp || "",
+        isBot: detectBot(ua),
 
-          path,
-          method: req.method,
-          statusCode: res.statusCode,
+        sessionId: req.sessionID || null,
 
-          responseTime: Date.now() - startTime,
+        eventType: path.includes("/admit-card")
+          ? "admit-card-click"
+          : "visit",
 
-          device: detectDevice(ua),
-          browser: detectBrowser(ua),
-          os: detectOS(ua),
+        visitedAt: new Date()
+      }).catch(err => console.error("Log error:", err));
 
-          isBot: detectBot(ua),
-
-          sessionId: req.sessionID || null,
-
-          eventType: path.includes("/admit-card")
-            ? "admit-card-click"
-            : "visit",
-
-          visitedAt: new Date()
-        });
-
-      } catch (err) {
-        console.error("Visitor log error:", err);
-      }
-    });
+    } catch (err) {
+      console.error("Visitor log error:", err);
+    }
   });
 
   next();
