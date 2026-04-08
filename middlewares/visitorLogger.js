@@ -137,56 +137,60 @@ module.exports = (req, res, next) => {
   const hashedIP = hashIP(ip);
 
   res.on("finish", async () => {
+  try {
+    const user = req.user || {};
+    const isGuest = !req.user;
+
+    // 🔥 IMPORTANT LOGIC
+    if (isGuest && !path.includes("/admit-card")) return;
+
+    if (user.email === process.env.ADMIN_EMAIL) return;
+
+    const ua = req.headers["user-agent"] || "";
+
+    let geo = {};
     try {
-      const user = req.user || {};
-      if (user.email === process.env.ADMIN_EMAIL) return;
+      geo = await getGeoData(ip);
+    } catch {}
 
-      const ua = req.headers["user-agent"] || "";
+    VisitorLog.create({
+      userId: user._id || null,
+      email: user.email || "guest",
+      role: user.role || "guest",
 
-      let geo = {};
-      try {
-        geo = await getGeoData(ip);
-      } catch {}
+      ip,
+      hashedIP,
 
-      // 🚀 Fire & forget (NO BLOCKING)
-      VisitorLog.create({
-        userId: user._id || null,
-        email: user.email || "guest",
-        role: user.role || "guest",
+      country: geo.country || "",
+      city: geo.city || "",
+      region: geo.region || "",
+      isp: geo.isp || "",
 
-        ip,
-        hashedIP,
+      path,
+      method: req.method,
+      statusCode: res.statusCode,
 
-        country: geo.country || "",
-        city: geo.city || "",
-        region: geo.region || "",
-        isp: geo.isp || "",
+      responseTime: Date.now() - startTime,
 
-        path,
-        method: req.method,
-        statusCode: res.statusCode,
+      device: detectDevice(ua),
+      browser: detectBrowser(ua),
+      os: detectOS(ua),
 
-        responseTime: Date.now() - startTime,
+      isBot: detectBot(ua),
 
-        device: detectDevice(ua),
-        browser: detectBrowser(ua),
-        os: detectOS(ua),
+      sessionId: req.sessionID || null,
 
-        isBot: detectBot(ua),
+      eventType: path.includes("/admit-card")
+        ? "admit-card-click"
+        : "visit",
 
-        sessionId: req.sessionID || null,
+      visitedAt: new Date()
+    }).catch(err => console.error("Log error:", err));
 
-        eventType: path.includes("/admit-card")
-          ? "admit-card-click"
-          : "visit",
-
-        visitedAt: new Date()
-      }).catch(err => console.error("Log error:", err));
-
-    } catch (err) {
-      console.error("Visitor log error:", err);
-    }
-  });
+  } catch (err) {
+    console.error("Visitor log error:", err);
+  }
+});
 
   next();
 };
