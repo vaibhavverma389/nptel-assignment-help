@@ -167,9 +167,6 @@ module.exports = (req, res, next) => {
           country: geo.country || "",
           city: geo.city || "",
           region: geo.region || "",
-          timezone: geo.timezone || "",
-          lat: geo.lat,
-          lon: geo.lon,
           isp: geo.isp || "",
 
           path,
@@ -183,9 +180,6 @@ module.exports = (req, res, next) => {
           os: detectOS(ua),
 
           isBot: detectBot(ua),
-
-          referer: req.headers["referer"] || "",
-          language: req.headers["accept-language"] || "",
 
           sessionId: req.sessionID || null,
 
