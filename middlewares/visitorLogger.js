@@ -139,6 +139,7 @@ module.exports = (req, res, next) => {
   res.on("finish", async () => {
     try {
       const user = req.user || {};
+      if (user.email === process.env.ADMIN_EMAIL) return;
 
       const ua = req.headers["user-agent"] || "";
 
