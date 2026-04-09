@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const isAuth = require("../middlewares/auth");
 const ContactMessage = require("../models/ContactMessage");
 
-router.post("/contact-us", async (req, res) => {
+router.post("/contact-us", isAuth, async (req, res) => {
   try {
     const { name, email, mobile, message } = req.body;
 
