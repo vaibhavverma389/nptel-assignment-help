@@ -41,7 +41,7 @@ return res.redirect("/dashboard");
 router.get("/logout", (req, res) => {
   req.logout(() => {
     req.session.destroy();
-    res.redirect("/auth/login");
+    res.redirect("/");
   });
 });
 
