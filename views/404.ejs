@@ -1,69 +1,86 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <title>404 - Page Not Found</title>
 
-<title>404 - Page Not Found</title>
+  <!-- Auto Redirect -->
+  <meta http-equiv="refresh" content="5; url=/dashboard">
 
-<link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-<meta http-equiv="refresh" content="4; url=/dashboard">
+    .container {
+      text-align: center;
+    }
 
+    h1 {
+      font-size: 80px;
+      margin-bottom: 10px;
+      color: #f43f5e;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #cbd5f5;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      background: #22c55e;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #16a34a;
+    }
+
+    .timer {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+  </style>
 </head>
 
 <body>
 
 <div class="container">
+  <h1>404</h1>
+  <p>Oops! Page Not Found</p>
 
-  <div class="bus-groups">
+  <a href="/dashboard" class="btn">Go to Dashboard</a>
 
-    <!-- Non AC Bus -->
-    <a href="/join-bus-nonac" class="bus-card-link">
-      <div class="card bus-card">
-        <h3>🚌 Budget Bus (Non-AC)</h3>
-
-        <p class="muted-text">
-          NPTEL exam center jaane ke liye affordable bus service.
-          Updates ke liye WhatsApp group join karein.
-        </p>
-
-        <div class="join-area">
-          <span class="btn-join">Join Non-AC Group</span>
-        </div>
-      </div>
-    </a>
-
-    <!-- AC Bus -->
-    <a href="/join-bus-ac" class="bus-card-link">
-      <div class="card bus-card">
-        <h3>❄ Premium Bus (AC)</h3>
-
-        <p class="muted-text">
-          Comfortable AC bus se exam center travel karein.
-          Updates ke liye WhatsApp group join karein.
-        </p>
-
-        <div class="join-area">
-          <span class="btn-join">Join AC Group</span>
-        </div>
-      </div>
-    </a>
-    
-
+  <div class="timer">
+    Redirecting in <span id="count">5</span> seconds...
+  </div>
 </div>
 
 <script>
+  let time = 5;
 
-let time = 4;
+  const timer = setInterval(() => {
+    time--;
+    document.getElementById("count").innerText = time;
 
-const timer = setInterval(() => {
-  time--;
-  document.getElementById("count").innerText = time;
-
-  if (time <= 0) {
-    clearInterval(timer);
-  }
-}, 1000);
-
+    if (time <= 0) {
+      clearInterval(timer);
+    }
+  }, 1000);
 </script>
 
 </body>
