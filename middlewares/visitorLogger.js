@@ -142,7 +142,7 @@ module.exports = (req, res, next) => {
     const isGuest = !req.user;
 
     // 🔥 IMPORTANT LOGIC
-    if (isGuest && !path.includes("/admit-card")) return;
+    if (isGuest && !path.includes("/admit-card") ) return;
 
     if (user.email === process.env.ADMIN_EMAIL) return;
 
