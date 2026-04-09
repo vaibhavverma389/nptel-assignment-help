@@ -15,7 +15,7 @@ function hashIP(ip) {
   return crypto.createHash("sha256").update(String(ip)).digest("hex");
 }
 
-// ✅ Validate IPv4
+// ✅ IPv4 check
 function isValidIP(ip) {
   return /^(25[0-5]|2[0-4]\d|1\d\d|\d\d|\d)\.(25[0-5]|2[0-4]\d|1\d\d|\d\d|\d)\.(25[0-5]|2[0-4]\d|1\d\d|\d\d|\d)\.(25[0-5]|2[0-4]\d|1\d\d|\d\d|\d)$/.test(ip);
 }
@@ -49,11 +49,12 @@ function detectOS(ua) {
   return "Other";
 }
 
-// 🤖 Bot detection
+// 🤖 Bot
 function detectBot(ua) {
-  return /bot|crawler|spider|crawling|curl|wget|headless/i.test(ua);
+  return /bot|crawler|spider|curl|wget|headless/i.test(ua);
 }
 
+// ISP normalize
 function formatISP(isp) {
   if (!isp) return "Unknown";
   if (isp.includes("Jio")) return "Jio";
@@ -63,7 +64,7 @@ function formatISP(isp) {
   return isp;
 }
 
-// 🌍 Fetch Geo
+// 🌍 Fetch geo
 async function fetchGeo(ip) {
   try {
     const res = await axios.get(`https://ipinfo.io/${ip}?token=${IPINFO_TOKEN}`);
@@ -100,13 +101,13 @@ async function fetchGeo(ip) {
   }
 }
 
-// 📦 Cache (with limit)
+// 📦 Cache
 async function getGeoData(ip) {
   if (geoCache.has(ip)) return geoCache.get(ip);
 
   const geo = await fetchGeo(ip);
 
-  if (geoCache.size > 5000) geoCache.clear(); // prevent memory leak
+  if (geoCache.size > 5000) geoCache.clear();
 
   geoCache.set(ip, geo);
   return geo;
@@ -122,7 +123,7 @@ module.exports = (req, res, next) => {
   if (IGNORE_PATHS.some(p => path.startsWith(p))) return next();
   if (IGNORE_EXT.some(ext => path.endsWith(ext))) return next();
 
-  // 🌐 IP detection
+  // 🌐 IP
   let ip =
     req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
     req.socket?.remoteAddress ||
@@ -137,60 +138,59 @@ module.exports = (req, res, next) => {
   const hashedIP = hashIP(ip);
 
   res.on("finish", async () => {
-  try {
-    const user = req.user || {};
-    const isGuest = !req.user;
-
-    // 🔥 IMPORTANT LOGIC
-    if (isGuest && !path.includes("/admit-card") ) return;
-
-    if (user.email === process.env.ADMIN_EMAIL) return;
-
-    const ua = req.headers["user-agent"] || "";
-
-    let geo = {};
     try {
-      geo = await getGeoData(ip);
-    } catch {}
+      const user = req.user || {};
+      const ua = req.headers["user-agent"] || "";
 
-    VisitorLog.create({
-      userId: user._id || null,
-      email: user.email || "guest",
-      role: user.role || "guest",
+      let geo = {};
+      try {
+        geo = await getGeoData(ip);
+      } catch {}
 
-      ip,
-      hashedIP,
+      // 🔥 ONLY INDIA ALLOWED
+      if (geo.country !== "IN") return;
 
-      country: geo.country || "",
-      city: geo.city || "",
-      region: geo.region || "",
-      isp: geo.isp || "",
+      // ❌ Ignore admin
+      if (user.email === process.env.ADMIN_EMAIL) return;
 
-      path,
-      method: req.method,
-      statusCode: res.statusCode,
+      await VisitorLog.create({
+        userId: user._id || null,
+        email: user.email || "guest",
+        role: user.role || "guest",
 
-      responseTime: Date.now() - startTime,
+        ip,
+        hashedIP,
 
-      device: detectDevice(ua),
-      browser: detectBrowser(ua),
-      os: detectOS(ua),
+        country: geo.country,
+        city: geo.city,
+        region: geo.region,
+        isp: geo.isp,
 
-      isBot: detectBot(ua),
+        path,
+        method: req.method,
+        statusCode: res.statusCode,
 
-      sessionId: req.sessionID || null,
+        responseTime: Date.now() - startTime,
 
-      eventType: path.includes("/admit-card")
-        ? "admit-card-click"
-        : "visit",
+        device: detectDevice(ua),
+        browser: detectBrowser(ua),
+        os: detectOS(ua),
 
-      visitedAt: new Date()
-    }).catch(err => console.error("Log error:", err));
+        isBot: detectBot(ua),
 
-  } catch (err) {
-    console.error("Visitor log error:", err);
-  }
-});
+        sessionId: req.sessionID || null,
+
+        eventType: path.includes("/admit-card")
+          ? "admit-card-click"
+          : "visit",
+
+        visitedAt: new Date()
+      });
+
+    } catch (err) {
+      console.error("Visitor log error:", err);
+    }
+  });
 
   next();
 };
