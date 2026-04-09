@@ -79,6 +79,7 @@
             <th>Subject</th>
             <th>Week</th>
             <th>Type</th>
+            <th>Time</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -97,7 +98,9 @@
                 <%= m.type === "assignment" ? " Assignment" : " Study Material" %>
               </td>
 
-              
+              <td>
+                <%= m.createdAt.toLocaleString() %>
+              </td>
 
               <td>
                 <div class="table-actions">
