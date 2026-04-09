@@ -61,63 +61,80 @@
     </form>
   </div>
 
-  <!-- ================= MATERIALS LIST ================= -->
-  <div class="card">
-    <h3> Uploaded Materials (<%= materials.length %>)</h3>
 
-    <% if(materials.length === 0) { %>
-      <p class="muted-text"> No materials uploaded yet</p>
+<div class="card">
+  <h3>Uploaded Materials (<%= materials.length %>)</h3>
 
-    <% } else { %>
-      <div class="materials-list">
+  <% if(materials.length === 0) { %>
+    <p class="muted-text">No materials uploaded yet</p>
 
-        <% materials.forEach(m => { %>
-          <div class="material-item">
+  <% } else { %>
 
-            <!-- INFO -->
-            <div>
-              <strong><%= m.subject %></strong> | Week <%= m.week %> <br>
-              <small>
-                <%= m.type === "assignment" ? "📝 Assignment" : "📚 Study Material" %>
-              </small><br>
+    <div class="table-wrapper">
+      <table class="answers-table">
 
-              <% if(m.fileName) { %>
-                <small> <%= m.fileName %></small>
-              <% } %>
-            </div>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Subject</th>
+            <th>Week</th>
+            <th>Type</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
 
-            <!-- ACTIONS -->
-            <div class="material-actions">
+        <tbody>
+          <% materials.forEach((m, index) => { %>
+            <tr>
 
-              <!-- ✅ FIXED VIEW BUTTON -->
-              <a 
-                href="/pdf/<%= m.type === 'assignment' ? 'assi' : 'study' %>/<%= m.week %>?subject=<%= encodeURIComponent(m.subject) %>" 
-                target="_blank"
-                class="btn btn-secondary btn-sm"
-              >
-                 View
-              </a>
+              <td><%= index + 1 %></td>
 
-              <!-- DELETE -->
-              <form 
-                action="/admin/materials/delete/<%= m._id %>" 
-                method="post"
-                onsubmit="return confirm('Delete this material?');"
-              >
-                <button class="btn btn-danger btn-sm">
-                   Delete
-                </button>
-              </form>
+              <td><strong><%= m.subject %></strong></td>
 
-            </div>
+              <td>Week <%= m.week %></td>
 
-          </div>
-        <% }) %>
+              <td>
+                <%= m.type === "assignment" ? " Assignment" : " Study Material" %>
+              </td>
 
-      </div>
-    <% } %>
-  </div>
+              
 
+              <td>
+                <div class="table-actions">
+
+                  <!-- VIEW -->
+                  <a 
+                    href="/pdf/<%= m.type === 'assignment' ? 'assi' : 'study' %>/<%= m.week %>?subject=<%= encodeURIComponent(m.subject) %>" 
+                    target="_blank"
+                    class="btn btn-secondary btn-sm"
+                  >
+                    View
+                  </a>
+
+                  <!-- DELETE -->
+                  <form 
+                    action="/admin/materials/delete/<%= m._id %>" 
+                    method="post"
+                    style="display:inline;"
+                    onsubmit="return confirm('Delete this material?');"
+                  >
+                    <button class="btn btn-danger btn-sm">
+                      Delete
+                    </button>
+                  </form>
+
+                </div>
+              </td>
+
+            </tr>
+          <% }) %>
+        </tbody>
+
+      </table>
+    </div>
+
+  <% } %>
+</div>
   <!-- ================= BACK ================= -->
   <div class="card">
     <a href="/admin" class="btn btn-secondary">← Back</a>
