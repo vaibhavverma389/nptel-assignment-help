@@ -17,12 +17,12 @@ router.post("/contact-us", async (req, res) => {
     });
 
     req.flash("success", "Message sent successfully ✅");
-    res.redirect("back"); 
+    res.redirect(req.get("Referrer") || "/");
 
   } catch (err) {
     console.error(err);
     req.flash("error", "Something went wrong ❌");
-    res.redirect("back");
+    res.redirect(req.get("Referrer") || "/");
   }
 });
 
