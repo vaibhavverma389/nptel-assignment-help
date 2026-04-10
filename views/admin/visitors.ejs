@@ -2,139 +2,181 @@
 
 <div class="card">
 
-<h2 style="margin-bottom:10px;">Visitor Logs</h2>
+  <h2 style="margin-bottom:10px;">Visitor Logs</h2>
 
-<!-- SEARCH -->
-<input 
-  type="text"
-  id="searchInput"
-  placeholder="Search by Email or IP..."
-  style="margin-bottom:15px;padding:8px;width:100%;max-width:350px;"
->
+  <!-- SEARCH -->
+  <input 
+    type="text"
+    id="searchInput"
+    placeholder="Search by Email or IP..."
+    style="margin-bottom:15px;padding:8px;width:100%;max-width:350px;"
+  >
 
-<div class="table-wrapper">
+  <div class="table-wrapper">
 
-<table class="answers-table" id="logsTable">
+    <table class="answers-table" id="logsTable">
 
-<thead>
-<tr>
-  
-<th>Email</th>
-<th>IP</th>
-<th>Path</th>
-<th>Response</th>
-<th>Time</th>
-</tr>
-</thead>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>IP</th>
+          <th>Path</th>
+          <th>Response</th>
+          <th>Time</th>
+        </tr>
+      </thead>
 
-<tbody>
+      <tbody>
 
-<% if (!logs || logs.length === 0) { %>
+        <% if (!logs || logs.length === 0) { %>
 
-<tr>
-<td colspan="5" style="text-align:center;">
-No visitor logs found
-</td>
-</tr>
+          <tr id="noDataRow">
+            <td colspan="5" style="text-align:center;">
+              No visitor logs found
+            </td>
+          </tr>
 
-<% } else { %>
+        <% } else { %>
 
-<% logs.forEach(v => { %>
+          <% logs.forEach(v => { %>
 
-<tr>
+            <tr>
 
-<!-- Email -->
-<td>
-<%= v.email || "Guest" %>
-</td>
+              <!-- Email -->
+              <td class="email-cell">
+                <%= v.email || "Guest" %>
+              </td>
 
-<!-- IP COPY -->
-<td 
-class="copy-ip"
-title="Click to copy IP"
-data-ip="<%= v.ip %>"
-style="cursor:pointer;color:#007bff;"
->
-<%= v.ip %>
-</td>
+              <!-- IP -->
+              <td 
+                class="copy-ip"
+                title="Click to copy IP"
+                data-ip="<%= v.ip %>"
+                style="cursor:pointer;color:#007bff;"
+              >
+                <%= v.ip %>
+              </td>
 
-<!-- Path -->
-<td title="<%= v.path %>">
-<%= v.path && v.path.length > 30
-? v.path.slice(0,30) + "..."
-: v.path %>
-</td>
+              <!-- Path -->
+              <td title="<%= v.path %>">
+                <%= v.path && v.path.length > 30
+                  ? v.path.slice(0,30) + "..."
+                  : v.path %>
+              </td>
 
-<!-- Response -->
-<td>
-<%= v.responseTime ? v.responseTime + " ms" : "0 ms" %>
-</td>
+              <!-- Response -->
+              <td>
+                <%= v.responseTime ? v.responseTime + " ms" : "0 ms" %>
+              </td>
 
-<!-- Time -->
-<td>
-<%= v.visitedAt
-? new Date(v.visitedAt).toLocaleString("en-IN",{timeZone:"Asia/Kolkata"})
-: "" %>
-</td>
+              <!-- Time -->
+              <td>
+                <%= v.visitedAt
+                  ? new Date(v.visitedAt).toLocaleString("en-IN",{timeZone:"Asia/Kolkata"})
+                  : "" %>
+              </td>
 
-</tr>
+            </tr>
 
-<% }) %>
+          <% }) %>
 
-<% } %>
+        <% } %>
 
-</tbody>
+      </tbody>
 
-</table>
+    </table>
 
-</div>
+  </div>
 
 </div>
 
 <script>
 
-/* ================= SEARCH ================= */
+/* ================= SEARCH (DEBOUNCED) ================= */
 
 const searchInput = document.getElementById("searchInput");
+let timeout;
 
 searchInput.addEventListener("keyup", function () {
 
-const filter = this.value.toLowerCase();
+  clearTimeout(timeout);
 
-const rows = document.querySelectorAll("#logsTable tbody tr");
+  timeout = setTimeout(() => {
 
-rows.forEach(row => {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll("#logsTable tbody tr");
 
-const email = row.cells[0].textContent.toLowerCase();
-const ip = row.cells[1].textContent.toLowerCase();
+    let visibleCount = 0;
 
-if (email.includes(filter) || ip.includes(filter)) {
-row.style.display = "";
-} else {
-row.style.display = "none";
-}
+    rows.forEach(row => {
+
+      if (row.cells.length < 2) return; // skip "no data" row
+
+      const emailCell = row.cells[0];
+      const ipCell = row.cells[1];
+
+      const email = emailCell.textContent.toLowerCase();
+      const ip = ipCell.textContent.toLowerCase();
+
+      // Reset highlight
+      emailCell.innerHTML = emailCell.textContent;
+      ipCell.innerHTML = ipCell.textContent;
+
+      if (email.includes(filter) || ip.includes(filter)) {
+
+        row.style.display = "";
+        visibleCount++;
+
+        // Highlight match
+        if (filter) {
+          emailCell.innerHTML = emailCell.textContent.replace(
+            new RegExp(filter, "gi"),
+            match => `<mark>${match}</mark>`
+          );
+
+          ipCell.innerHTML = ipCell.textContent.replace(
+            new RegExp(filter, "gi"),
+            match => `<mark>${match}</mark>`
+          );
+        }
+
+      } else {
+        row.style.display = "none";
+      }
+
+    });
+
+  }, 300);
 
 });
 
-});
 
 /* ================= COPY IP ================= */
 
 document.querySelectorAll(".copy-ip").forEach(el => {
 
-el.addEventListener("click", () => {
+  el.addEventListener("click", async () => {
 
-const ip = el.getAttribute("data-ip");
+    const ip = el.getAttribute("data-ip");
 
-navigator.clipboard.writeText(ip);
+    try {
+      await navigator.clipboard.writeText(ip);
 
-el.innerText = "Copied!";
+      const original = ip;
 
-setTimeout(() => {
-el.innerText = ip;
-},1500);
+      el.innerText = "Copied ✔";
+      el.style.color = "green";
 
-});
+      setTimeout(() => {
+        el.innerText = original;
+        el.style.color = "#007bff";
+      }, 1500);
+
+    } catch (err) {
+      alert("Copy failed ❌");
+    }
+
+  });
 
 });
 

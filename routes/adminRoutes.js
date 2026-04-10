@@ -163,8 +163,7 @@ router.get("/admin/export/visitors", isAdmin, asyncHandler(async (req, res) => {
     role: v.role || "guest",
 
     // 🌐 IP
-    ip: v.ip || "", // ⚠️ hidden field ko explicitly include kiya
-    hashedIP: v.hashedIP || "",
+    ip: v.ip || "",
 
     // 📍 GEO
     country: v.country || "",
@@ -223,7 +222,6 @@ router.get("/admin/export/visitors", isAdmin, asyncHandler(async (req, res) => {
 
     // IP
     { header: "IP Address", key: "ip", width: 18 },
-    { header: "User Hash", key: "hashedIP", width: 30 },
 
     // GEO
     { header: "Country", key: "country", width: 12 },
