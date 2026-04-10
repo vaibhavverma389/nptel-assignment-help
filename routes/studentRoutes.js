@@ -24,7 +24,7 @@ const isValidWeek = (week) => {
 };
 
 /* ================= DASHBOARD ================= */
-router.get("/dashboard", asyncHandler(async (req, res) => {
+router.get("/dashboard",isAuth, asyncHandler(async (req, res) => {
   const { course = "", week = null } = req.query;
   const weekNum = week ? Number(week) : null;
 
