@@ -1,50 +1,65 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
-const visitorLogSchema = new mongoose.Schema({
+const visitorLogSchema = new mongoose.Schema(
+  {
+    // 👤 User Info
+    userId: { type: mongoose.Schema.Types.ObjectId, index: true },
+    email: { type: String, default: "guest" },
+    role: { type: String, default: "guest" },
 
-  userId: { type: mongoose.Schema.Types.ObjectId, index: true },
-  email: String,
-  role: String,
+    // 🌐 IP Info (privacy safe)
+    ip: { type: String, select: false }, // ❌ hide by default
+    hashedIP: { type: String, index: true },
 
-  ip: { type: String, index: true },
-hashedIP: { type: String },
-  country: String,
-  city: String,
-  region: String,
-  timezone: String,
-  lat: Number,
-  lon: Number,
-  isp: String,
+    // 📍 Geo Info
+    country: { type: String, index: true },
+    city: String,
+    region: String,
+    timezone: String,
+    postal: String,
+    lat: Number,
+    lon: Number,
+    isp: String,
+    asn: String,
 
-  path: { type: String, index: true },
-  method: String,
-  statusCode: Number,
+    // 🌍 Request Info
+    path: { type: String, index: true },
+    method: String,
+    statusCode: Number,
+    responseTime: Number,
+    eventType: { type: String, index: true }, // 🔥 important
 
-  responseTime: Number,
+    // 💻 Device Info
+    device: String,
+    browser: String,
+    browserVersion: String,
+    os: String,
+    isBot: { type: Boolean, index: true },
 
-  device: String,
-  browser: String,
-  os: String,
+    // 🔗 Tracking Info
+    referer: String,
+    language: String,
+    dnt: Boolean,
+    isAjax: Boolean,
+    secFetchSite: String,
+    secFetchMode: String,
+    protocol: String,
+    queryParams: [String],
 
-  isBot: Boolean,
+    // 🔐 Session
+    sessionId: { type: String, index: true },
 
-  referer: String,
-  language: String,
-
-  sessionId: String,
-
-  visitedAt: {
-    type: Date,
-    default: Date.now,
-    index: true
+    // ⏱️ Time
+    visitedAt: {
+      type: Date,
+      default: Date.now,
+      index: true,
+    },
+  },
+  {
+    timestamps: false,
   }
+);
 
-})
 
-// 🔥 Important indexes for analytics
-visitorLogSchema.index({ userId: 1, visitedAt: -1 })
-visitorLogSchema.index({ path: 1, visitedAt: -1 })
-visitorLogSchema.index({ country: 1 })
-visitorLogSchema.index({ isBot: 1 })
-
-module.exports = mongoose.model("VisitorLog", visitorLogSchema)
+module.exports = mongoose.model("VisitorLog", visitorLogSchema);

@@ -136,11 +136,9 @@ router.get(
 );
 
 // ================= EXPORT VISITORS =================
-
 router.get("/admin/export/visitors", isAdmin, asyncHandler(async (req, res) => {
 
   const { from, to } = req.query;
-
   const query = {};
 
   if (from && to) {
@@ -151,85 +149,126 @@ router.get("/admin/export/visitors", isAdmin, asyncHandler(async (req, res) => {
   }
 
   const logs = await VisitorLog.find(query)
-    .select("ip email role country city device browser os path method statusCode responseTime referer language isBot sessionId visitedAt isp eventType")
+    .select("+ip hashedIP userId email role country city region timezone postal lat lon isp asn path method statusCode responseTime eventType device browser browserVersion os isBot referer language dnt isAjax secFetchSite secFetchMode protocol queryParams sessionId visitedAt")
     .sort({ visitedAt: -1 })
-    .limit(10000)
+    .limit(20000)
     .lean();
 
   const rows = logs.map((v, i) => ({
-
     sn: i + 1,
 
-    ip: v.ip,
-
+    // 👤 USER
+    userId: v.userId || "",
     email: v.email || "Guest",
-
     role: v.role || "guest",
 
+    // 🌐 IP
+    ip: v.ip || "", // ⚠️ hidden field ko explicitly include kiya
+    hashedIP: v.hashedIP || "",
+
+    // 📍 GEO
     country: v.country || "",
-
     city: v.city || "",
-
+    region: v.region || "",
+    timezone: v.timezone || "",
+    postal: v.postal || "",
+    lat: v.lat || "",
+    lon: v.lon || "",
     isp: v.isp || "",
+    asn: v.asn || "",
 
-    device: v.device || "",
-
-    browser: v.browser || "",
-
-    os: v.os || "",
-
-    path: v.path,
-
-    method: v.method,
-
-    statusCode: v.statusCode,
-
-    responseTime: v.responseTime,
-
-    referer: v.referer || "",
-
-    language: v.language || "",
-
-    isBot: v.isBot ? "Yes" : "No",
-
-    sessionId: v.sessionId || "",
-
+    // 🌍 REQUEST
+    path: v.path || "",
+    method: v.method || "",
+    statusCode: v.statusCode || "",
+    responseTime: v.responseTime || "",
     eventType: v.eventType || "visit",
 
+    // 💻 DEVICE
+    device: v.device || "",
+    browser: v.browser || "",
+    browserVersion: v.browserVersion || "",
+    os: v.os || "",
+    isBot: v.isBot ? "Yes" : "No",
+
+    // 🔗 TRACKING
+    referer: v.referer || "",
+    language: v.language || "",
+    dnt: v.dnt ? "Yes" : "No",
+    isAjax: v.isAjax ? "Yes" : "No",
+    secFetchSite: v.secFetchSite || "",
+    secFetchMode: v.secFetchMode || "",
+    protocol: v.protocol || "",
+    queryParams: v.queryParams?.join(", ") || "",
+
+    // 🔐 SESSION
+    sessionId: v.sessionId || "",
+
+    // ⏱️ TIME
     visitedAt: v.visitedAt
       ? new Date(v.visitedAt).toLocaleString("en-IN", {
           timeZone: "Asia/Kolkata"
         })
       : ""
-
   }));
 
   const columns = [
 
     { header: "S.N.", key: "sn", width: 8 },
-    { header: "IP Address", key: "ip", width: 18 },
+
+    // USER
+    { header: "User ID", key: "userId", width: 28 },
     { header: "Email", key: "email", width: 28 },
     { header: "Role", key: "role", width: 12 },
+
+    // IP
+    { header: "IP Address", key: "ip", width: 18 },
+    { header: "User Hash", key: "hashedIP", width: 30 },
+
+    // GEO
     { header: "Country", key: "country", width: 12 },
     { header: "City", key: "city", width: 18 },
-    { header: "ISP", key: "isp", width: 18 },
-    { header: "Device", key: "device", width: 12 },
-    { header: "Browser", key: "browser", width: 14 },
-    { header: "OS", key: "os", width: 14 },
-    { header: "Path", key: "path", width: 35 },
+    { header: "Region", key: "region", width: 18 },
+    { header: "Timezone", key: "timezone", width: 18 },
+    { header: "Postal", key: "postal", width: 12 },
+    { header: "Latitude", key: "lat", width: 12 },
+    { header: "Longitude", key: "lon", width: 12 },
+    { header: "ISP", key: "isp", width: 20 },
+    { header: "ASN", key: "asn", width: 12 },
+
+    // REQUEST
+    { header: "Path", key: "path", width: 40 },
     { header: "Method", key: "method", width: 10 },
     { header: "Status Code", key: "statusCode", width: 12 },
     { header: "Response Time (ms)", key: "responseTime", width: 18 },
+    { header: "Event Type", key: "eventType", width: 18 },
+
+    // DEVICE
+    { header: "Device", key: "device", width: 12 },
+    { header: "Browser", key: "browser", width: 14 },
+    { header: "Browser Version", key: "browserVersion", width: 16 },
+    { header: "OS", key: "os", width: 14 },
+    { header: "Bot", key: "isBot", width: 10 },
+
+    // TRACKING
     { header: "Referer", key: "referer", width: 30 },
     { header: "Language", key: "language", width: 14 },
-    { header: "Bot", key: "isBot", width: 10 },
+    { header: "DNT", key: "dnt", width: 10 },
+    { header: "AJAX", key: "isAjax", width: 10 },
+    { header: "Fetch Site", key: "secFetchSite", width: 16 },
+    { header: "Fetch Mode", key: "secFetchMode", width: 16 },
+    { header: "Protocol", key: "protocol", width: 10 },
+    { header: "Query Params", key: "queryParams", width: 25 },
+
+    // SESSION
     { header: "Session ID", key: "sessionId", width: 25 },
-    { header: "Event Type", key: "eventType", width: 18 },
+
+    // TIME
     { header: "Visited At (IST)", key: "visitedAt", width: 22 }
 
   ];
 
-  await exportExcel(res, "Visitors", columns, rows, "visitors.xlsx");
+  await exportExcel(res, "Full Visitor Logs", columns, rows, "visitors_full.xlsx");
 
 }));
 
