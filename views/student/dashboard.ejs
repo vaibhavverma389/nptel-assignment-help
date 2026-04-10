@@ -157,21 +157,23 @@
 
   <form action="/contact-us" method="post" class="form-column">
 
-    <!-- Name (from login) -->
+    <!-- Name -->
     <input
       type="text"
       class="input"
       name="name"
-      placeholder=" Enter Your Name"
+      placeholder="Enter Your Name"
+      required
     />
 
-    <!-- Email (from login) -->
+    <!-- Email -->
     <input
-  type="hidden"
-  name="email"
-  value=" <%= user ? user.email : " " %>"
-/>
-
+      type="email"
+      class="input"
+      name="email"
+      placeholder="Enter Your Email"
+      required
+    />
 
     <!-- Mobile -->
     <input
