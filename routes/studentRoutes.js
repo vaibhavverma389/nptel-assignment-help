@@ -53,14 +53,14 @@ router.get("/dashboard", asyncHandler(async (req, res) => {
 }));
 
 /* ================= STUDY MATERIAL ================= */
-router.get("/study-material", isAuth, asyncHandler(async (req, res) => {
+router.get("/study-material", asyncHandler(async (req, res) => {
   const { subject = "" } = req.query;
   const subjects = await Subject.find().sort({ name: 1 });
   res.render("study", { subject, subjects });
 }));
 
 /* ================= STUDY VIEW ================= */
-router.get("/study-view", isAuth, asyncHandler(async (req, res) => {
+router.get("/study-view",  asyncHandler(async (req, res) => {
   const { subject, week } = req.query;
 
   if (!subject) {
@@ -88,7 +88,7 @@ router.get("/study-view", isAuth, asyncHandler(async (req, res) => {
 }));
 
 /* ================= SHORT PDF ROUTE ================= */
-router.get("/pdf/:type/:week", isAuth, asyncHandler(async (req, res) => {
+router.get("/pdf/:type/:week", asyncHandler(async (req, res) => {
   const { type, week } = req.params;
   const { subject } = req.query;
 
