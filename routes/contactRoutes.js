@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const isAuth = require("../middlewares/auth");
+// ❌ remove isAuth
 const ContactMessage = require("../models/ContactMessage");
 
-router.post("/contact-us", isAuth, async (req, res) => {
+router.post("/contact-us", async (req, res) => {
   try {
     const { name, email, mobile, message } = req.body;
 
@@ -12,16 +12,17 @@ router.post("/contact-us", isAuth, async (req, res) => {
       email,
       mobile,
       message,
-      userId: req.user._id
+      // ✅ optional userId (only if logged in)
+      userId: req.user ? req.user._id : null
     });
 
     req.flash("success", "Message sent successfully ✅");
-    res.redirect("/dashboard");
+    res.redirect("back"); 
 
   } catch (err) {
     console.error(err);
     req.flash("error", "Something went wrong ❌");
-    res.redirect("/dashboard");
+    res.redirect("back");
   }
 });
 
