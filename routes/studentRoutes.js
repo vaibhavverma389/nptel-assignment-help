@@ -53,7 +53,7 @@ router.get("/dashboard", asyncHandler(async (req, res) => {
 }));
 
 /* ================= STUDY MATERIAL ================= */
-router.get("/study-material", asyncHandler(async (req, res) => {
+router.get("/study-material",isAuth, asyncHandler(async (req, res) => {
   const { subject = "" } = req.query;
   const subjects = await Subject.find().sort({ name: 1 });
   res.render("study", { subject, subjects });
