@@ -107,6 +107,10 @@ app.get("/login", (req, res) => {
 app.get("/join-bus-nonac",isAuth, (req, res) => {
   res.redirect(process.env.GROUP_LINKNONAC);
 });
+app.get("/bus-booking", (req, res) => {
+  res.redirect("https://forms.gle/YJFmqsX5D3kmaAuu9");
+});
+
 
 app.get("/join-bus-ac", isAuth, (req, res) => {
   res.redirect(process.env.GROUP_LINKAC);
