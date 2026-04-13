@@ -9,9 +9,10 @@ router.post("/contact-us", async (req, res) => {
 
     await ContactMessage.create({
       name,
-      email,
       mobile,
       message,
+      email: req.user ? req.user.email : email,
+      name1: req.user ? req.user.name : "Guest",
       // ✅ optional userId (only if logged in)
       userId: req.user ? req.user._id : null
     });
