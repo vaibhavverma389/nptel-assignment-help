@@ -12,8 +12,10 @@
         <thead>
           <tr>
             <th>Name</th>
+            <th>Name (User)</th>
             <th>Email</th>
             <th>Mobile</th>
+            <th>Email (User)</th>
             <th>Message</th>
             <th>Date</th>
           </tr>
@@ -23,8 +25,10 @@
           <% messages.forEach(msg => { %>
             <tr>
               <td><%= msg.name %></td>
+              <td><%= msg.name1 %></td>
               <td><%= msg.email %></td>
               <td><%= msg.mobile %></td>
+              <td><%= msg.email1 %></td>
               <td style="max-width:300px;">
                 <%= msg.message %>
               </td>
