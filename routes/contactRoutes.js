@@ -12,8 +12,6 @@ router.post("/contact-us", async (req, res) => {
       email,
       mobile,
       message,
-      email1: req.user ? req.user.email : "N/A",
-      name1: req.user ? req.user.name : "Guest",
       // ✅ optional userId (only if logged in)
       userId: req.user ? req.user._id : null
     });
