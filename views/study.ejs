@@ -72,6 +72,48 @@
       <% } %>
     </div> 
    </div>
+   <div class="card" style="margin-top:30px;">
+  <h3>Contact Us</h3>
+  <p class="muted-text">Any issue, doubt or feedback? Send us a message.</p>
+
+  <form action="/contact-us" method="post" class="form-column">
+
+    <!-- Name -->
+    <input
+      type="text"
+      class="input"
+      name="name"
+      placeholder="Enter Your Name"
+      minlength="2"
+      required
+    />
+
+    <!-- Mobile -->
+    <input
+      type="tel"
+      class="input"
+      name="mobile"
+      placeholder="Enter Mobile Number"
+      required
+    />
+
+    <!-- Message -->
+    <textarea
+      class="input"
+      name="message"
+      rows="4"
+      placeholder="Write your message here..."
+      minlength="10"
+      required
+    ></textarea>
+
+    <!-- Submit -->
+    <button type="submit" class="btn btn-submit">
+      Send Message
+    </button>
+
+  </form>
+</div>
 
 </div>
 
