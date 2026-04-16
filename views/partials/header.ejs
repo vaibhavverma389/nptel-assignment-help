@@ -9,36 +9,34 @@
 </head>
 <body>
 
-<header class="header">
-  <div class="container header-flex">
-    <a href="/" style="text-decoration: none;"><h2>NPTEL Assignment Helper</h2></a>
 
-    
+  <header class="header">
+  <div class="container header-flex">
+
+    <a href="/" style="text-decoration: none;">
+      <h2> Student Exam Portal</h2>
+    </a>
+
     <nav class="nav-links">
 
-  <% if (user) { %>
-    <!-- AFTER LOGIN -->
-    <a href="/dashboard">Dashboard</a>
+      <% if (user) { %>
+        <a href="/dashboard">Dashboard</a>
 
-    <% if (user.role === "admin") { %>
-      <a href="/admin">Admin Panel</a>
-    <% } %>
+        <% if (user.role === "admin") { %>
+          <a href="/admin">Admin Panel</a>
+        <% } %>
 
-    <a href="/auth/logout">Logout</a>
+        <a href="/auth/logout">Logout</a>
 
-    <!-- <span class="user-chip">
-       <%= user.name %>
-    </span> -->
+      <% } else { %>
+        <a href="/auth/login">Login</a>
+        <a href="/auth/login">Register</a>
+      <% } %>
 
-  <% } else { %>
-    <!-- BEFORE LOGIN -->
-    <a href="/auth/login">Login</a>
-    <a href="/auth/login">Register</a>
-  <% } %>
-
-</nav>
+    </nav>
 
   </div>
+
   <script src="/js/visitorData.js"></script>
 </header>
 
