@@ -11,6 +11,8 @@ const Subject = require("../models/Subject");
 const WeekMaterial = require("../models/WeekMaterial");
 const VisitorLog = require("../models/VisitorLog");
 const ContactMessage = require("../models/ContactMessage");
+const Note = require("../models/Note");
+const ActivityLog = require("../models/ActivityLog");
 
 const isAdmin = require("../middlewares/isAdmin");
 const asyncHandler = require("../utils/asyncHandler");
@@ -313,36 +315,72 @@ router.post(
     }
 
     // Validate required fields
-    if (!subject || !week || !type) {
-      return res.status(400).send("Subject, week, and type are required");
+    if (!subject || !type) {
+      return res.status(400).send("Subject and type are required");
+    }
+
+    if (type === "assignment" && !week) {
+      return res.status(400).send("Week is required for assignments");
     }
 
     try {
+      // Create a unique file name
+      const filePrefix = type === "assignment" 
+        ? `${subject.replace(/\s+/g, "_")}-week${week}` 
+        : `${subject.replace(/\s+/g, "_")}-material-${Date.now()}`;
+
       // Upload to ImageKit
       const result = await imagekit.upload({
         file: req.file.buffer,
-        fileName: `${subject}-week${week}-${type}.pdf`,
+        fileName: `${filePrefix}.pdf`,
         folder: "study-material"
       });
 
       // Save in database
-      await WeekMaterial.findOneAndUpdate(
-        { subject, week: Number(week), type },
-        {
+      if (type === "assignment") {
+        await WeekMaterial.findOneAndUpdate(
+          { subject, week: Number(week), type },
+          {
+            subject,
+            week: Number(week),
+            type,
+            fileUrl: result.url,
+            fileName: req.file.originalname
+          },
+          { upsert: true, new: true }
+        );
+      } else {
+        await WeekMaterial.create({
           subject,
-          week: Number(week),
           type,
           fileUrl: result.url,
           fileName: req.file.originalname
-        },
-        { upsert: true, new: true }
-      );
+        });
+      }
 
+      req.flash("success", "Material uploaded successfully");
       res.redirect("/admin/materials?success=Material uploaded successfully");
     } catch (error) {
       console.error("Upload error:", error);
       res.status(500).send("Error uploading material");
     }
+  })
+);
+
+router.post(
+  "/admin/materials/delete/:id",
+  isAdmin,
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).send("Invalid material ID");
+    }
+
+    await WeekMaterial.findByIdAndDelete(id);
+
+    req.flash("success", "Material deleted successfully");
+    res.redirect("/admin/materials?success=Material deleted successfully");
   })
 );
 
@@ -387,6 +425,46 @@ router.post(
     await Subject.findByIdAndDelete(id);
 
     res.redirect("/admin/subjects?success=Subject deleted");
+  })
+);
+
+router.post(
+  "/admin/subjects/edit/:id",
+  isAdmin,
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).send("Invalid subject ID");
+    }
+
+    if (!name || name.trim() === "") {
+      return res.status(400).redirect("/admin/subjects?error=Subject name cannot be empty");
+    }
+
+    const newName = name.trim();
+    const subject = await Subject.findById(id);
+    if (!subject) {
+      return res.status(404).send("Subject not found");
+    }
+
+    const oldName = subject.name;
+    
+    // Update subject name
+    subject.name = newName;
+    await subject.save();
+
+    // Cascading updates
+    if (oldName !== newName) {
+      await Promise.all([
+        Answer.updateMany({ course: oldName }, { course: newName }),
+        WeekMaterial.updateMany({ subject: oldName }, { subject: newName }),
+        Note.updateMany({ subject: oldName }, { subject: newName })
+      ]);
+    }
+
+    res.redirect("/admin/subjects?success=Subject updated successfully");
   })
 );
 
@@ -442,6 +520,97 @@ router.get(
       .lean();
 
     res.render("admin/contactMessages", { messages });
+  })
+);
+
+// ================= ACTIVITY LOGS =================
+
+router.get(
+  "/admin/activity-logs",
+  isAdmin,
+  asyncHandler(async (req, res) => {
+    const { email, activityType, subject } = req.query;
+    const filter = {};
+
+    if (email && email.trim()) {
+      filter.$or = [
+        { email: { $regex: email.trim(), $options: "i" } },
+        { userName: { $regex: email.trim(), $options: "i" } }
+      ];
+    }
+    if (activityType) {
+      filter.activityType = activityType;
+    }
+    if (subject) {
+      filter.subject = subject;
+    }
+
+    const [logs, subjects] = await Promise.all([
+      ActivityLog.find(filter).sort({ timestamp: -1 }).limit(1000).lean(),
+      Subject.find().sort({ name: 1 }).lean()
+    ]);
+
+    res.render("admin/activityLogs", {
+      logs,
+      subjects,
+      filter: {
+        email: email || "",
+        activityType: activityType || "",
+        subject: subject || ""
+      }
+    });
+  })
+);
+
+router.get(
+  "/admin/export/activity-logs",
+  isAdmin,
+  asyncHandler(async (req, res) => {
+    const { email, activityType, subject } = req.query;
+    const filter = {};
+
+    if (email && email.trim()) {
+      filter.$or = [
+        { email: { $regex: email.trim(), $options: "i" } },
+        { userName: { $regex: email.trim(), $options: "i" } }
+      ];
+    }
+    if (activityType) {
+      filter.activityType = activityType;
+    }
+    if (subject) {
+      filter.subject = subject;
+    }
+
+    const logs = await ActivityLog.find(filter).sort({ timestamp: -1 }).lean();
+
+    const rows = logs.map((v, i) => ({
+      sn: i + 1,
+      userName: v.userName || "N/A",
+      email: v.email || "N/A",
+      activityType: v.activityType === "upload" ? "Upload" : "Download",
+      itemType: v.itemType,
+      title: v.title,
+      fileName: v.fileName,
+      subject: v.subject,
+      timestamp: v.timestamp
+        ? new Date(v.timestamp).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+        : ""
+    }));
+
+    const columns = [
+      { header: "S.N.", key: "sn", width: 8 },
+      { header: "Student Name", key: "userName", width: 22 },
+      { header: "Email", key: "email", width: 28 },
+      { header: "Action", key: "activityType", width: 14 },
+      { header: "Type", key: "itemType", width: 16 },
+      { header: "Title/Resource", key: "title", width: 30 },
+      { header: "File Name", key: "fileName", width: 30 },
+      { header: "Subject", key: "subject", width: 18 },
+      { header: "Timestamp", key: "timestamp", width: 22 }
+    ];
+
+    await exportExcel(res, "Student Activity Logs", columns, rows, "student_activity_logs.xlsx");
   })
 );
 

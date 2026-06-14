@@ -57,7 +57,11 @@
         <h3><%= material.fileName || `Week ${week}` %></h3>
 
         <div class="btn-group">
-          <a href="<%= secureUrl %>" target="_blank" class="btn btn-sm">Open</a>
+          <% if (typeof type !== 'undefined' && type === "Note") { %>
+            <a href="/notes/download/<%= material._id %>" target="_blank" class="btn btn-sm">Open</a>
+          <% } else { %>
+            <a href="/materials/download/<%= material._id %>" target="_blank" class="btn btn-sm">Open</a>
+          <% } %>
         </div>
       </div>
 

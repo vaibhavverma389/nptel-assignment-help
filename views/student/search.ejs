@@ -50,7 +50,7 @@
           <div style="border-top: 1px solid var(--border-light); padding-top: 15px; margin-top: 15px;">
             <% if (note.fileUrl) { %>
               <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
-                <a href="<%= note.fileUrl %>" target="_blank" class="muted-text" style="font-size: 0.85rem; color: var(--primary-light); text-decoration: underline; word-break: break-all;" download>
+                <a href="/notes/download/<%= note._id %>" target="_blank" class="muted-text" style="font-size: 0.85rem; color: var(--primary-light); text-decoration: underline; word-break: break-all;" download>
                   <%= note.fileName || 'Download Attachment' %>
                 </a>
               </div>

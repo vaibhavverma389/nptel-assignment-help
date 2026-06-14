@@ -9,9 +9,18 @@ const weekMaterialSchema = new mongoose.Schema({
 
   week: {
     type: Number,
-    required: true,
-    min: 1,
-    max: 12
+    required: function() {
+      return this.type === "assignment";
+    },
+    validate: {
+      validator: function(v) {
+        if (this.type === "assignment") {
+          return Number.isInteger(v) && v >= 1 && v <= 12;
+        }
+        return v === undefined || v === null || (Number.isInteger(v) && v >= 1 && v <= 12);
+      },
+      message: "Week must be between 1 and 12 for assignments"
+    }
   },
 
   type: {
@@ -30,7 +39,13 @@ const weekMaterialSchema = new mongoose.Schema({
   timestamps: true   // 🔥 createdAt, updatedAt
 });
 
-/* 🔥 UNIQUE COMBINATION (IMPORTANT) */
-weekMaterialSchema.index({ subject: 1, week: 1, type: 1 }, { unique: true });
+/* 🔥 UNIQUE COMBINATION (IMPORTANT - PARTIAL INDEX FOR ASSIGNMENTS) */
+weekMaterialSchema.index(
+  { subject: 1, week: 1, type: 1 },
+  { 
+    unique: true,
+    partialFilterExpression: { week: { $exists: true, $ne: null } }
+  }
+);
 
 module.exports = mongoose.model("WeekMaterial", weekMaterialSchema);

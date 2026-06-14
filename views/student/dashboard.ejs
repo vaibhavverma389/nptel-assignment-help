@@ -66,6 +66,21 @@
 
   </div>
 
+  <!-- Browse by Subject -->
+  <div class="card" style="margin-top:30px;">
+    <h3>Browse Notes by Subject</h3>
+    <p class="muted-text" style="margin-bottom: 15px;">Click on any course/subject to view all shared notes and study materials.</p>
+    <div class="subject-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+      <% subjects.forEach(s => { %>
+        <a href="/notes?subject=<%= encodeURIComponent(s.name) %>" style="text-decoration: none;">
+          <div class="card action-card" style="margin: 0; padding: 20px; text-align: center; border: 1px solid var(--border-light); height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.02); transition: transform 0.2s, background 0.2s;">
+            <h4 style="margin: 0; font-size: 1.05rem; color: #fff;"><%= s.name %></h4>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+
   <!-- Search Section -->
   <div class="card" style="margin-top:30px;">
     <h3>Search Notes</h3>

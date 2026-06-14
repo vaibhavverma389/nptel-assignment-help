@@ -11,7 +11,7 @@
       <!-- TYPE -->
       <div class="form-group">
         <label>Select Type *</label>
-        <select name="type" class="input" required>
+        <select name="type" id="typeSelect" class="input" required onchange="toggleWeekInput()">
           <option value="material"> Study Material</option>
           <option value="assignment">Assignment PDF</option>
         </select>
@@ -28,15 +28,15 @@
       </div>
 
       <!-- WEEK -->
-      <div class="form-group">
+      <div class="form-group" id="weekGroup" style="display: none;">
         <label>Week *</label>
         <input 
           type="number" 
           name="week" 
+          id="weekInput"
           placeholder="Enter Week (1-12)" 
           min="1" 
           max="12"
-          required 
           class="input"
         >
       </div>
@@ -92,7 +92,7 @@
 
               <td><strong><%= m.subject %></strong></td>
 
-              <td>Week <%= m.week %></td>
+              <td><%= m.week ? `Week ${m.week}` : 'N/A' %></td>
 
               <td>
                 <%= m.type === "assignment" ? " Assignment" : " Study Material" %>
@@ -106,13 +106,23 @@
                 <div class="table-actions">
 
                   <!-- VIEW -->
-                  <a 
-                    href="/pdf/<%= m.type === 'assignment' ? 'assi' : 'study' %>/<%= m.week %>?subject=<%= encodeURIComponent(m.subject) %>" 
-                    target="_blank"
-                    class="btn btn-secondary btn-sm"
-                  >
-                    View
-                  </a>
+                  <% if (m.type === 'assignment') { %>
+                    <a 
+                      href="/pdf/assi/<%= m.week %>?subject=<%= encodeURIComponent(m.subject) %>" 
+                      target="_blank"
+                      class="btn btn-secondary btn-sm"
+                    >
+                      View
+                    </a>
+                  <% } else { %>
+                    <a 
+                      href="<%= m.fileUrl %>" 
+                      target="_blank"
+                      class="btn btn-secondary btn-sm"
+                    >
+                      View
+                    </a>
+                  <% } %>
 
                   <!-- DELETE -->
                   <form 
@@ -158,6 +168,24 @@
       this.value = "";
     }
   });
+
+  function toggleWeekInput() {
+    const typeSelect = document.getElementById("typeSelect");
+    const weekGroup = document.getElementById("weekGroup");
+    const weekInput = document.getElementById("weekInput");
+
+    if (typeSelect.value === "assignment") {
+      weekGroup.style.display = "block";
+      weekInput.required = true;
+    } else {
+      weekGroup.style.display = "none";
+      weekInput.required = false;
+      weekInput.value = "";
+    }
+  }
+
+  // Run on startup to set initial state
+  document.addEventListener("DOMContentLoaded", toggleWeekInput);
 </script>
 
 <%- include("../partials/footer") %>

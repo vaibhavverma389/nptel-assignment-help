@@ -8,6 +8,7 @@ const Subject = require("../models/Subject");
 const WeekMaterial = require("../models/WeekMaterial");
 const Note = require("../models/Note");
 const VisitorLog = require("../models/VisitorLog");
+const ActivityLog = require("../models/ActivityLog");
 const isAuth = require("../middlewares/auth");
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -116,8 +117,13 @@ router.get("/dashboard", asyncHandler(async (req, res) => {
 router.get("/study-material", asyncHandler(async (req, res) => {
   const { subject = "" } = req.query;
   const subjects = await Subject.find().sort({ name: 1 });
+  
+  let materials = [];
+  if (subject) {
+    materials = await WeekMaterial.find({ subject, type: "material" }).sort({ createdAt: -1 }).lean();
+  }
  
-  res.render("study", { subject, subjects });
+  res.render("study", { subject, subjects, materials });
 }));
 
 /* ================= STUDY VIEW ================= */
@@ -271,18 +277,27 @@ router.post("/submit-bulk", isAuth, asyncHandler(async (req, res) => {
 
 /* ================= NOTES MANAGEMENT ================= */
 
-// List notes (Personal + Subject Filter)
-router.get("/notes", isAuth, asyncHandler(async (req, res) => {
+// List notes (All Students + Subject Filter + Admin Materials)
+router.get("/notes", asyncHandler(async (req, res) => {
   const { subject = "" } = req.query;
   const subjects = await Subject.find().sort({ name: 1 }).lean();
   
-  const query = { email: req.user.email };
+  const query = {};
   if (subject) {
     query.subject = subject;
   }
   
-  const notes = await Note.find(query).sort({ createdAt: -1 }).lean();
-  res.render("student/notes", { notes, subjects, selectedSubject: subject });
+  const [notes, adminMaterials] = await Promise.all([
+    Note.find(query).sort({ createdAt: -1 }).lean(),
+    subject ? WeekMaterial.find({ subject, type: "material" }).sort({ createdAt: -1 }).lean() : []
+  ]);
+  
+  res.render("student/notes", { 
+    notes, 
+    subjects, 
+    selectedSubject: subject,
+    adminMaterials
+  });
 }));
 
 // Render Upload note page
@@ -317,7 +332,7 @@ router.post("/upload", isAuth, upload.single("noteFile"), asyncHandler(async (re
     }
   }
 
-  await Note.create({
+  const note = await Note.create({
     title: title.trim(),
     description: description ? description.trim() : "",
     subject,
@@ -326,6 +341,20 @@ router.post("/upload", isAuth, upload.single("noteFile"), asyncHandler(async (re
     email: req.user.email,
     user: req.user.name,
     lastAccessed: new Date()
+  });
+
+  // Log upload activity
+  await ActivityLog.create({
+    userId: req.user ? req.user._id : null,
+    email: req.user ? req.user.email : "guest",
+    userName: req.user ? req.user.name : "Guest",
+    activityType: "upload",
+    itemType: "Note",
+    itemId: note._id,
+    title: note.title,
+    fileName: note.fileName || "Text Note (No File)",
+    subject: note.subject,
+    timestamp: new Date()
   });
 
   res.redirect("/notes?success=Note added successfully");
@@ -354,12 +383,11 @@ router.get("/recent", isAuth, asyncHandler(async (req, res) => {
 }));
 
 // Search Notes
-router.get("/search", isAuth, asyncHandler(async (req, res) => {
+router.get("/search", asyncHandler(async (req, res) => {
   const { query = "" } = req.query;
   let notes = [];
   if (query.trim()) {
     notes = await Note.find({
-      email: req.user.email,
       $or: [
         { title: { $regex: query.trim(), $options: "i" } },
         { description: { $regex: query.trim(), $options: "i" } },
@@ -371,8 +399,8 @@ router.get("/search", isAuth, asyncHandler(async (req, res) => {
 }));
 
 // View Single Note (tracks access / downloads / views)
-router.get("/notes/view/:id", isAuth, asyncHandler(async (req, res) => {
-  const note = await Note.findOne({ _id: req.params.id, email: req.user.email });
+router.get("/notes/view/:id", asyncHandler(async (req, res) => {
+  const note = await Note.findById(req.params.id);
   if (!note) {
     return res.status(404).render("404");
   }
@@ -425,6 +453,52 @@ router.post("/notes/edit/:id", isAuth, asyncHandler(async (req, res) => {
 router.post("/notes/delete/:id", isAuth, asyncHandler(async (req, res) => {
   await Note.deleteOne({ _id: req.params.id, email: req.user.email });
   res.redirect("/notes?success=Note deleted successfully");
+}));
+
+// Download Student Note
+router.get("/notes/download/:id", asyncHandler(async (req, res) => {
+  const note = await Note.findById(req.params.id);
+  if (!note || !note.fileUrl) {
+    return res.status(404).send("File not found");
+  }
+
+  await ActivityLog.create({
+    userId: req.user ? req.user._id : null,
+    email: req.user ? req.user.email : "guest",
+    userName: req.user ? req.user.name : "Guest",
+    activityType: "download",
+    itemType: "Note",
+    itemId: note._id,
+    title: note.title,
+    fileName: note.fileName || "attachment",
+    subject: note.subject,
+    timestamp: new Date()
+  });
+
+  res.redirect(note.fileUrl);
+}));
+
+// Download WeekMaterial (Admin PDF)
+router.get("/materials/download/:id", asyncHandler(async (req, res) => {
+  const material = await WeekMaterial.findById(req.params.id);
+  if (!material || !material.fileUrl) {
+    return res.status(404).send("File not found");
+  }
+
+  await ActivityLog.create({
+    userId: req.user ? req.user._id : null,
+    email: req.user ? req.user.email : "guest",
+    userName: req.user ? req.user.name : "Guest",
+    activityType: "download",
+    itemType: "WeekMaterial",
+    itemId: material._id,
+    title: `Week ${material.week} ${material.type === "assignment" ? "Assignment" : "Study Material"}`,
+    fileName: material.fileName || `${material.subject}-week${material.week}-${material.type}.pdf`,
+    subject: material.subject,
+    timestamp: new Date()
+  });
+
+  res.redirect(material.fileUrl);
 }));
 
 module.exports = router;
