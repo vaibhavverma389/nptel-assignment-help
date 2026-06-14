@@ -9,7 +9,7 @@ const connectDB = async () => {
     try {
       if (mongoose.connection && mongoose.connection.db) {
         await mongoose.connection.db.collection("weekmaterials").dropIndex("subject_1_week_1_type_1");
-        console.log("Dropped old unique index subject_1_week_1_type_1");
+        // console.log("Dropped old unique index subject_1_week_1_type_1");
       }
     } catch (e) {
       // Index might not exist, which is fine
