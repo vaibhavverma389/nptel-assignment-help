@@ -11,8 +11,11 @@ router.get("/login", (req, res) => {
 });
 
 router.get("/register", (req, res) => {
-  res.render("auth/register");
+  res.render("auth/login");
 });
+
+
+
 
 router.post("/register", async (req, res) => {
   try {

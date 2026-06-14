@@ -78,7 +78,9 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
-
+app.get("/auth/register", (req, res) => {
+  res.redirect("login");
+});
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
   res.locals.success = req.flash("success");
@@ -106,18 +108,6 @@ app.get("/login", (req, res) => {
   res.redirect("/dashboard");
 });
 
-app.get("/join-bus-nonac",isAuth, (req, res) => {
-  res.redirect(process.env.GROUP_LINKNONAC);
-});
-
-
-
-app.get("/join-bus-ac", isAuth, (req, res) => {
-  res.redirect(process.env.GROUP_LINKAC);
-});
-app.get("/admit-card", (req, res) => {
-  res.redirect("https://internalapp.nptel.ac.in/");
-});
 
 app.use((req, res) => {
   res.status(404).render("404")
