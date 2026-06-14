@@ -1,0 +1,52 @@
+<%- include("../partials/header") %>
+
+<div class="dashboard">
+  <h2 class="page-title">🕒 Recent Activity</h2>
+  <p class="muted-text" style="text-align: center; margin-bottom: 25px;">Continue studying where you left off</p>
+
+  <div style="text-align: right; margin-bottom: 25px;">
+    <a href="/notes" class="btn btn-secondary">Back to Notes Hub</a>
+  </div>
+
+  <% if (notes.length === 0) { %>
+    <div class="card" style="text-align: center; padding: 50px 20px;">
+      <p class="muted-text" style="font-size: 1.2rem; margin-bottom: 20px;">No recent activity found.</p>
+      <a href="/upload" class="btn btn-submit">Create or View Notes</a>
+    </div>
+  <% } else { %>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px;">
+      <% notes.forEach(note => { %>
+        <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between; min-height: 220px; position: relative; padding: 25px;">
+          <div>
+            <!-- Subject Tag -->
+            <span class="countdown-text" style="background: rgba(0, 113, 189, 0.15); color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; border-radius: 4px; padding: 3px 8px;">
+              <%= note.subject %>
+            </span>
+
+            <!-- Note Title -->
+            <h3 style="margin-top: 10px; margin-bottom: 8px; font-size: 1.35rem; color: #fff; word-break: break-word;">
+              <%= note.title %>
+            </h3>
+
+            <!-- Access Timestamp -->
+            <p class="muted-text" style="font-size: 0.8rem; font-style: italic; color: var(--gold); margin-bottom: 15px;">
+              Last accessed: <%= new Date(note.lastAccessed).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) %>
+            </p>
+          </div>
+
+          <!-- Footer Actions -->
+          <div style="border-top: 1px solid var(--border-light); padding-top: 15px; margin-top: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <!-- View / Details Link -->
+              <a href="/notes/view/<%= note._id %>" class="btn btn-submit" style="padding: 6px 15px; font-size: 0.85rem; width: 100%;">
+                Resume Study
+              </a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<%- include("../partials/footer") %>

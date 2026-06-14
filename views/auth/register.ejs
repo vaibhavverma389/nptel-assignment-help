@@ -16,9 +16,9 @@
   <h2>Register</h2>
   <p>Create a new account</p>
 
-  <form method="post" action="/register" class="form-row" style="margin-top: 20px;">
+  <form method="post" action="/auth/register" class="form-row" style="margin-top: 20px;">
     <input name="name" class="input" placeholder="Name" required />
-    <input name="email" class="input" placeholder="Email" required />
+    <input name="email" class="input" type="email" placeholder="Email" required />
     <input name="password" class="input" type="password" placeholder="Password" required />
     <button class="btn btn-submit">Register</button>
   </form>

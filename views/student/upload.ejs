@@ -1,0 +1,51 @@
+<%- include("../partials/header") %>
+
+<h2 class="page-title">⬆️ Create & Upload Notes</h2>
+
+<form method="post" action="/upload" enctype="multipart/form-data" class="card" style="max-width: 650px; margin: 0 auto 30px;">
+  <div class="form-column">
+    
+    <!-- Title -->
+    <div class="form-group">
+      <label class="form-label" for="title">Note Title</label>
+      <input type="text" id="title" name="title" class="input" placeholder="e.g. Artificial Intelligence Basics" required />
+    </div>
+
+    <!-- Subject Selection -->
+    <div class="form-group">
+      <label class="form-label" for="subject">Select Subject</label>
+      <select id="subject" name="subject" class="select" required>
+        <option value="">-- Choose Course/Subject --</option>
+        <% subjects.forEach(s => { %>
+          <option value="<%= s.name %>"><%= s.name %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <!-- Content / Description -->
+    <div class="form-group">
+      <label class="form-label" for="description">Note Content / Description</label>
+      <textarea id="description" name="description" rows="6" class="input" placeholder="Type key insights, study points, or details about the notes..."></textarea>
+    </div>
+
+    <!-- File Upload -->
+    <div class="form-group">
+      <label class="form-label" for="noteFile">Attach Document / Image (Optional PDF, JPEG, PNG)</label>
+      <input type="file" id="noteFile" name="noteFile" class="input" accept=".pdf,.png,.jpg,.jpeg" style="padding: 10px;" />
+      <span id="check-info" style="margin-top: 5px; font-size: 0.8rem; opacity: 0.75;">Maximum file size: 10MB. Files are securely uploaded to ImageKit storage.</span>
+    </div>
+
+    <!-- Buttons -->
+    <div class="btn-group" style="margin-top: 15px;">
+      <button type="submit" class="btn btn-submit">Create Note</button>
+      <a href="/notes" class="btn btn-secondary">Cancel</a>
+    </div>
+
+  </div>
+</form>
+
+<div style="text-align: center; margin-bottom: 40px;">
+  <a href="/notes" class="back-dashboard">← Back to Notes Hub</a>
+</div>
+
+<%- include("../partials/footer") %>

@@ -49,6 +49,13 @@ const visitorLogSchema = new mongoose.Schema(
     // 🔐 Session
     sessionId: { type: String, index: true },
 
+    // 💻 Client System Info
+    screenWidth: Number,
+    screenHeight: Number,
+    connectionType: String,
+    cpuCores: Number,
+    deviceMemory: Number,
+
     // ⏱️ Time
     visitedAt: {
       type: Date,

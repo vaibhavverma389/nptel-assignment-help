@@ -149,7 +149,7 @@ router.get("/admin/export/visitors", isAdmin, asyncHandler(async (req, res) => {
   }
 
   const logs = await VisitorLog.find(query)
-    .select("+ip hashedIP userId email role country city region timezone postal lat lon isp asn path method statusCode responseTime eventType device browser browserVersion os isBot referer language dnt isAjax secFetchSite secFetchMode protocol queryParams sessionId visitedAt")
+    .select("+ip hashedIP userId email role country city region timezone postal lat lon isp asn path method statusCode responseTime eventType device browser browserVersion os isBot referer language dnt isAjax secFetchSite secFetchMode protocol queryParams sessionId visitedAt screenWidth screenHeight connectionType cpuCores deviceMemory")
     .sort({ visitedAt: -1 })
     .limit(20000)
     .lean();
@@ -189,6 +189,13 @@ router.get("/admin/export/visitors", isAdmin, asyncHandler(async (req, res) => {
     browserVersion: v.browserVersion || "",
     os: v.os || "",
     isBot: v.isBot ? "Yes" : "No",
+
+    // 💻 SYSTEM & NETWORK
+    screenWidth: v.screenWidth || "",
+    screenHeight: v.screenHeight || "",
+    connectionType: v.connectionType || "",
+    cpuCores: v.cpuCores || "",
+    deviceMemory: v.deviceMemory || "",
 
     // 🔗 TRACKING
     referer: v.referer || "",
@@ -247,6 +254,13 @@ router.get("/admin/export/visitors", isAdmin, asyncHandler(async (req, res) => {
     { header: "Browser Version", key: "browserVersion", width: 16 },
     { header: "OS", key: "os", width: 14 },
     { header: "Bot", key: "isBot", width: 10 },
+
+    // SYSTEM & NETWORK INFO
+    { header: "Screen Width", key: "screenWidth", width: 14 },
+    { header: "Screen Height", key: "screenHeight", width: 14 },
+    { header: "Connection Type", key: "connectionType", width: 16 },
+    { header: "CPU Cores", key: "cpuCores", width: 12 },
+    { header: "Device Memory (GB)", key: "deviceMemory", width: 18 },
 
     // TRACKING
     { header: "Referer", key: "referer", width: 30 },

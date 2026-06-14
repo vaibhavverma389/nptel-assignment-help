@@ -20,6 +20,7 @@
         <tr>
           <th>Email</th>
           <th>IP</th>
+          <th>Action</th>
           <th>Path</th>
           <th>Response</th>
           <th>Time</th>
@@ -31,7 +32,7 @@
         <% if (!logs || logs.length === 0) { %>
 
           <tr id="noDataRow">
-            <td colspan="5" style="text-align:center;">
+            <td colspan="6" style="text-align:center;">
               No visitor logs found
             </td>
           </tr>
@@ -44,17 +45,60 @@
 
               <!-- Email -->
               <td class="email-cell">
-                <%= v.email || "Guest" %>
+                <strong style="color: #fff;"><%= v.email || "Guest" %></strong>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">
+                  <%= v.browser || 'Browser' %> <%= v.browserVersion || '' %> on <%= v.os || 'OS' %>
+                </div>
               </td>
 
               <!-- IP -->
-              <td 
-                class="copy-ip"
-                title="Click to copy IP"
-                data-ip="<%= v.ip %>"
-                style="cursor:pointer;color:#007bff;"
-              >
-                <%= v.ip %>
+              <td>
+                <span class="copy-ip" title="Click to copy IP" data-ip="<%= v.ip %>" style="cursor:pointer;color:#007bff;font-weight:600;"><%= v.ip %></span>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
+                  📍 <%= (v.city || v.region) ? (v.city || v.region) + ', ' + (v.country || '') : (v.country || 'Local/Unknown') %> 
+                  <br>
+                  📶 <span style="opacity: 0.8;"><%= v.isp || 'Local Network' %></span>
+                </div>
+              </td>
+
+              <!-- Action -->
+              <td>
+                <% 
+                  let badgeColor = "rgba(255,255,255,0.1)";
+                  let textColor = "#fff";
+                  const event = v.eventType || "visit";
+                  if (event === "login" || event === "register") {
+                    badgeColor = "rgba(0, 200, 83, 0.15)";
+                    textColor = "#00e676";
+                  } else if (event === "logout") {
+                    badgeColor = "rgba(255, 23, 68, 0.15)";
+                    textColor = "#ff1744";
+                  } else if (event.startsWith("note-")) {
+                    badgeColor = "rgba(238, 186, 27, 0.15)";
+                    textColor = "#EEBA1B";
+                  } else if (event.endsWith("-submit")) {
+                    badgeColor = "rgba(0, 113, 189, 0.15)";
+                    textColor = "#0071BD";
+                  }
+                %>
+                <span style="background: <%= badgeColor %>; color: <%= textColor %>; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <%= event.replace(/-/g, " ") %>
+                </span>
+
+                <!-- System & Network Info -->
+                <% if (v.screenWidth || v.connectionType || v.cpuCores) { %>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.4;">
+                    <% if (v.screenWidth && v.screenHeight) { %>
+                      🖥️ <%= v.screenWidth %>x<%= v.screenHeight %>
+                    <% } %>
+                    <% if (v.connectionType) { %>
+                      ⚡ <%= v.connectionType.toUpperCase() %>
+                    <% } %>
+                    <% if (v.cpuCores || v.deviceMemory) { %>
+                      <br>⚙️ <%= v.cpuCores ? v.cpuCores + ' CPU' : '' %> <%= v.deviceMemory ? '| ' + v.deviceMemory + 'GB RAM' : '' %>
+                    <% } %>
+                  </div>
+                <% } %>
               </td>
 
               <!-- Path -->

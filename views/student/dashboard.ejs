@@ -4,69 +4,111 @@
 
   <!-- Welcome -->
   <div class="welcome-card">
-    <h2>Welcome <span><%= user ? user.name : "" %></span></h2>
-    <p>NPTEL Exam Dashboard</p>
+    <h2>Welcome <span><%= user ? user.name : "Student" %></span></h2>
+    <p>📚 Student Notes Hub</p>
   </div>
 
-  <!-- Stats -->
+  <!-- Overview Stats -->
   <div class="stats-row">
 
-    <div class="stat-box highlight-week">
-      <h4>🎯 Exam Date</h4>
-      <p>19 April 2026</p>
+    <div class="stat-box">
+      <label>👤 User</label>
+      <p style="font-size: 1.15rem; word-break: break-all;"><%= user ? user.email : "Guest" %></p>
     </div>
 
-    <div class="stat-box highlight-date">
-      <h4>⏳ Exam Countdown</h4>
-      <p id="countdown"></p>
+    <div class="stat-box">
+      <label>📄 Personal Notes</label>
+      <p><%= typeof personalNotesCount !== 'undefined' ? personalNotesCount : 0 %></p>
+    </div>
+
+    <div class="stat-box">
+      <label>⭐ Favorites</label>
+      <p><%= typeof favoriteNotesCount !== 'undefined' ? favoriteNotesCount : 0 %></p>
+    </div>
+
+    <div class="stat-box highlight-week">
+      <label>🔥 Active Streak</label>
+      <p><%= typeof streak !== 'undefined' ? streak : 0 %> Days</p>
     </div>
 
   </div>
 
-  <!-- Admit Card -->
-  <a href="/admit-card" target="_blank" style="text-decoration: none;">
-    <div class="card" style="margin-top:20px; text-align:center; cursor:pointer;">
-      <h3> NPTEL Admit Card</h3>
-      <p class="muted-text">Download your admit card before exam.</p>
+  <!-- Action Cards -->
+  <div class="grid">
 
-      <span class="btn btn-submit">
-        Download Admit Card
-      </span>
-    </div>
-  </a>
+    <a href="/notes">
+      <div class="card action-card">
+        <h3>📄 My Notes</h3>
+        <p>View and manage your study notes</p>
+      </div>
+    </a>
 
+    <a href="/upload">
+      <div class="card action-card">
+        <h3>⬆️ Upload Notes</h3>
+        <p>Add new notes to your collection</p>
+      </div>
+    </a>
 
-  <!-- Study Material -->
-  <a href="/study-material" target="_blank" style="text-decoration: none;">
-    <div class="card" style="margin-top:20px; text-align:center; cursor:pointer;">
-      <h3>📚 Study Material</h3>
-      <p class="muted-text">Revise PDFs directly (No Download)</p>
+    <a href="/favorites">
+      <div class="card action-card">
+        <h3>⭐ Favorite Notes</h3>
+        <p>Quick access to saved notes</p>
+      </div>
+    </a>
 
-      <span class="btn btn-submit">
-        Open Study Material
-      </span>
-    </div>
-  </a>
+    <a href="/recent">
+      <div class="card action-card">
+        <h3>🕒 Recent Activity</h3>
+        <p>Continue where you left off</p>
+      </div>
+    </a>
 
-  <!-- Exam Instructions -->
-  <div class="card exam-card">
-  <h3>📢 Exam Instructions</h3>
-  <p class="muted-text">
-  Please follow all instructions carefully to avoid any issues during the exam.
-</p>
+  </div>
 
-  <ul class="instruction-list">
-    <li>Admit card print karke le jana compulsory hai</li>
-    <li>Valid ID proof (Aadhar / College ID)</li>
-    <li>Exam center par 30 min pehle pahuchna</li>
-    <li>Mobile allowed nahi hoga</li>
-  </ul>
-</div>
+  <!-- Search Section -->
+  <div class="card" style="margin-top:30px;">
+    <h3>🔍 Search Notes</h3>
+
+    <form action="/search" method="GET" class="form-row">
+      <input type="text" name="query" class="input"
+        placeholder="Search by subject, topic..." required />
+      <button type="submit" class="btn btn-submit">Search</button>
+    </form>
+  </div>
+
+  <!-- Insights -->
+  <div class="card" style="margin-top:30px;">
+    <h3>📈 Study Insights</h3>
+    <p class="muted-text">
+      Track your study patterns and improve productivity.
+    </p>
+
+    <ul class="instruction-list">
+      <li>✔ <strong>Notes Usage:</strong> <%= typeof personalNotesCount !== 'undefined' ? personalNotesCount : 0 %> notes uploaded</li>
+      <li>✔ <strong>Most Viewed Subject:</strong> <%= typeof mostViewedSubject !== 'undefined' ? mostViewedSubject : "None yet" %></li>
+      <li>✔ <strong>Streak Tracking:</strong> <%= typeof streak !== 'undefined' ? streak : 0 %> days active</li>
+      <li>✔ <strong>Recent Activity:</strong> <%= typeof recentActivityCount !== 'undefined' ? recentActivityCount : 0 %> notes accessed this week</li>
+    </ul>
+  </div>
+
+  <!-- Features (Resume Boost) -->
+  <div class="card" style="margin-top:30px;">
+    <h3>⚙️ Platform Features</h3>
+
+    <ul class="instruction-list">
+      <li>✔ Secure Login & Authentication</li>
+      <li>✔ Dynamic Dashboard Rendering (EJS)</li>
+      <li>✔ REST API Ready Backend</li>
+      <li>✔ Modular & Scalable Design</li>
+      <li>✔ Responsive UI for all devices</li>
+    </ul>
+  </div>
 
   <!-- Contact -->
   <div class="card" style="margin-top:30px;">
-    <h3>Contact Us</h3>
-    <p class="muted-text">Any issue, doubt or feedback? Send us a message.</p>
+    <h3>📞 Support</h3>
+    <p class="muted-text">Need help? Contact us anytime.</p>
 
     <form action="/contact-us" method="post" class="form-column">
 
@@ -91,27 +133,5 @@
   </div>
 
 </div>
-
-<!-- Countdown Script -->
-<script>
-const examDate = new Date("2026-04-19T00:00:00").getTime();
-
-const timer = setInterval(() => {
-  const now = new Date().getTime();
-  const diff = examDate - now;
-
-  if (diff <= 0) {
-    document.getElementById("countdown").innerHTML = "Exam Started 🚀";
-    clearInterval(timer);
-    return;
-  }
-
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-
-  document.getElementById("countdown").innerHTML =
-    days + "d " + hours + "h left";
-}, 1000);
-</script>
 
 <%- include("../partials/footer") %>

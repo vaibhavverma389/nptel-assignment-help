@@ -21,6 +21,7 @@ const authRoutes = require("./routes/authRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const contactRoutes = require("./routes/contactRoutes");
+const pingRoutes = require("./routes/ping");
 
 /* ================= MIDDLEWARES ================= */
 const lastActive = require("./middlewares/lastActive");
@@ -95,6 +96,7 @@ app.use("/auth", authRoutes);
 app.use(studentRoutes);
 app.use(adminRoutes);
 app.use(contactRoutes);
+app.use(pingRoutes);
 
 app.get("/", (req, res) => {
   res.redirect("/dashboard");

@@ -192,6 +192,18 @@ function resolveEventType(path, method) {
   if (path.includes("/register") || path.includes("/signup")) return "register";
   if (path.includes("/logout")) return "logout";
   if (path.includes("/download")) return "download";
+  
+  // Notes Event Types
+  if (path.includes("/notes/view")) return "note-view";
+  if (path.includes("/upload")) return method === "POST" ? "note-upload" : "visit";
+  if (path.includes("/notes/favorite")) return "note-favorite";
+  if (path.includes("/notes/edit")) return method === "POST" ? "note-edit" : "visit";
+  if (path.includes("/notes/delete")) return "note-delete";
+  
+  // MCQ Answer Submissions
+  if (path.includes("/submit-bulk")) return method === "POST" ? "bulk-answer-submit" : "visit";
+  if (path.includes("/submit")) return method === "POST" ? "single-answer-submit" : "visit";
+
   if (method === "POST") return "form-submit";
   return "visit";
 }

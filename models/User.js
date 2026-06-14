@@ -20,9 +20,17 @@ const userSchema = new mongoose.Schema({
     default: null
   },
   photo: {
-  type: String,
-  default: null,
-}
+    type: String,
+    default: null,
+  },
+  streak: {
+    type: Number,
+    default: 0
+  },
+  streakLastUpdated: {
+    type: Date,
+    default: null
+  }
 
 });
 

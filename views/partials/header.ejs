@@ -30,7 +30,7 @@
 
       <% } else { %>
         <a href="/auth/login">Login</a>
-        <a href="/auth/login">Register</a>
+        <a href="/auth/register">Register</a>
       <% } %>
 
     </nav>
@@ -41,3 +41,17 @@
 </header>
 
 <main class="container">
+
+  <!-- Flash Messages -->
+  <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
+    <div class="alert alert-success" style="background: rgba(0, 113, 189, 0.15); border: 1px solid var(--sky); padding: 12px 20px; border-radius: var(--radius-md); margin-top: 20px; margin-bottom: 20px; color: var(--ice); font-weight: 500; display: flex; align-items: center; justify-content: space-between;">
+      <span><%= success %></span>
+      <button onclick="this.parentElement.style.display='none'" style="background:none; border:none; color:inherit; font-size:1.2rem; cursor:pointer; padding:0 5px;">&times;</button>
+    </div>
+  <% } %>
+  <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+    <div class="alert alert-danger" style="background: rgba(217, 48, 37, 0.15); border: 1px solid var(--danger-color); padding: 12px 20px; border-radius: var(--radius-md); margin-top: 20px; margin-bottom: 20px; color: #ff8a80; font-weight: 500; display: flex; align-items: center; justify-content: space-between;">
+      <span><%= error %></span>
+      <button onclick="this.parentElement.style.display='none'" style="background:none; border:none; color:inherit; font-size:1.2rem; cursor:pointer; padding:0 5px;">&times;</button>
+    </div>
+  <% } %>

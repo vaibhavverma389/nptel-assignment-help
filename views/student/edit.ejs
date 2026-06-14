@@ -1,0 +1,54 @@
+<%- include("../partials/header") %>
+
+<h2 class="page-title">✏️ Edit Note</h2>
+
+<form method="post" action="/notes/edit/<%= note._id %>" class="card" style="max-width: 650px; margin: 0 auto 30px;">
+  <div class="form-column">
+    
+    <!-- Title -->
+    <div class="form-group">
+      <label class="form-label" for="title">Note Title</label>
+      <input type="text" id="title" name="title" class="input" value="<%= note.title %>" required />
+    </div>
+
+    <!-- Subject Selection -->
+    <div class="form-group">
+      <label class="form-label" for="subject">Select Subject</label>
+      <select id="subject" name="subject" class="select" required>
+        <% subjects.forEach(s => { %>
+          <option value="<%= s.name %>" <%= note.subject === s.name ? "selected" : "" %>><%= s.name %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <!-- Content / Description -->
+    <div class="form-group">
+      <label class="form-label" for="description">Note Content / Description</label>
+      <textarea id="description" name="description" rows="8" class="input" placeholder="Type key insights, study points, or details..."><%= note.description %></textarea>
+    </div>
+
+    <!-- Attached File Notice -->
+    <% if (note.fileUrl) { %>
+      <div style="background: rgba(0, 113, 189, 0.08); border: 1px solid var(--border-light); padding: 15px; border-radius: var(--radius-md); margin-top: 10px;">
+        <span style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 5px;">Attached File:</span>
+        <a href="<%= note.fileUrl %>" target="_blank" style="color: var(--primary-light); text-decoration: underline; word-break: break-all;">
+          <%= note.fileName || 'View Attachment' %>
+        </a>
+        <p class="muted-text" style="font-size: 0.8rem; margin-top: 5px; margin-bottom: 0;">File modifications are not supported. Delete this note and upload a new one if you wish to change the attachment.</p>
+      </div>
+    <% } %>
+
+    <!-- Buttons -->
+    <div class="btn-group" style="margin-top: 15px;">
+      <button type="submit" class="btn btn-submit">Save Changes</button>
+      <a href="/notes" class="btn btn-secondary">Cancel</a>
+    </div>
+
+  </div>
+</form>
+
+<div style="text-align: center; margin-bottom: 40px;">
+  <a href="/notes" class="back-dashboard">← Back to Notes Hub</a>
+</div>
+
+<%- include("../partials/footer") %>

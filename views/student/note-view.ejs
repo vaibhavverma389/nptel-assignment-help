@@ -1,0 +1,60 @@
+<%- include("../partials/header") %>
+
+<div style="max-width: 800px; margin: 40px auto 50px;">
+  
+  <div style="margin-bottom: 25px;">
+    <a href="/notes" class="back-dashboard">← Back to Notes Hub</a>
+  </div>
+
+  <div class="card" style="padding: 40px;">
+    <!-- Subject Tag -->
+    <span class="countdown-text" style="background: rgba(0, 113, 189, 0.15); color: var(--gold); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8rem; border-radius: 4px; padding: 4px 10px;">
+      <%= note.subject %>
+    </span>
+
+    <!-- Note Title -->
+    <h1 style="margin-top: 15px; margin-bottom: 10px; font-size: 2.2rem; line-height: 1.3; color: #fff;">
+      <%= note.title %>
+    </h1>
+
+    <!-- Created date & metadata -->
+    <div class="muted-text" style="font-size: 0.85rem; display: flex; flex-wrap: wrap; gap: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 20px; margin-bottom: 25px;">
+      <span>📅 Created: <%= new Date(note.createdAt).toLocaleDateString("en-IN") %></span>
+      <span>👁️ Views: <%= note.viewsCount %></span>
+      <% if (note.isFavorite) { %>
+        <span style="color: var(--gold);">★ Favorite</span>
+      <% } %>
+    </div>
+
+    <!-- Note Content / Description -->
+    <div style="font-size: 1.1rem; line-height: 1.8; color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; margin-bottom: 30px;">
+      <%= note.description || 'No detailed content provided.' %>
+    </div>
+
+    <!-- Attachment Section -->
+    <% if (note.fileUrl) { %>
+      <div style="background: rgba(0, 113, 189, 0.08); border: 1px solid var(--border-light); padding: 20px; border-radius: var(--radius-lg); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap;">
+        <div>
+          <span style="font-weight: 600; font-size: 0.95rem; display: block; margin-bottom: 4px; color: #fff;">Attachment:</span>
+          <span class="muted-text" style="font-size: 0.85rem; word-break: break-all;"><%= note.fileName || 'note_document' %></span>
+        </div>
+        <a href="<%= note.fileUrl %>" target="_blank" class="btn btn-download" download style="padding: 10px 20px; font-size: 0.9rem;">
+          Download Attachment
+        </a>
+      </div>
+    <% } %>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 10px; border-top: 1px solid var(--border-light); padding-top: 25px; margin-top: 10px;">
+      <a href="/notes/edit/<%= note._id %>" class="btn btn-secondary" style="padding: 10px 20px;">Edit Note</a>
+      
+      <form method="post" action="/notes/delete/<%= note._id %>" onsubmit="return confirm('Are you sure you want to delete this note?');" style="display: inline;">
+        <button type="submit" class="btn btn-remove" style="padding: 10px 20px;">Delete Note</button>
+      </form>
+    </div>
+
+  </div>
+
+</div>
+
+<%- include("../partials/footer") %>
