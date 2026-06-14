@@ -49,3 +49,17 @@
 </div>
 
 <%- include("../partials/footer") %>
+
+<script>
+  document.getElementById('noteFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const titleInput = document.getElementById('title');
+      const fileName = file.name;
+      const lastDotIndex = fileName.lastIndexOf('.');
+      const title = lastDotIndex !== -1 ? fileName.substring(0, lastDotIndex) : fileName;
+      titleInput.value = title;
+    }
+  });
+</script>
+
