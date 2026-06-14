@@ -588,7 +588,17 @@ router.get(
       sn: i + 1,
       userName: v.userName || "N/A",
       email: v.email || "N/A",
-      activityType: v.activityType === "upload" ? "Upload" : "Download",
+      activityType: v.activityType === "upload"
+        ? "Upload"
+        : v.activityType === "download"
+          ? "Download"
+          : v.activityType === "approve_note"
+            ? "Approve Note"
+            : v.activityType === "reject_note"
+              ? "Reject Note"
+              : v.activityType === "delete_note"
+                ? "Delete Note"
+                : v.activityType,
       itemType: v.itemType,
       title: v.title,
       fileName: v.fileName,
@@ -611,6 +621,149 @@ router.get(
     ];
 
     await exportExcel(res, "Student Activity Logs", columns, rows, "student_activity_logs.xlsx");
+  })
+);
+
+// ================= STUDENT NOTES MANAGEMENT =================
+
+router.get(
+  "/admin/notes",
+  isAdmin,
+  asyncHandler(async (req, res) => {
+    const { status = "", subject = "" } = req.query;
+    
+    const filter = {};
+    if (status) {
+      filter.status = status;
+    }
+    if (subject) {
+      filter.subject = subject;
+    }
+
+    const [notes, subjects, stats] = await Promise.all([
+      Note.find(filter).sort({ createdAt: -1 }).lean(),
+      Subject.find().sort({ name: 1 }).lean(),
+      Promise.all([
+        Note.countDocuments(),
+        Note.countDocuments({ status: "pending" }),
+        Note.countDocuments({ status: "approved" }),
+        Note.countDocuments({ status: "rejected" })
+      ])
+    ]);
+
+    res.render("admin/notes", {
+      notes,
+      subjects,
+      selectedStatus: status,
+      selectedSubject: subject,
+      stats: {
+        total: stats[0],
+        pending: stats[1],
+        approved: stats[2],
+        rejected: stats[3]
+      }
+    });
+  })
+);
+
+router.post(
+  "/admin/notes/approve/:id",
+  isAdmin,
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).send("Invalid note ID");
+    }
+
+    const note = await Note.findById(id);
+    if (!note) {
+      return res.status(404).send("Note not found");
+    }
+
+    note.status = "approved";
+    await note.save();
+
+    await ActivityLog.create({
+      userId: req.user ? req.user._id : null,
+      email: req.user ? req.user.email : "admin",
+      userName: req.user ? req.user.name : "Admin",
+      activityType: "approve_note",
+      itemType: "Note",
+      itemId: note._id,
+      title: `Approved note: ${note.title}`,
+      fileName: note.fileName || "Text Note (No File)",
+      subject: note.subject,
+      timestamp: new Date()
+    });
+
+    res.redirect("/admin/notes?success=Note approved successfully");
+  })
+);
+
+router.post(
+  "/admin/notes/reject/:id",
+  isAdmin,
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).send("Invalid note ID");
+    }
+
+    const note = await Note.findById(id);
+    if (!note) {
+      return res.status(404).send("Note not found");
+    }
+
+    note.status = "rejected";
+    await note.save();
+
+    await ActivityLog.create({
+      userId: req.user ? req.user._id : null,
+      email: req.user ? req.user.email : "admin",
+      userName: req.user ? req.user.name : "Admin",
+      activityType: "reject_note",
+      itemType: "Note",
+      itemId: note._id,
+      title: `Rejected note: ${note.title}`,
+      fileName: note.fileName || "Text Note (No File)",
+      subject: note.subject,
+      timestamp: new Date()
+    });
+
+    res.redirect("/admin/notes?success=Note rejected successfully");
+  })
+);
+
+router.post(
+  "/admin/notes/delete/:id",
+  isAdmin,
+  asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).send("Invalid note ID");
+    }
+
+    const note = await Note.findById(id);
+    if (!note) {
+      return res.status(404).send("Note not found");
+    }
+
+    await Note.deleteOne({ _id: id });
+
+    await ActivityLog.create({
+      userId: req.user ? req.user._id : null,
+      email: req.user ? req.user.email : "admin",
+      userName: req.user ? req.user.name : "Admin",
+      activityType: "delete_note",
+      itemType: "Note",
+      itemId: note._id,
+      title: `Deleted note: ${note.title}`,
+      fileName: note.fileName || "Text Note (No File)",
+      subject: note.subject,
+      timestamp: new Date()
+    });
+
+    res.redirect("/admin/notes?success=Note deleted successfully");
   })
 );
 

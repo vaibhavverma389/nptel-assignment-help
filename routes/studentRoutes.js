@@ -286,6 +286,16 @@ router.get("/notes", asyncHandler(async (req, res) => {
   if (subject) {
     query.subject = subject;
   }
+
+  // Only show approved notes to regular users. Logged-in students can also see their own pending/rejected notes. Admin sees all notes.
+  if (!req.user) {
+    query.status = "approved";
+  } else if (req.user.role !== "admin") {
+    query.$or = [
+      { status: "approved" },
+      { email: req.user.email }
+    ];
+  }
   
   const [notes, adminMaterials] = await Promise.all([
     Note.find(query).sort({ createdAt: -1 }).lean(),
@@ -387,11 +397,26 @@ router.get("/search", asyncHandler(async (req, res) => {
   const { query = "" } = req.query;
   let notes = [];
   if (query.trim()) {
+    const statusQuery = {};
+    if (!req.user) {
+      statusQuery.status = "approved";
+    } else if (req.user.role !== "admin") {
+      statusQuery.$or = [
+        { status: "approved" },
+        { email: req.user.email }
+      ];
+    }
+
     notes = await Note.find({
-      $or: [
-        { title: { $regex: query.trim(), $options: "i" } },
-        { description: { $regex: query.trim(), $options: "i" } },
-        { subject: { $regex: query.trim(), $options: "i" } }
+      $and: [
+        statusQuery,
+        {
+          $or: [
+            { title: { $regex: query.trim(), $options: "i" } },
+            { description: { $regex: query.trim(), $options: "i" } },
+            { subject: { $regex: query.trim(), $options: "i" } }
+          ]
+        }
       ]
     }).sort({ createdAt: -1 }).lean();
   }
@@ -403,6 +428,15 @@ router.get("/notes/view/:id", asyncHandler(async (req, res) => {
   const note = await Note.findById(req.params.id);
   if (!note) {
     return res.status(404).render("404");
+  }
+
+  // Authorization Check: prevent guests/other students from viewing pending/rejected notes
+  if (note.status !== "approved") {
+    const isOwner = req.user && req.user.email === note.email;
+    const isAdmin = req.user && req.user.role === "admin";
+    if (!isOwner && !isAdmin) {
+      return res.status(403).send("Unauthorized access. This note is pending approval or has been rejected.");
+    }
   }
 
   note.viewsCount += 1;
@@ -424,7 +458,11 @@ router.get("/notes/view/:id", asyncHandler(async (req, res) => {
 
 // Edit Note GET
 router.get("/notes/edit/:id", isAuth, asyncHandler(async (req, res) => {
-  const note = await Note.findOne({ _id: req.params.id, email: req.user.email }).lean();
+  const query = { _id: req.params.id };
+  if (req.user.role !== 'admin') {
+    query.email = req.user.email;
+  }
+  const note = await Note.findOne(query).lean();
   if (!note) {
     return res.status(404).render("404");
   }
@@ -435,7 +473,11 @@ router.get("/notes/edit/:id", isAuth, asyncHandler(async (req, res) => {
 // Edit Note POST
 router.post("/notes/edit/:id", isAuth, asyncHandler(async (req, res) => {
   const { title, description, subject } = req.body;
-  const note = await Note.findOne({ _id: req.params.id, email: req.user.email });
+  const query = { _id: req.params.id };
+  if (req.user.role !== 'admin') {
+    query.email = req.user.email;
+  }
+  const note = await Note.findOne(query);
   if (!note) {
     return res.status(404).render("404");
   }
@@ -451,7 +493,11 @@ router.post("/notes/edit/:id", isAuth, asyncHandler(async (req, res) => {
 
 // Delete Note POST
 router.post("/notes/delete/:id", isAuth, asyncHandler(async (req, res) => {
-  await Note.deleteOne({ _id: req.params.id, email: req.user.email });
+  const query = { _id: req.params.id };
+  if (req.user.role !== 'admin') {
+    query.email = req.user.email;
+  }
+  await Note.deleteOne(query);
   res.redirect("/notes?success=Note deleted successfully");
 }));
 
@@ -460,6 +506,15 @@ router.get("/notes/download/:id", asyncHandler(async (req, res) => {
   const note = await Note.findById(req.params.id);
   if (!note || !note.fileUrl) {
     return res.status(404).send("File not found");
+  }
+
+  // Authorization Check: prevent guests/other students from downloading pending/rejected notes
+  if (note.status !== "approved") {
+    const isOwner = req.user && req.user.email === note.email;
+    const isAdmin = req.user && req.user.role === "admin";
+    if (!isOwner && !isAdmin) {
+      return res.status(403).send("Unauthorized access. This note is pending approval or has been rejected.");
+    }
   }
 
   await ActivityLog.create({

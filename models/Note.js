@@ -42,6 +42,11 @@ const noteSchema = new mongoose.Schema({
   lastAccessed: {
     type: Date,
     default: Date.now
+  },
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending"
   }
 }, {
   timestamps: true

@@ -26,6 +26,9 @@
         <option value="">All Actions</option>
         <option value="upload" <%= filter.activityType === 'upload' ? 'selected' : '' %>>Upload</option>
         <option value="download" <%= filter.activityType === 'download' ? 'selected' : '' %>>Download</option>
+        <option value="approve_note" <%= filter.activityType === 'approve_note' ? 'selected' : '' %>>Approve Note</option>
+        <option value="reject_note" <%= filter.activityType === 'reject_note' ? 'selected' : '' %>>Reject Note</option>
+        <option value="delete_note" <%= filter.activityType === 'delete_note' ? 'selected' : '' %>>Delete Note</option>
       </select>
     </div>
 
@@ -96,16 +99,32 @@
                 <% 
                   let badgeBg = "rgba(0, 113, 189, 0.15)";
                   let badgeColor = "#0071BD";
+                  let displayAction = log.activityType;
+
                   if (log.activityType === "upload") {
                     badgeBg = "rgba(0, 200, 83, 0.15)";
                     badgeColor = "#00e676";
+                    displayAction = "Upload";
                   } else if (log.activityType === "download") {
                     badgeBg = "rgba(238, 186, 27, 0.15)";
                     badgeColor = "#EEBA1B";
+                    displayAction = "Download";
+                  } else if (log.activityType === "approve_note") {
+                    badgeBg = "rgba(37, 211, 102, 0.15)";
+                    badgeColor = "#25d366";
+                    displayAction = "Approve";
+                  } else if (log.activityType === "reject_note") {
+                    badgeBg = "rgba(217, 48, 37, 0.15)";
+                    badgeColor = "#ff8a80";
+                    displayAction = "Reject";
+                  } else if (log.activityType === "delete_note") {
+                    badgeBg = "rgba(217, 48, 37, 0.25)";
+                    badgeColor = "#ff5252";
+                    displayAction = "Delete";
                   }
                 %>
                 <span style="background: <%= badgeBg %>; color: <%= badgeColor %>; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                  <%= log.activityType %>
+                  <%= displayAction %>
                 </span>
               </td>
               

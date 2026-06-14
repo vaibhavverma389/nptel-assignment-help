@@ -14,6 +14,20 @@ const connectDB = async () => {
     } catch (e) {
       // Index might not exist, which is fine
     }
+
+    // Migrate existing notes to have approved status if status is not set
+    try {
+      const Note = require("../models/Note");
+      const result = await Note.updateMany(
+        { status: { $exists: false } },
+        { $set: { status: "approved" } }
+      );
+      if (result.modifiedCount > 0) {
+        console.log(`Migrated ${result.modifiedCount} existing notes to approved status.`);
+      }
+    } catch (migrateErr) {
+      console.error("Notes migration error:", migrateErr);
+    }
   } catch (err) {
     console.error(err);
     process.exit(1);

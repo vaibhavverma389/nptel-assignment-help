@@ -1,0 +1,148 @@
+<%- include("../partials/header") %>
+
+<h2 class="page-title">Manage Student Notes</h2>
+
+<p class="page-subtitle" style="text-align: center; margin-bottom: 30px;">
+  Review, approve, reject, and delete student-uploaded notes
+</p>
+
+<!-- Statistics Row -->
+<div class="stats-row" style="margin-bottom: 25px;">
+  <div class="stat-box">
+    <label>Total Uploaded</label>
+    <p><%= stats.total %></p>
+  </div>
+  <div class="stat-box highlight-week">
+    <label>Pending Approval</label>
+    <p><%= stats.pending %></p>
+  </div>
+  <div class="stat-box highlight-date">
+    <label>Approved</label>
+    <p><%= stats.approved %></p>
+  </div>
+  <div class="stat-box" style="border-left: 3px solid var(--danger-color);">
+    <label>Rejected</label>
+    <p><%= stats.rejected %></p>
+  </div>
+</div>
+
+<!-- Filters Card -->
+<div class="card" style="margin-bottom: 25px; padding: 20px;">
+  <form method="get" action="/admin/notes" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
+    <div style="flex: 1; min-width: 200px;">
+      <label class="form-label" style="margin-bottom: 5px; display: block; font-size: 0.75rem;">Filter by Status</label>
+      <select name="status" class="select" onchange="this.form.submit()" style="margin: 0; width: 100%; padding: 10px;">
+        <option value="" <%= selectedStatus === "" ? "selected" : "" %>>All Statuses</option>
+        <option value="pending" <%= selectedStatus === "pending" ? "selected" : "" %>>Pending Approval</option>
+        <option value="approved" <%= selectedStatus === "approved" ? "selected" : "" %>>Approved</option>
+        <option value="rejected" <%= selectedStatus === "rejected" ? "selected" : "" %>>Rejected</option>
+      </select>
+    </div>
+    <div style="flex: 1; min-width: 200px;">
+      <label class="form-label" style="margin-bottom: 5px; display: block; font-size: 0.75rem;">Filter by Subject</label>
+      <select name="subject" class="select" onchange="this.form.submit()" style="margin: 0; width: 100%; padding: 10px;">
+        <option value="" <%= selectedSubject === "" ? "selected" : "" %>>All Subjects</option>
+        <% subjects.forEach(s => { %>
+          <option value="<%= s.name %>" <%= selectedSubject === s.name ? "selected" : "" %>><%= s.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div>
+      <a href="/admin/notes" class="btn btn-secondary" style="padding: 10px 20px; font-size: 0.9rem; min-height: auto; margin: 0;">Clear Filters</a>
+    </div>
+  </form>
+</div>
+
+<!-- Notes List Table Card -->
+<div class="card" style="padding: 25px;">
+  <h3 style="margin-bottom: 20px; color: #fff;">Student Note Submissions</h3>
+  
+  <% if (notes.length === 0) { %>
+    <p class="muted-text" style="text-align: center; padding: 40px; font-size: 1.1rem;">No student notes found matching these filters.</p>
+  <% } else { %>
+    <div class="table-wrapper">
+      <table class="answers-table">
+        <thead>
+          <tr>
+            <th style="width: 50px;">S.N.</th>
+            <th style="width: 250px;">Note Details</th>
+            <th>Uploaded By</th>
+            <th>File Attachment</th>
+            <th>Date Uploaded</th>
+            <th>Status</th>
+            <th style="width: 240px; text-align: center;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% let count = 1; %>
+          <% notes.forEach(note => { %>
+            <tr>
+              <td><%= count++ %></td>
+              <td>
+                <span class="countdown-text" style="background: rgba(0, 113, 189, 0.15); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.7rem; border-radius: 4px; padding: 2px 6px; display: inline-block; margin-bottom: 5px; margin-top: 0;">
+                  <%= note.subject %>
+                </span>
+                <strong style="display: block; color: #fff; font-size: 1rem; margin-bottom: 4px;"><%= note.title %></strong>
+                <span class="muted-text" style="font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
+                  <%= note.description || 'No description' %>
+                </span>
+              </td>
+              <td>
+                <span style="display: block; color: var(--ice); font-weight: 500;"><%= note.user %></span>
+                <span class="muted-text" style="font-size: 0.8rem;"><%= note.email %></span>
+              </td>
+              <td>
+                <% if (note.fileUrl) { %>
+                  <a href="/notes/download/<%= note._id %>" target="_blank" class="btn btn-secondary btn-sm" style="padding: 4px 8px; font-size: 0.8rem; display: inline-flex; border-color: rgba(0, 113, 189, 0.3); margin: 0;" download>
+                    📄 <%= note.fileName || 'Download Attachment' %>
+                  </a>
+                <% } else { %>
+                  <span class="muted-text" style="font-size: 0.85rem; font-style: italic;">No attachment</span>
+                <% } %>
+              </td>
+              <td style="font-size: 0.85rem; color: var(--ice);">
+                <%= new Date(note.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) %>
+              </td>
+              <td>
+                <% if (note.status === 'pending') { %>
+                  <span style="background: rgba(238, 186, 27, 0.15); color: var(--lemon); font-size: 0.8rem; border-radius: 4px; padding: 4px 8px; font-weight: 600; display: inline-block;">
+                    ⏳ Pending
+                  </span>
+                <% } else if (note.status === 'rejected') { %>
+                  <span style="background: rgba(217, 48, 37, 0.15); color: #ff8a80; font-size: 0.8rem; border-radius: 4px; padding: 4px 8px; font-weight: 600; display: inline-block;">
+                    ❌ Rejected
+                  </span>
+                <% } else { %>
+                  <span style="background: rgba(37, 211, 102, 0.15); color: #25d366; font-size: 0.8rem; border-radius: 4px; padding: 4px 8px; font-weight: 600; display: inline-block;">
+                    ✓ Approved
+                  </span>
+                <% } %>
+              </td>
+              <td>
+                <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                  <% if (note.status !== 'approved') { %>
+                    <form method="post" action="/admin/notes/approve/<%= note._id %>" style="margin: 0;">
+                      <button type="submit" class="btn btn-submit" style="padding: 6px 12px; font-size: 0.8rem; min-height: auto; margin: 0;">Approve</button>
+                    </form>
+                  <% } %>
+                  <% if (note.status !== 'rejected') { %>
+                    <form method="post" action="/admin/notes/reject/<%= note._id %>" style="margin: 0;">
+                      <button type="submit" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem; min-height: auto; border-color: rgba(217, 48, 37, 0.4); color: #ff8a80; margin: 0;">Reject</button>
+                    </form>
+                  <% } %>
+                  <form method="post" action="/admin/notes/delete/<%= note._id %>" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this note permanently?');">
+                    <button type="submit" class="btn btn-remove" style="padding: 6px 12px; font-size: 0.8rem; min-height: auto; margin: 0;">Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<a href="/admin" class="back-dashboard">← Back to Dashboard</a>
+
+<%- include("../partials/footer") %>

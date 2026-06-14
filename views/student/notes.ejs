@@ -82,7 +82,7 @@
           </form>
  
           <div>
-            <!-- Subject & Uploader Info -->
+            <!-- Subject & Uploader Info & Status -->
             <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px;">
               <span class="countdown-text" style="background: rgba(0, 113, 189, 0.15); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.75rem; border-radius: 4px; padding: 3px 8px;">
                 <%= note.subject %>
@@ -90,6 +90,21 @@
               <span class="muted-text" style="font-size: 0.75rem;">
                 by <%= note.user || 'Student' %>
               </span>
+              <% if (typeof note.status !== 'undefined' && note.status) { %>
+                <% if (note.status === 'pending') { %>
+                  <span class="countdown-text" style="background: rgba(238, 186, 27, 0.15); color: var(--lemon); font-size: 0.75rem; border-radius: 4px; padding: 3px 8px; font-weight: 600;">
+                    ⏳ Pending
+                  </span>
+                <% } else if (note.status === 'rejected') { %>
+                  <span class="countdown-text" style="background: rgba(217, 48, 37, 0.15); color: #ff8a80; font-size: 0.75rem; border-radius: 4px; padding: 3px 8px; font-weight: 600;">
+                    ❌ Rejected
+                  </span>
+                <% } else if (note.status === 'approved' && user && (note.email === user.email || user.role === 'admin')) { %>
+                  <span class="countdown-text" style="background: rgba(37, 211, 102, 0.15); color: #25d366; font-size: 0.75rem; border-radius: 4px; padding: 3px 8px; font-weight: 600;">
+                    ✓ Approved
+                  </span>
+                <% } %>
+              <% } %>
             </div>
 
             <!-- Note Title -->
