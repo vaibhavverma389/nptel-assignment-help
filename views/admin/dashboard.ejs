@@ -1,6 +1,6 @@
 <%- include("../partials/header") %>
 
-<h2 class="page-title">🛠 Admin Dashboard</h2>
+<h2 class="page-title">Admin Dashboard</h2>
 
 <p class="page-subtitle">
   Manage students, answers, subjects and weekly materials
@@ -10,7 +10,7 @@
 
   <!-- USERS -->
   <a href="/admin/users" class="dash-card">
-    <h3>👤 Users</h3>
+    <h3>Users</h3>
 
     <p>
       <strong>Total Users:</strong>
@@ -18,19 +18,19 @@
     </p>
 
     <div class="card-actions">
-      <span>📋 View all students</span>
+      <span>View all students</span>
     </div>
   </a>
 
   <!-- EXPORT USERS -->
   <a href="/admin/export/users" class="dash-card">
-    <h3>📥 Export Users</h3>
+    <h3>Export Users</h3>
     <p>Download students data (Excel)</p>
   </a>
 
   <!-- ANSWERS -->
   <a href="/admin/answers" class="dash-card">
-    <h3>📝 Answers</h3>
+    <h3>Answers</h3>
 
     <p>
       <strong>Total Answers:</strong>
@@ -38,27 +38,27 @@
     </p>
 
     <div class="card-actions">
-      <span>📊 View submissions</span>
+      <span>View submissions</span>
     </div>
   </a>
 
   <!-- BULK SUBMIT -->
   <a href="/submit-bulk" class="dash-card">
-    <h3>📝 Submit Answers</h3>
+    <h3>Submit Answers</h3>
 
     <p>
       Submit / Update answers (Admin)
     </p>
   </a>
 <a href="/admin/materials" class="dash-card">
-  <h3>📚 Study Material</h3>
+  <h3>Study Material</h3>
 
   <p>
     Upload & manage weekly PDFs
   </p>
 
   <div class="card-actions">
-    <span>📂 Manage Materials</span>
+    <span>Manage Materials</span>
   </div>
 </a>
   <!-- VISITORS -->
@@ -72,7 +72,7 @@
 
   <!-- EXPORT VISITORS -->
   <a href="/admin/export/visitors" class="dash-card">
-    <h3>📤 Export Visitors</h3>
+    <h3>Export Visitors</h3>
 
     <p>
       Export visitors data (Excel)
@@ -81,7 +81,7 @@
 
   <!-- CONTACT MESSAGES -->
   <a href="/admin/contact-messages" class="dash-card">
-    <h3>📩 Contact Messages</h3>
+    <h3>Contact Messages</h3>
 
     <p>
       View all student queries
@@ -91,7 +91,7 @@
   <!-- LOGGED IN USERS -->
   <div class="dash-card">
 
-    <h3>🟢 Logged-in Visitors</h3>
+    <h3>Logged-in Visitors</h3>
 
     <p>
       <strong><%= loggedInUsers %></strong>
@@ -102,7 +102,7 @@
   <!-- LIVE USERS -->
   <div class="dash-card">
 
-    <h3>⚡ Live Users</h3>
+    <h3>Live Users</h3>
 
     <p>
       <strong id="liveUsers">0</strong>
@@ -113,7 +113,7 @@
   <!-- ACTIVITY 24H -->
   <div class="dash-card">
 
-    <h3>📊 Activity (Last 24h)</h3>
+    <h3>Activity (Last 24h)</h3>
 
     <p>
       <strong>Total Logs:</strong>
@@ -125,7 +125,7 @@
   <!-- NEW USERS -->
   <div class="dash-card">
 
-    <h3>🆕 New Users (24h)</h3>
+    <h3>New Users (24h)</h3>
 
     <p>
       <strong><%= newUsersLast24h %></strong>

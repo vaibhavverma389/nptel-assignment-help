@@ -1,7 +1,7 @@
 <%- include("../partials/header") %>
 
 <div class="dashboard">
-  <h2 class="page-title">🔍 Search Results</h2>
+  <h2 class="page-title">Search Results</h2>
   <p class="muted-text" style="text-align: center; margin-bottom: 25px;">Search query: <strong>"<%= query %>"</strong></p>
 
   <div style="text-align: right; margin-bottom: 25px;">
@@ -50,7 +50,6 @@
           <div style="border-top: 1px solid var(--border-light); padding-top: 15px; margin-top: 15px;">
             <% if (note.fileUrl) { %>
               <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px;">
-                <span style="font-size: 1.1rem;">📎</span>
                 <a href="<%= note.fileUrl %>" target="_blank" class="muted-text" style="font-size: 0.85rem; color: var(--primary-light); text-decoration: underline; word-break: break-all;" download>
                   <%= note.fileName || 'Download Attachment' %>
                 </a>

@@ -55,9 +55,9 @@
               <td>
                 <span class="copy-ip" title="Click to copy IP" data-ip="<%= v.ip %>" style="cursor:pointer;color:#007bff;font-weight:600;"><%= v.ip %></span>
                 <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
-                  📍 <%= (v.city || v.region) ? (v.city || v.region) + ', ' + (v.country || '') : (v.country || 'Local/Unknown') %> 
+                  <%= (v.city || v.region) ? (v.city || v.region) + ', ' + (v.country || '') : (v.country || 'Local/Unknown') %> 
                   <br>
-                  📶 <span style="opacity: 0.8;"><%= v.isp || 'Local Network' %></span>
+                  <span style="opacity: 0.8;"><%= v.isp || 'Local Network' %></span>
                 </div>
               </td>
 
@@ -89,13 +89,13 @@
                 <% if (v.screenWidth || v.connectionType || v.cpuCores) { %>
                   <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.4;">
                     <% if (v.screenWidth && v.screenHeight) { %>
-                      🖥️ <%= v.screenWidth %>x<%= v.screenHeight %>
+                      <%= v.screenWidth %>x<%= v.screenHeight %>
                     <% } %>
                     <% if (v.connectionType) { %>
-                      ⚡ <%= v.connectionType.toUpperCase() %>
+                      <%= v.connectionType.toUpperCase() %>
                     <% } %>
                     <% if (v.cpuCores || v.deviceMemory) { %>
-                      <br>⚙️ <%= v.cpuCores ? v.cpuCores + ' CPU' : '' %> <%= v.deviceMemory ? '| ' + v.deviceMemory + 'GB RAM' : '' %>
+                      <br><%= v.cpuCores ? v.cpuCores + ' CPU' : '' %> <%= v.deviceMemory ? '| ' + v.deviceMemory + 'GB RAM' : '' %>
                     <% } %>
                   </div>
                 <% } %>

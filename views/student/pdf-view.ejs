@@ -19,7 +19,7 @@
         <a 
           href="/pdf/<%= type === 'assignment' ? 'assi' : 'study' %>/<%= Number(week) - 1 %>?subject=<%= encodeURIComponent(subject) %>" 
           class="btn btn-primary">
-          ⬅ Previous
+          Previous
         </a>
       <% } %>
 
@@ -28,7 +28,7 @@
         <a 
           href="/pdf/<%= type === 'assignment' ? 'assi' : 'study' %>/<%= Number(week) + 1 %>?subject=<%= encodeURIComponent(subject) %>" 
           class="btn btn-primary">
-          Next ➡
+          Next
         </a>
       <% } %>
 
@@ -40,7 +40,6 @@
 
     <div class="card empty-state">
       <div class="empty-content">
-        <p class="empty-icon">📭</p>
         <p class="muted-text">No PDF available for Week <%= week %></p>
 
         <a href="/study-material?subject=<%= encodeURIComponent(subject) %>" class="btn btn-secondary">
@@ -76,7 +75,7 @@
 
 </div>
 <a href="/study-material?subject=<%= encodeURIComponent(subject) %>" class="btn btn-secondary">
-        ← Back
+        Back
       </a>
 
 
