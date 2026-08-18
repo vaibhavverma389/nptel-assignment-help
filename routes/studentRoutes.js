@@ -31,7 +31,7 @@ const isValidWeek = (week) => {
 };
 
 /* ================= DASHBOARD ================= */
-router.get("/dashboard", asyncHandler(async (req, res) => {
+router.get("/dashboard", isAuth, asyncHandler(async (req, res) => {
   const { course = "", week = null } = req.query;
   const weekNum = week ? Number(week) : null;
  
@@ -114,7 +114,7 @@ router.get("/dashboard", asyncHandler(async (req, res) => {
 }));
 
 /* ================= STUDY MATERIAL ================= */
-router.get("/study-material", asyncHandler(async (req, res) => {
+router.get("/study-material", isAuth, asyncHandler(async (req, res) => {
   const { subject = "" } = req.query;
   const subjects = await Subject.find().sort({ name: 1 });
   
@@ -127,7 +127,7 @@ router.get("/study-material", asyncHandler(async (req, res) => {
 }));
 
 /* ================= STUDY VIEW ================= */
-router.get("/study-view",  asyncHandler(async (req, res) => {
+router.get("/study-view", isAuth, asyncHandler(async (req, res) => {
   const { subject, week } = req.query;
 
   if (!subject) {
@@ -154,7 +154,7 @@ router.get("/study-view",  asyncHandler(async (req, res) => {
 }));
 
 /* ================= SHORT PDF ROUTE ================= */
-router.get("/pdf/:type/:week", asyncHandler(async (req, res) => {
+router.get("/pdf/:type/:week", isAuth, asyncHandler(async (req, res) => {
   const { type, week } = req.params;
   const { subject } = req.query;
 
@@ -278,7 +278,7 @@ router.post("/submit-bulk", isAuth, asyncHandler(async (req, res) => {
 /* ================= NOTES MANAGEMENT ================= */
 
 // List notes (All Students + Subject Filter + Admin Materials)
-router.get("/notes", asyncHandler(async (req, res) => {
+router.get("/notes", isAuth, asyncHandler(async (req, res) => {
   const { subject = "" } = req.query;
   const subjects = await Subject.find().sort({ name: 1 }).lean();
   
@@ -393,7 +393,7 @@ router.get("/recent", isAuth, asyncHandler(async (req, res) => {
 }));
 
 // Search Notes
-router.get("/search", asyncHandler(async (req, res) => {
+router.get("/search", isAuth, asyncHandler(async (req, res) => {
   const { query = "" } = req.query;
   let notes = [];
   if (query.trim()) {
@@ -424,7 +424,7 @@ router.get("/search", asyncHandler(async (req, res) => {
 }));
 
 // View Single Note (tracks access / downloads / views)
-router.get("/notes/view/:id", asyncHandler(async (req, res) => {
+router.get("/notes/view/:id", isAuth, asyncHandler(async (req, res) => {
   const note = await Note.findById(req.params.id);
   if (!note) {
     return res.status(404).render("404");
@@ -502,7 +502,7 @@ router.post("/notes/delete/:id", isAuth, asyncHandler(async (req, res) => {
 }));
 
 // Download Student Note
-router.get("/notes/download/:id", asyncHandler(async (req, res) => {
+router.get("/notes/download/:id", isAuth, asyncHandler(async (req, res) => {
   const note = await Note.findById(req.params.id);
   if (!note || !note.fileUrl) {
     return res.status(404).send("File not found");
@@ -534,7 +534,7 @@ router.get("/notes/download/:id", asyncHandler(async (req, res) => {
 }));
 
 // Download WeekMaterial (Admin PDF)
-router.get("/materials/download/:id", asyncHandler(async (req, res) => {
+router.get("/materials/download/:id", isAuth, asyncHandler(async (req, res) => {
   const material = await WeekMaterial.findById(req.params.id);
   if (!material || !material.fileUrl) {
     return res.status(404).send("File not found");
