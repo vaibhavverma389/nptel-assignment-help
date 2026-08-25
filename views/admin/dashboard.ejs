@@ -1,168 +1,155 @@
 <%- include("../partials/header") %>
 
-<h2 class="page-title">Admin Dashboard</h2>
+<div class="dashboard">
 
-<p class="page-subtitle">
-  Manage students, answers, subjects and weekly materials
-</p>
+  <div class="page-header-banner">
+    <h2><i class="fa-solid fa-user-shield"></i> Admin Control Panel</h2>
+    <p class="muted-text">Manage users, approve student note submissions, upload official study materials, and monitor real-time activity.</p>
+  </div>
 
-<div class="dashboard-actions">
+  <!-- Admin Sub Navigation Tabs -->
+  <div class="admin-nav-tabs">
+    <a href="/admin" class="admin-nav-link active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+    <a href="/admin/users" class="admin-nav-link"><i class="fa-solid fa-users"></i> Users (<%= usersCount %>)</a>
+    <a href="/admin/notes" class="admin-nav-link"><i class="fa-solid fa-book"></i> Student Notes</a>
+    <a href="/admin/materials" class="admin-nav-link"><i class="fa-solid fa-folder-open"></i> Materials</a>
+    <a href="/admin/answers" class="admin-nav-link"><i class="fa-solid fa-list-check"></i> Answers (<%= answersCount %>)</a>
+    <a href="/admin/activity-logs" class="admin-nav-link"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
+    <a href="/admin/contact-messages" class="admin-nav-link"><i class="fa-solid fa-envelope"></i> Messages</a>
+  </div>
 
-  <!-- USERS -->
-  <a href="/admin/users" class="dash-card">
-    <h3>Users</h3>
+  <!-- Live Stats Row -->
+  <div class="stats-row" style="margin-bottom: 30px;">
 
-    <p>
-      <strong>Total Users:</strong>
-      <%= usersCount %>
-    </p>
-
-    <div class="card-actions">
-      <span>View all students</span>
+    <div class="stat-box highlight-cyan">
+      <div class="stat-icon-wrap">
+        <i class="fa-solid fa-signal"></i>
+      </div>
+      <div>
+        <label>Active Live Users</label>
+        <p><span id="liveUsers">0</span></p>
+      </div>
     </div>
-  </a>
 
-  <!-- EXPORT USERS -->
-  <a href="/admin/export/users" class="dash-card">
-    <h3>Export Users</h3>
-    <p>Download students data (Excel)</p>
-  </a>
-
-  <!-- ANSWERS -->
-  <a href="/admin/answers" class="dash-card">
-    <h3>Answers</h3>
-
-    <p>
-      <strong>Total Answers:</strong>
-      <%= answersCount %>
-    </p>
-
-    <div class="card-actions">
-      <span>View submissions</span>
+    <div class="stat-box highlight-week">
+      <div class="stat-icon-wrap">
+        <i class="fa-solid fa-users"></i>
+      </div>
+      <div>
+        <label>Total Registered Users</label>
+        <p><%= usersCount %></p>
+      </div>
     </div>
-  </a>
 
-  <!-- BULK SUBMIT -->
-  <a href="/submit-bulk" class="dash-card">
-    <h3>Submit Answers</h3>
-
-    <p>
-      Submit / Update answers (Admin)
-    </p>
-  </a>
-<a href="/admin/materials" class="dash-card">
-  <h3>Study Material</h3>
-
-  <p>
-    Upload & manage weekly PDFs
-  </p>
-
-  <div class="card-actions">
-    <span>Manage Materials</span>
-  </div>
-</a>
-  <!-- ACTIVITY LOGS -->
-  <a href="/admin/activity-logs" class="dash-card">
-    <h3>Downloads & Uploads</h3>
-    <p>
-      Track student download & upload activity
-    </p>
-    <div class="card-actions">
-      <span>View Activity Logs</span>
+    <div class="stat-box highlight-gold">
+      <div class="stat-icon-wrap">
+        <i class="fa-solid fa-list-check"></i>
+      </div>
+      <div>
+        <label>Total Answers</label>
+        <p><%= answersCount %></p>
+      </div>
     </div>
-  </a>
 
-  <!-- STUDENT NOTES -->
-  <a href="/admin/notes" class="dash-card">
-    <h3>Student Notes</h3>
-    <p>
-      Approve, track, reject, and delete student-uploaded notes
-    </p>
-    <div class="card-actions">
-      <span>Manage Notes</span>
+    <div class="stat-box highlight-streak">
+      <div class="stat-icon-wrap">
+        <i class="fa-solid fa-bolt"></i>
+      </div>
+      <div>
+        <label>24h Activity Logs</label>
+        <p><%= logsLast24h %></p>
+      </div>
     </div>
-  </a>
-
-  <!-- EXPORT VISITORS -->
-  <a href="/admin/export/visitors" class="dash-card">
-    <h3>Export Visitors</h3>
-
-    <p>
-      Export visitors data (Excel)
-    </p>
-  </a>
-
-  <!-- CONTACT MESSAGES -->
-  <a href="/admin/contact-messages" class="dash-card">
-    <h3>Contact Messages</h3>
-
-    <p>
-      View all student queries
-    </p>
-  </a>
-
-  <!-- LOGGED IN USERS -->
-  <div class="dash-card">
-
-    <h3>Logged-in Visitors</h3>
-
-    <p>
-      <strong><%= loggedInUsers %></strong>
-    </p>
 
   </div>
 
-  <!-- LIVE USERS -->
-  <div class="dash-card">
+  <!-- Dashboard Action Cards Grid -->
+  <div class="dashboard-actions">
 
-    <h3>Live Users</h3>
+    <!-- STUDENT NOTES -->
+    <a href="/admin/notes" class="dash-card">
+      <div class="dash-card-icon"><i class="fa-solid fa-book-open"></i></div>
+      <h3>Student Notes Approval</h3>
+      <p>Review, approve, reject, or delete student-submitted notes.</p>
+      <div class="card-actions">Manage Notes <i class="fa-solid fa-arrow-right"></i></div>
+    </a>
 
-    <p>
-      <strong id="liveUsers">0</strong>
-    </p>
+    <!-- STUDY MATERIALS -->
+    <a href="/admin/materials" class="dash-card">
+      <div class="dash-card-icon study-icon"><i class="fa-solid fa-file-pdf"></i></div>
+      <h3>Official Study Materials</h3>
+      <p>Upload and manage weekly PDFs and assignment resources.</p>
+      <div class="card-actions">Manage Materials <i class="fa-solid fa-arrow-right"></i></div>
+    </a>
+
+    <!-- USERS -->
+    <a href="/admin/users" class="dash-card">
+      <div class="dash-card-icon upload-icon"><i class="fa-solid fa-users-gear"></i></div>
+      <h3>User Management</h3>
+      <p>View registered student profiles and platform permissions.</p>
+      <div class="card-actions">View All Users <i class="fa-solid fa-arrow-right"></i></div>
+    </a>
+
+    <!-- ANSWERS -->
+    <a href="/admin/answers" class="dash-card">
+      <div class="dash-card-icon fav-icon"><i class="fa-solid fa-list-check"></i></div>
+      <h3>MCQ Answers Key</h3>
+      <p>View, verify, or update course weekly assignment answer keys.</p>
+      <div class="card-actions">View Answers <i class="fa-solid fa-arrow-right"></i></div>
+    </a>
+
+    <!-- BULK SUBMIT -->
+    <a href="/submit-bulk" class="dash-card">
+      <div class="dash-card-icon"><i class="fa-solid fa-pen-to-square"></i></div>
+      <h3>Bulk Submit Answers</h3>
+      <p>Add or update weekly assignment answer options in bulk.</p>
+      <div class="card-actions">Submit Answers <i class="fa-solid fa-arrow-right"></i></div>
+    </a>
+
+    <!-- ACTIVITY LOGS -->
+    <a href="/admin/activity-logs" class="dash-card">
+      <div class="dash-card-icon study-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+      <h3>Activity & Download Logs</h3>
+      <p>Track student download and upload activity in real-time.</p>
+      <div class="card-actions">View Logs <i class="fa-solid fa-arrow-right"></i></div>
+    </a>
+
+    <!-- CONTACT MESSAGES -->
+    <a href="/admin/contact-messages" class="dash-card">
+      <div class="dash-card-icon upload-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+      <h3>Contact Messages</h3>
+      <p>View student support requests and inquiry submissions.</p>
+      <div class="card-actions">View Messages <i class="fa-solid fa-arrow-right"></i></div>
+    </a>
+
+    <!-- EXPORT USERS -->
+    <a href="/admin/export/users" class="dash-card">
+      <div class="dash-card-icon fav-icon"><i class="fa-solid fa-file-excel"></i></div>
+      <h3>Export Users Data</h3>
+      <p>Download complete student registry as an Excel spreadsheet.</p>
+      <div class="card-actions">Download Excel <i class="fa-solid fa-arrow-right"></i></div>
+    </a>
+
+    <!-- EXPORT VISITORS -->
+    <a href="/admin/export/visitors" class="dash-card">
+      <div class="dash-card-icon"><i class="fa-solid fa-file-csv"></i></div>
+      <h3>Export Visitors Data</h3>
+      <p>Download visitor analytics and IP traffic logs (Excel).</p>
+      <div class="card-actions">Export Analytics <i class="fa-solid fa-arrow-right"></i></div>
+    </a>
 
   </div>
-
-  <!-- ACTIVITY 24H -->
-  <div class="dash-card">
-
-    <h3>Activity (Last 24h)</h3>
-
-    <p>
-      <strong>Total Logs:</strong>
-      <%= logsLast24h %>
-    </p>
-
-  </div>
-
-  <!-- NEW USERS -->
-  <div class="dash-card">
-
-    <h3>New Users (24h)</h3>
-
-    <p>
-      <strong><%= newUsersLast24h %></strong>
-    </p>
-
-  </div>
-
 
 </div>
 
-<!-- SOCKET.IO -->
-
+<!-- SOCKET.IO LIVE COUNTER -->
 <script src="/socket.io/socket.io.js"></script>
-
 <script>
-
-const socket = io();
-
-socket.on("liveUsers", function(count){
-
-  document.getElementById("liveUsers").innerText = count;
-
-});
-
+  const socket = io();
+  socket.on("liveUsers", function(count){
+    const el = document.getElementById("liveUsers");
+    if (el) el.innerText = count;
+  });
 </script>
 
-<%- include("../partials/footer") %>
+<%- include("../partials/footer") %>

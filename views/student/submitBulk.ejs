@@ -1,54 +1,78 @@
 <%- include("../partials/header") %>
 
-<h2 class="page-title">Submit MCQ Answers</h2>
+<div class="dashboard">
 
-<!-- ================= FILTER FORM (GET) ================= -->
-<form method="get" action="/submit-bulk" class="form-row">
-
-  <!-- Subject -->
-  <select class="input" name="course" onchange="this.form.submit()" required>
-    <option value="">Select Subject</option>
-    <% subjects.forEach(s => { %>
-      <option value="<%= s.name %>" <%= selectedCourse === s.name ? "selected" : "" %>>
-        <%= s.name %>
-      </option>
-    <% }) %>
-  </select>
-
-  <!-- Week (MANUAL 1–12, NO AUTO) -->
-  <select class="input" name="week" onchange="this.form.submit()" required>
-    <% for (let i = 1; i <= 12; i++) { %>
-      <option value="<%= i %>" <%= selectedWeek == i ? "selected" : "" %>>
-        Week <%= i %>
-      </option>
-    <% } %>
-  </select>
-
-</form>
-
-<!-- ================= SUBMIT FORM (POST) ================= -->
-<form method="post" action="/submit-bulk" class="card">
-
-  <!-- hidden fields -->
-  <input type="hidden" name="course" value="<%= selectedCourse %>">
-  <input type="hidden" name="week" value="<%= selectedWeek %>">
-
-  <hr />
-
-  <div id="questions-container"></div>
-
-  <div class="btn-group">
-    <button type="button" class="btn btn-add" onclick="addNewQuestion()">➕ Add Question</button>
-    <button type="button" class="btn btn-remove" onclick="removeQuestion()">➖ Remove Last</button>
-
-    <button type="submit" class="btn btn-submit">
-      <%= existingAnswers.length ? "Update Answers" : "Submit All" %>
-    </button>
+  <div class="page-header-banner">
+    <h2><i class="fa-solid fa-list-check"></i> Submit MCQ Assignment Answers</h2>
+    <p class="muted-text">Select your course subject and week to fill or update multiple choice question answers.</p>
   </div>
 
-</form>
+  <!-- Filter Form -->
+  <form method="get" action="/submit-bulk" class="card" style="margin-bottom: 25px;">
+    <div class="form-row" style="margin-bottom: 0;">
+      
+      <div class="form-group">
+        <label class="form-label"><i class="fa-solid fa-book-bookmark"></i> Course Subject</label>
+        <select class="select" name="course" onchange="this.form.submit()" required>
+          <option value="">-- Select Subject --</option>
+          <% subjects.forEach(s => { %>
+            <option value="<%= s.name %>" <%= selectedCourse === s.name ? "selected" : "" %>>
+              <%= s.name %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
 
-<a href="/dashboard" class="back-dashboard">← Back to Dashboard</a>
+      <div class="form-group">
+        <label class="form-label"><i class="fa-solid fa-calendar-week"></i> Select Week</label>
+        <select class="select" name="week" onchange="this.form.submit()" required>
+          <% for (let i = 1; i <= 12; i++) { %>
+            <option value="<%= i %>" <%= selectedWeek == i ? "selected" : "" %>>
+              Week <%= i %>
+            </option>
+          <% } %>
+        </select>
+      </div>
+
+    </div>
+  </form>
+
+  <!-- Submit Form -->
+  <form method="post" action="/submit-bulk" class="card">
+    <input type="hidden" name="course" value="<%= selectedCourse %>">
+    <input type="hidden" name="week" value="<%= selectedWeek %>">
+
+    <div class="card-header-flex" style="margin-bottom: 20px;">
+      <div>
+        <h3><i class="fa-solid fa-pen-field"></i> Answer Key Builder</h3>
+        <p class="muted-text">Week <%= selectedWeek %> — <%= selectedCourse || 'No Subject Selected' %></p>
+      </div>
+    </div>
+
+    <div id="questions-container"></div>
+
+    <div class="btn-group" style="margin-top: 25px; border-top: 1px solid var(--border-light); padding-top: 20px;">
+      <button type="button" class="btn btn-add" onclick="addNewQuestion()">
+        <i class="fa-solid fa-plus"></i> Add Question
+      </button>
+      <button type="button" class="btn btn-remove" onclick="removeQuestion()">
+        <i class="fa-solid fa-minus"></i> Remove Last
+      </button>
+
+      <button type="submit" class="btn btn-submit">
+        <i class="fa-solid fa-floppy-disk"></i> <%= existingAnswers.length ? "Update Answers" : "Submit All Answers" %>
+      </button>
+    </div>
+
+  </form>
+
+  <div style="text-align: center; margin-top: 25px; margin-bottom: 40px;">
+    <a href="/dashboard" class="back-dashboard">
+      <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+    </a>
+  </div>
+
+</div>
 
 <script>
   let questionCount = 0;
@@ -61,16 +85,16 @@
     div.className = "question-row";
 
     div.innerHTML = `
-      <span class="q-label">Question No:- ${questionNo}</span>
+      <span class="q-label"><i class="fa-solid fa-circle-question"></i> Question No: ${questionNo}</span>
 
       <input type="hidden" name="questions[]" value="${questionNo}" />
 
-      <select name="options[]" class="select" required>
-        <option value="">Select Option</option>
-        <option value="A" ${selectedOption === "A" ? "selected" : ""}>A</option>
-        <option value="B" ${selectedOption === "B" ? "selected" : ""}>B</option>
-        <option value="C" ${selectedOption === "C" ? "selected" : ""}>C</option>
-        <option value="D" ${selectedOption === "D" ? "selected" : ""}>D</option>
+      <select name="options[]" class="select" required style="margin-top: 8px;">
+        <option value="">-- Select Option --</option>
+        <option value="A" ${selectedOption === "A" ? "selected" : ""}>Option A</option>
+        <option value="B" ${selectedOption === "B" ? "selected" : ""}>Option B</option>
+        <option value="C" ${selectedOption === "C" ? "selected" : ""}>Option C</option>
+        <option value="D" ${selectedOption === "D" ? "selected" : ""}>Option D</option>
         <option value="True" ${selectedOption === "True" ? "selected" : ""}>TRUE</option>
         <option value="False" ${selectedOption === "False" ? "selected" : ""}>FALSE</option>        
       </select>
@@ -91,7 +115,6 @@
     }
   }
 
-  // preload existing answers
   if (existingAnswers.length > 0) {
     existingAnswers.forEach(ans => {
       renderQuestion(ans.question, ans.option);
@@ -102,3 +125,4 @@
 </script>
 
 <%- include("../partials/footer") %>
+
