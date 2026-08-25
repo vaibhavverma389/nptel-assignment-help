@@ -539,9 +539,10 @@ router.get(
     const filter = {};
 
     if (email && email.trim()) {
+      const safeQuery = escapeRegex(email.trim());
       filter.$or = [
-        { email: { $regex: email.trim(), $options: "i" } },
-        { userName: { $regex: email.trim(), $options: "i" } }
+        { email: { $regex: safeQuery, $options: "i" } },
+        { userName: { $regex: safeQuery, $options: "i" } }
       ];
     }
     if (activityType) {
@@ -576,11 +577,13 @@ router.get(
     const filter = {};
 
     if (email && email.trim()) {
+      const safeQuery = escapeRegex(email.trim());
       filter.$or = [
-        { email: { $regex: email.trim(), $options: "i" } },
-        { userName: { $regex: email.trim(), $options: "i" } }
+        { email: { $regex: safeQuery, $options: "i" } },
+        { userName: { $regex: safeQuery, $options: "i" } }
       ];
     }
+
     if (activityType) {
       filter.activityType = activityType;
     }
