@@ -100,14 +100,17 @@
 
     <div class="subject-grid">
       <% subjects.forEach(s => { %>
-        <a href="/notes?subject=<%= encodeURIComponent(s.name) %>" class="subject-pill-card">
-          <div class="subject-icon"><i class="fa-solid fa-book-bookmark"></i></div>
-          <h4><%= s.name %></h4>
-          <span class="subject-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+        <a href="/notes?subject=<%= encodeURIComponent(s.name) %>" class="subject-card-box">
+          <div class="subject-box-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+          <div class="subject-box-info">
+            <span class="subject-box-title"><%= s.name %></span>
+          </div>
+          <i class="fa-solid fa-chevron-right subject-box-arrow"></i>
         </a>
       <% }) %>
     </div>
   </div>
+
 
   <!-- Search Notes Card -->
   <div class="card">
