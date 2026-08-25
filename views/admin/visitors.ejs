@@ -1,6 +1,8 @@
 <%- include("../partials/header") %>
 
-<div class="card">
+<div class="dashboard">
+  <%- include("../partials/adminNav", { activeTab: 'visitors' }) %>
+
 
   <h2 style="margin-bottom:10px;">Visitor Logs</h2>
 
@@ -226,4 +228,6 @@ document.querySelectorAll(".copy-ip").forEach(el => {
 
 </script>
 
-<%- include("../partials/footer") %>
+</div>
+
+<%- include("../partials/footer") %>
