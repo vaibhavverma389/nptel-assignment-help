@@ -23,6 +23,11 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // ================= CONSTANTS & HELPERS =================
 
+// Helper: Escape special regex characters to prevent ReDoS injection
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
+
 const DATE_RANGES = {
   LAST_24_HOURS: () => new Date(Date.now() - 24 * 60 * 60 * 1000),
   LAST_7_DAYS: () => {
@@ -36,6 +41,7 @@ const DATE_RANGES = {
     return today;
   }
 };
+
 
 const EXCEL_COLUMNS = {
   VISITORS: [
