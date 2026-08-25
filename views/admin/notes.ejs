@@ -8,15 +8,8 @@
   </div>
 
   <!-- Admin Sub Navigation Tabs -->
-  <div class="admin-nav-tabs">
-    <a href="/admin" class="admin-nav-link"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
-    <a href="/admin/users" class="admin-nav-link"><i class="fa-solid fa-users"></i> Users</a>
-    <a href="/admin/notes" class="admin-nav-link active"><i class="fa-solid fa-book"></i> Student Notes</a>
-    <a href="/admin/materials" class="admin-nav-link"><i class="fa-solid fa-folder-open"></i> Materials</a>
-    <a href="/admin/answers" class="admin-nav-link"><i class="fa-solid fa-list-check"></i> Answers</a>
-    <a href="/admin/activity-logs" class="admin-nav-link"><i class="fa-solid fa-clock-rotate-left"></i> Activity Logs</a>
-    <a href="/admin/contact-messages" class="admin-nav-link"><i class="fa-solid fa-envelope"></i> Messages</a>
-  </div>
+  <%- include("../partials/adminNav", { activeTab: 'notes' }) %>
+
 
   <!-- Statistics Row -->
   <div class="stats-row" style="margin-bottom: 25px;">
