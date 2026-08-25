@@ -54,7 +54,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(
   session({
     name: "nptel.sid",
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || "nptel_default_secret_key_2026",
 
     resave: false,
     saveUninitialized: false,
@@ -108,11 +108,23 @@ app.get("/login", (req, res) => {
   res.redirect("/dashboard");
 });
 
-
+// 404 Handler
 app.use((req, res) => {
-  res.status(404).render("404")
-  
+  res.status(404).render("404");
 });
+
+// Global Centralized Error Handling Middleware
+app.use((err, req, res, next) => {
+  console.error("Global Application Error:", err.stack || err.message || err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  if (req.xhr || (req.headers.accept && req.headers.accept.includes("json"))) {
+    return res.status(500).json({ error: err.message || "Internal Server Error" });
+  }
+  res.status(err.status || 500).render("404");
+});
+
 
 
 const server = http.createServer(app);

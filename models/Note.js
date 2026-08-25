@@ -52,4 +52,11 @@ const noteSchema = new mongoose.Schema({
   timestamps: true
 });
 
+/* Indexes for High Performance Queries */
+noteSchema.index({ email: 1, isFavorite: 1 });
+noteSchema.index({ subject: 1, status: 1 });
+noteSchema.index({ status: 1, createdAt: -1 });
+noteSchema.index({ email: 1, lastAccessed: -1 });
+
 module.exports = mongoose.model("Note", noteSchema);
+

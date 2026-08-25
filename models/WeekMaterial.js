@@ -47,5 +47,6 @@ weekMaterialSchema.index(
     partialFilterExpression: { week: { $exists: true, $ne: null } }
   }
 );
+weekMaterialSchema.index({ subject: 1, type: 1 });
 
-module.exports = mongoose.model("WeekMaterial", weekMaterialSchema);
+module.exports = mongoose.model("WeekMaterial", weekMaterialSchema);

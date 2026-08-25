@@ -13,4 +13,9 @@ const answerSchema = new mongoose.Schema({
   }
 });
 
+/* Indexes for Fast Answer Queries */
+answerSchema.index({ course: 1, week: 1 });
+answerSchema.index({ email: 1, course: 1, week: 1 });
+
 module.exports = mongoose.model("Answer", answerSchema);
+

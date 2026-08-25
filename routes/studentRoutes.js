@@ -11,7 +11,24 @@ const VisitorLog = require("../models/VisitorLog");
 const ActivityLog = require("../models/ActivityLog");
 const isAuth = require("../middlewares/auth");
 
-const upload = multer({ storage: multer.memoryStorage() });
+// Secure Multer configuration with 10MB limit and MIME-type validation
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB Max limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type. Only PDF, PNG, and JPEG files are allowed."));
+    }
+  }
+});
+
+// Helper: Escape special regex characters to prevent ReDoS injection
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
 
 // Constants
 const WEEK_RANGE = { MIN: 1, MAX: 12 };
@@ -29,6 +46,7 @@ const isValidWeek = (week) => {
   const weekNum = Number(week);
   return !isNaN(weekNum) && weekNum >= WEEK_RANGE.MIN && weekNum <= WEEK_RANGE.MAX;
 };
+
 
 /* ================= DASHBOARD ================= */
 router.get("/dashboard", isAuth, asyncHandler(async (req, res) => {
@@ -397,6 +415,7 @@ router.get("/search", isAuth, asyncHandler(async (req, res) => {
   const { query = "" } = req.query;
   let notes = [];
   if (query.trim()) {
+    const safeQuery = escapeRegex(query.trim());
     const statusQuery = {};
     if (!req.user) {
       statusQuery.status = "approved";
@@ -412,9 +431,9 @@ router.get("/search", isAuth, asyncHandler(async (req, res) => {
         statusQuery,
         {
           $or: [
-            { title: { $regex: query.trim(), $options: "i" } },
-            { description: { $regex: query.trim(), $options: "i" } },
-            { subject: { $regex: query.trim(), $options: "i" } }
+            { title: { $regex: safeQuery, $options: "i" } },
+            { description: { $regex: safeQuery, $options: "i" } },
+            { subject: { $regex: safeQuery, $options: "i" } }
           ]
         }
       ]
@@ -422,6 +441,7 @@ router.get("/search", isAuth, asyncHandler(async (req, res) => {
   }
   res.render("student/search", { notes, query });
 }));
+
 
 // View Single Note (tracks access / downloads / views)
 router.get("/notes/view/:id", isAuth, asyncHandler(async (req, res) => {
