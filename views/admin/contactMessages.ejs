@@ -1,6 +1,8 @@
 <%- include("../partials/header") %>
 
-<div class="card">
+<div class="dashboard">
+  <%- include("../partials/adminNav", { activeTab: 'messages' }) %>
+
   <h2>Student Contact Messages</h2>
 
   <% if (!messages || messages.length === 0) { %>
@@ -41,3 +43,4 @@
 </div>
 
 <%- include("../partials/footer") %>
+
