@@ -1,6 +1,9 @@
 <%- include("../partials/header") %>
 
+<div class="dashboard">
+  <%- include("../partials/adminNav", { activeTab: 'subjects' }) %>
   <h2 class="page-title">Manage Subjects</h2>
+
 
   <div class="card centered-card" style="text-align: left;">
     <form method="post" action="/admin/subjects" class="form-row">
@@ -61,6 +64,6 @@
         editForm.style.display = 'flex';
       }
     }
-  </script>
+  </div>
 
-  <%- include("../partials/footer") %>
+  <%- include("../partials/footer") %>

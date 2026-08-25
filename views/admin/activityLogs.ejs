@@ -1,6 +1,8 @@
 <%- include("../partials/header") %>
 
-<div class="card" style="margin-bottom: 25px;">
+<div class="dashboard">
+  <%- include("../partials/adminNav", { activeTab: 'activityLogs' }) %>
+
   <h2>Student Activity Logs</h2>
   <p class="muted-text">Track which students uploaded or downloaded which notes & materials</p>
   
@@ -166,4 +168,7 @@
 
 <a href="/admin" class="back-dashboard">Back to Dashboard</a>
 
+</div>
+
 <%- include("../partials/footer") %>
+

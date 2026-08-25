@@ -1,6 +1,9 @@
 <%- include("../partials/header") %>
 
+<div class="dashboard">
+  <%- include("../partials/adminNav", { activeTab: 'answers' }) %>
   <h2 class="page-title">All Answers</h2>
+
 
   <div class="card">
     <div class="table-wrapper">
@@ -53,4 +56,6 @@
   </div>
   <a href="/admin" class="back-dashboard">← Back to Dashboard</a>
 
-  <%- include("../partials/footer") %>
+</div>
+
+<%- include("../partials/footer") %>

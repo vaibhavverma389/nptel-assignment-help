@@ -1,0 +1,29 @@
+<div class="admin-nav-tabs">
+  <a href="/admin" class="admin-nav-link <%= typeof activeTab !== 'undefined' && activeTab === 'dashboard' ? 'active' : '' %>">
+    <i class="fa-solid fa-chart-line"></i> Dashboard
+  </a>
+  <a href="/admin/users" class="admin-nav-link <%= typeof activeTab !== 'undefined' && activeTab === 'users' ? 'active' : '' %>">
+    <i class="fa-solid fa-users"></i> Users
+  </a>
+  <a href="/admin/notes" class="admin-nav-link <%= typeof activeTab !== 'undefined' && activeTab === 'notes' ? 'active' : '' %>">
+    <i class="fa-solid fa-note-sticky"></i> Student Notes
+  </a>
+  <a href="/admin/materials" class="admin-nav-link <%= typeof activeTab !== 'undefined' && activeTab === 'materials' ? 'active' : '' %>">
+    <i class="fa-solid fa-file-pdf"></i> Materials
+  </a>
+  <a href="/admin/subjects" class="admin-nav-link <%= typeof activeTab !== 'undefined' && activeTab === 'subjects' ? 'active' : '' %>">
+    <i class="fa-solid fa-book"></i> Subjects
+  </a>
+  <a href="/admin/answers" class="admin-nav-link <%= typeof activeTab !== 'undefined' && activeTab === 'answers' ? 'active' : '' %>">
+    <i class="fa-solid fa-check-double"></i> Answers
+  </a>
+  <a href="/admin/activity-logs" class="admin-nav-link <%= typeof activeTab !== 'undefined' && activeTab === 'activityLogs' ? 'active' : '' %>">
+    <i class="fa-solid fa-list-check"></i> Activity Logs
+  </a>
+  <a href="/admin/visitors" class="admin-nav-link <%= typeof activeTab !== 'undefined' && activeTab === 'visitors' ? 'active' : '' %>">
+    <i class="fa-solid fa-chart-pie"></i> Visitor Logs
+  </a>
+  <a href="/admin/contact-messages" class="admin-nav-link <%= typeof activeTab !== 'undefined' && activeTab === 'messages' ? 'active' : '' %>">
+    <i class="fa-solid fa-envelope"></i> Messages
+  </a>
+</div>
