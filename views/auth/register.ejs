@@ -3,7 +3,6 @@
 <% if (user) { %>
   <script>
     const role = "<%= user.role %>";
-
     if (role === "admin") {
       window.location.href = "/admin";
     } else {
@@ -12,20 +11,69 @@
   </script>
 <% } %>
 
-<div class="card centered-card">
-  <h2>Register</h2>
-  <p>Create a new account</p>
+<div class="auth-wrapper">
+  <div class="card centered-card auth-card">
+    <div class="auth-header">
+      <div class="auth-icon-badge">
+        <i class="fa-solid fa-user-plus"></i>
+      </div>
+      <h2>Create Account</h2>
+      <p class="muted-text">Join Student Notes Portal to share & access notes</p>
+    </div>
 
-  <form method="post" action="/auth/register" class="form-row" style="margin-top: 20px;">
-    <input name="name" class="input" placeholder="Name" required />
-    <input name="email" class="input" type="email" placeholder="Email" required />
-    <input name="password" class="input" type="password" placeholder="Password" required />
-    <button class="btn btn-submit">Register</button>
-  </form>
+    <form method="post" action="/auth/register" class="form-column" style="margin-top: 25px; text-align: left;">
+      <div class="form-group">
+        <label class="form-label"><i class="fa-solid fa-user"></i> Full Name</label>
+        <div class="input-icon-wrapper">
+          <i class="fa-solid fa-user input-icon"></i>
+          <input name="name" class="input input-with-icon" placeholder="Enter your full name" required />
+        </div>
+      </div>
 
-  <p class="muted-text" style="margin-top: 15px;">
-    Already have an account? <a href="/auth/login" style="color: var(--accent-blue);">Login</a>
-  </p>
+      <div class="form-group" style="margin-top: 15px;">
+        <label class="form-label"><i class="fa-solid fa-envelope"></i> Email Address</label>
+        <div class="input-icon-wrapper">
+          <i class="fa-solid fa-at input-icon"></i>
+          <input name="email" type="email" class="input input-with-icon" placeholder="name@example.com" required />
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top: 15px;">
+        <label class="form-label"><i class="fa-solid fa-key"></i> Password</label>
+        <div class="input-icon-wrapper">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input name="password" id="regPassword" type="password" class="input input-with-icon" placeholder="Create a secure password" required />
+          <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('regPassword', this)">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-submit btn-lg" style="margin-top: 25px; width: 100%;">
+        <i class="fa-solid fa-user-plus"></i> Create Account
+      </button>
+    </form>
+
+    <p class="muted-text" style="margin-top: 25px; text-align: center;">
+      Already have an account? <a href="/auth/login" style="color: var(--accent-cyan); font-weight: 600;">Log In</a>
+    </p>
+  </div>
 </div>
 
-<%- include("../partials/footer") %>
+<script>
+  function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    } else {
+      input.type = 'password';
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    }
+  }
+</script>
+
+<%- include("../partials/footer") %>

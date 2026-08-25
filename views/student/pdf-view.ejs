@@ -2,24 +2,30 @@
 
 <div class="dashboard">
 
-  <!-- ================= HEADER ================= -->
-  <div class="card header-card">
-    <h2>
-      Week <%= week %> 
-      (<%= type === "assignment" ? "Assignment" : "Study Material" %>)
-    </h2>
+  <!-- PDF Viewer Header Toolbar -->
+  <div class="card pdf-toolbar-card">
+    <div class="pdf-toolbar-left">
+      <a href="/study-material?subject=<%= encodeURIComponent(subject) %>" class="btn btn-secondary btn-sm">
+        <i class="fa-solid fa-arrow-left"></i> Back to Courses
+      </a>
+      <div class="pdf-title-group">
+        <h2>
+          <i class="fa-solid fa-file-pdf text-rose"></i> Week <%= week %> 
+          <span class="badge badge-cyan"><%= type === "assignment" ? "Assignment Solution" : "Study Material" %></span>
+        </h2>
+        <% if (subject) { %>
+          <span class="muted-text" style="font-size: 0.85rem;"><i class="fa-solid fa-book-bookmark"></i> <%= subject %></span>
+        <% } %>
+      </div>
+    </div>
 
-    <div class="navigation-buttons">
-
-      <!-- BACK (FIXED) -->
-      
-
+    <div class="pdf-toolbar-right">
       <!-- PREVIOUS -->
       <% if(Number(week) > 1) { %>
         <a 
           href="/pdf/<%= type === 'assignment' ? 'assi' : 'study' %>/<%= Number(week) - 1 %>?subject=<%= encodeURIComponent(subject) %>" 
-          class="btn btn-primary">
-          Previous
+          class="btn btn-secondary btn-sm" title="Previous Week">
+          <i class="fa-solid fa-chevron-left"></i> Prev
         </a>
       <% } %>
 
@@ -27,62 +33,59 @@
       <% if(Number(week) < 12) { %>
         <a 
           href="/pdf/<%= type === 'assignment' ? 'assi' : 'study' %>/<%= Number(week) + 1 %>?subject=<%= encodeURIComponent(subject) %>" 
-          class="btn btn-primary">
-          Next
+          class="btn btn-secondary btn-sm" title="Next Week">
+          Next <i class="fa-solid fa-chevron-right"></i>
         </a>
       <% } %>
-
     </div>
   </div>
 
-  <!-- ================= PDF VIEWER ================= -->
+  <!-- PDF Content Container -->
   <% if(!material) { %>
 
-    <div class="card empty-state">
-      <div class="empty-content">
-        <p class="muted-text">No PDF available for Week <%= week %></p>
+    <div class="card empty-state" style="padding: 60px 20px; text-align: center;">
+      <i class="fa-solid fa-file-circle-xmark" style="font-size: 3rem; color: var(--accent-rose); margin-bottom: 15px;"></i>
+      <h3>No Document Available</h3>
+      <p class="muted-text" style="margin-bottom: 20px;">The PDF solution for Week <%= week %> has not been uploaded yet for this subject.</p>
 
-        <a href="/study-material?subject=<%= encodeURIComponent(subject) %>" class="btn btn-secondary">
-          Browse Other Weeks
-        </a>
-      </div>
+      <a href="/study-material?subject=<%= encodeURIComponent(subject) %>" class="btn btn-submit">
+        <i class="fa-solid fa-folder-open"></i> Browse Other Weeks
+      </a>
     </div>
 
   <% } else { %>
 
     <div class="card pdf-container">
-
-      <!-- Top Bar -->
       <div class="pdf-header">
-        <h3><%= material.fileName || `Week ${week}` %></h3>
+        <div class="pdf-file-name">
+          <i class="fa-solid fa-file-lines"></i> <%= material.fileName || `Week ${week} Document` %>
+        </div>
 
-        <div class="btn-group">
+        <div class="btn-group" style="margin-top: 0;">
           <% if (typeof type !== 'undefined' && type === "Note") { %>
-            <a href="/notes/download/<%= material._id %>" target="_blank" class="btn btn-sm">Open</a>
+            <a href="/notes/download/<%= material._id %>" target="_blank" class="btn btn-download btn-sm">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Open in New Tab
+            </a>
           <% } else { %>
-            <a href="/materials/download/<%= material._id %>" target="_blank" class="btn btn-sm">Open</a>
+            <a href="/materials/download/<%= material._id %>" target="_blank" class="btn btn-download btn-sm">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Open in New Tab
+            </a>
           <% } %>
         </div>
       </div>
 
-      <!-- PDF -->
       <div class="pdf-viewer">
         <iframe 
           src="<%= secureUrl %>" 
-          class="pdf-frame">
+          class="pdf-frame"
+          title="PDF Viewer">
         </iframe>
       </div>
-
     </div>
 
   <% } %>
 
 </div>
-<a href="/study-material?subject=<%= encodeURIComponent(subject) %>" class="btn btn-secondary">
-        Back
-      </a>
-
-
 
 <script>
 document.addEventListener("contextmenu", (e) => e.preventDefault());
@@ -94,4 +97,4 @@ document.addEventListener("keydown", function(e) {
 });
 </script>
 
-<%- include("../partials/footer") %>
+<%- include("../partials/footer") %>

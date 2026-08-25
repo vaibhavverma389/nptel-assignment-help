@@ -1,8 +1,59 @@
-</div>
+</main>
 
-<footer class="bg-gray-800 text-white text-center p-3 mt-10" >
-  © <%= new Date().getFullYear() %> Student Notes Portal
+<footer class="footer">
+  <div class="container footer-grid">
+    <div class="footer-col brand-col">
+      <div class="footer-brand">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>Student Notes Portal</span>
+      </div>
+      <p class="footer-desc">
+        Your ultimate hub for NPTEL assignments, lecture notes, official study materials, and peer study resources.
+      </p>
+      <div class="social-links">
+        <a href="#" aria-label="Github"><i class="fa-brands fa-github"></i></a>
+        <a href="#" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
+        <a href="#" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="#" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="/"><i class="fa-solid fa-chevron-right"></i> Home</a></li>
+        <li><a href="/dashboard"><i class="fa-solid fa-chevron-right"></i> Dashboard</a></li>
+        <li><a href="/notes"><i class="fa-solid fa-chevron-right"></i> Shared Notes</a></li>
+        <li><a href="/study-material"><i class="fa-solid fa-chevron-right"></i> Study Material</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Student Tools</h4>
+      <ul>
+        <li><a href="/upload"><i class="fa-solid fa-chevron-right"></i> Upload Notes</a></li>
+        <li><a href="/favorites"><i class="fa-solid fa-chevron-right"></i> Saved Favorites</a></li>
+        <li><a href="/recent"><i class="fa-solid fa-chevron-right"></i> Recent Activity</a></li>
+        <li><a href="/search"><i class="fa-solid fa-chevron-right"></i> Search Portal</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Support & Contact</h4>
+      <p style="font-size: 0.85rem; color: var(--text-tertiary);">
+        Have questions or want to contribute notes for your course? Get in touch with our team.
+      </p>
+      <a href="/dashboard#contact-support" class="btn btn-secondary btn-sm" style="margin-top: 10px;">
+        <i class="fa-solid fa-envelope"></i> Contact Support
+      </a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© <%= new Date().getFullYear() %> Student Notes Portal. Designed for Academic Excellence.</p>
+  </div>
 </footer>
 
 </body>
 </html>
+

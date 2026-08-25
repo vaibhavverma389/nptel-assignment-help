@@ -1,44 +1,124 @@
 <%- include("./partials/header") %>
 
-<div class="dashboard">
+<div class="landing-wrapper">
 
-  <!-- Hero Welcome Card -->
-  <div class="welcome-card">
-    <h2>Welcome to Student Notes Portal</h2>
-    <p>Search, View & Manage Weekly Assignment Answers Easily</p>
-  </div>
-
-  <!-- Feature Stats Row -->
-  <div class="stats-row">
-
-    <div class="stat-box highlight-week">
-      <h4>Subjects</h4>
-      <p>Multiple Courses Available</p>
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-badge">
+      <i class="fa-solid fa-sparkles"></i> Premier NPTEL & Academic Resource Portal
     </div>
 
-    <div class="stat-box highlight-date">
-      <h4>Weekly Updates</h4>
-      <p>Updated Every Week</p>
+    <h1 class="hero-title">
+      Master Your Courses with <span>Weekly Assignment Answers</span> & Notes
+    </h1>
+
+    <p class="hero-subtitle">
+      Access curated NPTEL assignment solutions, official study materials, student notes, and weekly updates all in one fast, modern dashboard.
+    </p>
+
+    <div class="hero-cta-group">
+      <a href="/dashboard" class="btn btn-submit btn-lg">
+        <i class="fa-solid fa-rocket"></i> Go to Dashboard
+      </a>
+      <a href="/study-material" class="btn btn-secondary btn-lg">
+        <i class="fa-solid fa-folder-open"></i> Browse Study Material
+      </a>
     </div>
 
-  </div>
+    <!-- Quick Stats Bar -->
+    <div class="stats-row hero-stats">
 
-  <!-- Action Card -->
-  <div class="card" style="margin-top:30px; text-align:center;">
-  <h3>Get Started</h3>
-  <p class="muted-text">
-    Access weekly NPTEL assignment answers directly from your dashboard.
-  </p>
+      <div class="stat-box highlight-week">
+        <div class="stat-icon-wrap">
+          <i class="fa-solid fa-book-bookmark"></i>
+        </div>
+        <div>
+          <label>Available Courses</label>
+          <p>Multiple Subjects</p>
+        </div>
+      </div>
 
-  <div style="margin-top:20px;">
-    <a href="/dashboard">
-      <button class="btn btn-submit">
-        Go to Dashboard
-      </button>
-    </a>
-  </div>
+      <div class="stat-box highlight-date">
+        <div class="stat-icon-wrap">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+        <div>
+          <label>Assignment Solutions</label>
+          <p>Weekly Updates</p>
+        </div>
+      </div>
+
+      <div class="stat-box highlight-streak">
+        <div class="stat-icon-wrap">
+          <i class="fa-solid fa-file-pdf"></i>
+        </div>
+        <div>
+          <label>Built-in Viewer</label>
+          <p>Instant PDF Access</p>
+        </div>
+      </div>
+
+      <div class="stat-box highlight-cyan">
+        <div class="stat-icon-wrap">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div>
+          <label>Peer Network</label>
+          <p>Shared Student Notes</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="section-container" style="margin-top: 40px;">
+    <div class="section-header">
+      <span class="section-tag"><i class="fa-solid fa-lightbulb"></i> How It Works</span>
+      <h2>Simplified Learning Workflow</h2>
+      <p class="muted-text">Everything you need to complete assignments and prepare for exams</p>
+    </div>
+
+    <div class="workflow-grid">
+      <div class="workflow-card">
+        <div class="step-num">01</div>
+        <div class="workflow-icon"><i class="fa-solid fa-list-check"></i></div>
+        <h3>Select Your Subject</h3>
+        <p>Choose from our comprehensive collection of active NPTEL and academic courses.</p>
+      </div>
+
+      <div class="workflow-card">
+        <div class="step-num">02</div>
+        <div class="workflow-icon"><i class="fa-solid fa-magnifying-glass-chart"></i></div>
+        <h3>View Weekly Solutions</h3>
+        <p>Browse week-by-week assignment PDFs, answer keys, and official study materials.</p>
+      </div>
+
+      <div class="workflow-card">
+        <div class="step-num">03</div>
+        <div class="workflow-icon"><i class="fa-solid fa-bookmark"></i></div>
+        <h3>Save & Share Notes</h3>
+        <p>Bookmark your favorite resources, upload personal notes, and track your study streak.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Action & Community Banner -->
+  <section class="section-container" style="margin-top: 40px;">
+    <div class="bus-card-link">
+      <div class="bus-card">
+        <div class="bus-card-badge">
+          <i class="fa-brands fa-whatsapp"></i> Official Community
+        </div>
+        <h3>Join NPTEL Assignment Discussion Group</h3>
+        <p>Get instant notifications when new weekly assignment answers and study guides are published!</p>
+        <a href="https://whatsapp.com" target="_blank" class="btn-join">
+          <i class="fa-brands fa-whatsapp"></i> Join WhatsApp Group
+        </a>
+      </div>
+    </div>
+  </section>
+
 </div>
 
-</div>
-
-<%- include("./partials/footer") %>
+<%- include("./partials/footer") %>

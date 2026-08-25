@@ -2,146 +2,198 @@
 
 <div class="dashboard">
 
-  <!-- Welcome -->
+  <!-- Welcome Banner -->
   <div class="welcome-card">
-    <h2>Welcome <span><%= user ? user.name : "Student" %></span></h2>
-    <p>Student Notes Hub</p>
+    <div class="welcome-badge">
+      <i class="fa-solid fa-fire"></i> Active Streak: <strong><%= typeof streak !== 'undefined' ? streak : 0 %> Days</strong>
+    </div>
+    <h2>Welcome Back, <span><%= user ? user.name : "Student" %></span> 👋</h2>
+    <p>Your academic hub for notes, weekly assignment solutions, and study materials.</p>
   </div>
 
-  <!-- Overview Stats -->
+  <!-- Overview Stats Row -->
   <div class="stats-row">
 
-    <div class="stat-box">
-      <label>User</label>
-      <p style="font-size: 1.15rem; word-break: break-all;"><%= user ? user.name : "Guest" %></p>
-    </div>
-
-    <div class="stat-box">
-      <label>Personal Notes</label>
-      <p><%= typeof personalNotesCount !== 'undefined' ? personalNotesCount : 0 %></p>
-    </div>
-
-    <div class="stat-box">
-      <label>Favorites</label>
-      <p><%= typeof favoriteNotesCount !== 'undefined' ? favoriteNotesCount : 0 %></p>
+    <div class="stat-box highlight-cyan">
+      <div class="stat-icon-wrap">
+        <i class="fa-solid fa-user-graduate"></i>
+      </div>
+      <div>
+        <label>Account</label>
+        <p style="font-size: 1.1rem; word-break: break-all;"><%= user ? user.name : "Guest" %></p>
+      </div>
     </div>
 
     <div class="stat-box highlight-week">
-      <label>Active Streak</label>
-      <p><%= typeof streak !== 'undefined' ? streak : 0 %> Days</p>
+      <div class="stat-icon-wrap">
+        <i class="fa-solid fa-note-sticky"></i>
+      </div>
+      <div>
+        <label>Personal Notes</label>
+        <p><%= typeof personalNotesCount !== 'undefined' ? personalNotesCount : 0 %></p>
+      </div>
+    </div>
+
+    <div class="stat-box highlight-gold">
+      <div class="stat-icon-wrap">
+        <i class="fa-solid fa-star"></i>
+      </div>
+      <div>
+        <label>Saved Favorites</label>
+        <p><%= typeof favoriteNotesCount !== 'undefined' ? favoriteNotesCount : 0 %></p>
+      </div>
+    </div>
+
+    <div class="stat-box highlight-streak">
+      <div class="stat-icon-wrap">
+        <i class="fa-solid fa-bolt"></i>
+      </div>
+      <div>
+        <label>Study Streak</label>
+        <p><%= typeof streak !== 'undefined' ? streak : 0 %> Days</p>
+      </div>
     </div>
 
   </div>
 
-  <!-- Action Cards -->
-  <div class="grid">
+  <!-- Quick Action Cards Grid -->
+  <div class="dashboard-actions">
 
-    <a href="/notes">
-      <div class="card action-card">
-        <h3>My Notes</h3>
-        <p>View and manage your study notes</p>
-      </div>
+    <a href="/notes" class="dash-card">
+      <div class="dash-card-icon"><i class="fa-solid fa-book-open"></i></div>
+      <h3>My Shared Notes</h3>
+      <p>View, manage, and download all uploaded study notes.</p>
+      <div class="card-actions">Explore Notes <i class="fa-solid fa-arrow-right"></i></div>
     </a>
 
-    <a href="/upload">
-      <div class="card action-card">
-        <h3>Upload Notes</h3>
-        <p>Add new notes to your collection</p>
-      </div>
+    <a href="/upload" class="dash-card">
+      <div class="dash-card-icon upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+      <h3>Upload Notes</h3>
+      <p>Share new lecture notes and study material with your peers.</p>
+      <div class="card-actions">Upload Now <i class="fa-solid fa-arrow-right"></i></div>
     </a>
 
-    <a href="/favorites">
-      <div class="card action-card">
-        <h3>Favorite Notes</h3>
-        <p>Quick access to saved notes</p>
-      </div>
+    <a href="/study-material" class="dash-card">
+      <div class="dash-card-icon study-icon"><i class="fa-solid fa-folder-open"></i></div>
+      <h3>Weekly Assignments</h3>
+      <p>Access weekly NPTEL assignment answers and solution PDFs.</p>
+      <div class="card-actions">Browse Materials <i class="fa-solid fa-arrow-right"></i></div>
     </a>
 
-    <a href="/recent">
-      <div class="card action-card">
-        <h3>Recent Activity</h3>
-        <p>Continue where you left off</p>
-      </div>
+    <a href="/favorites" class="dash-card">
+      <div class="dash-card-icon fav-icon"><i class="fa-solid fa-heart"></i></div>
+      <h3>Favorite Notes</h3>
+      <p>Quick access to saved notes and essential guides.</p>
+      <div class="card-actions">View Favorites <i class="fa-solid fa-arrow-right"></i></div>
     </a>
 
   </div>
 
-  <!-- Browse by Subject -->
-  <div class="card" style="margin-top:30px;">
-    <h3>Browse Notes by Subject</h3>
-    <p class="muted-text" style="margin-bottom: 15px;">Click on any course/subject to view all shared notes and study materials.</p>
-    <div class="subject-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+  <!-- Browse by Subject Section -->
+  <div class="card">
+    <div class="card-header-flex">
+      <div>
+        <h3><i class="fa-solid fa-layer-group"></i> Browse Notes by Subject</h3>
+        <p class="muted-text">Click on any course or subject to view shared student notes and official study materials.</p>
+      </div>
+    </div>
+
+    <div class="subject-grid">
       <% subjects.forEach(s => { %>
-        <a href="/notes?subject=<%= encodeURIComponent(s.name) %>" style="text-decoration: none;">
-          <div class="card action-card" style="margin: 0; padding: 20px; text-align: center; border: 1px solid var(--border-light); height: 100%; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.02); transition: transform 0.2s, background 0.2s;">
-            <h4 style="margin: 0; font-size: 1.05rem; color: #fff;"><%= s.name %></h4>
-          </div>
+        <a href="/notes?subject=<%= encodeURIComponent(s.name) %>" class="subject-pill-card">
+          <div class="subject-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+          <h4><%= s.name %></h4>
+          <span class="subject-arrow"><i class="fa-solid fa-chevron-right"></i></span>
         </a>
       <% }) %>
     </div>
   </div>
 
-  <!-- Search Section -->
-  <div class="card" style="margin-top:30px;">
-    <h3>Search Notes</h3>
+  <!-- Search Notes Card -->
+  <div class="card">
+    <h3><i class="fa-solid fa-magnifying-glass"></i> Search Notes & Topics</h3>
+    <p class="muted-text">Find notes instantly by subject, topic name, or keywords.</p>
 
-    <form action="/search" method="GET" class="form-row">
-      <input type="text" name="query" class="input"
-        placeholder="Search by subject, topic..." required />
-      <button type="submit" class="btn btn-submit">Search</button>
+    <form action="/search" method="GET" class="search-form-row">
+      <div class="input-icon-wrapper" style="flex-grow: 1;">
+        <i class="fa-solid fa-magnifying-glass input-icon"></i>
+        <input type="text" name="query" class="input input-with-icon" placeholder="Search by subject, topic, or keyword..." required />
+      </div>
+      <button type="submit" class="btn btn-submit">
+        <i class="fa-solid fa-search"></i> Search
+      </button>
     </form>
   </div>
 
-  <!-- Insights -->
-  <div class="card" style="margin-top:30px;">
-    <h3>Study Insights</h3>
-    <p class="muted-text">
-      Track your study patterns and improve productivity.
-    </p>
+  <!-- Insights & Platform Features Row -->
+  <div class="form-row" style="margin-top: 25px;">
+    
+    <div class="card" style="margin-bottom: 0;">
+      <h3><i class="fa-solid fa-chart-line"></i> Study Insights</h3>
+      <p class="muted-text">Track your learning progress & platform activity.</p>
 
-    <ul class="instruction-list">
-      <li>✔ <strong>Notes Usage:</strong> <%= typeof personalNotesCount !== 'undefined' ? personalNotesCount : 0 %> notes uploaded</li>
-      <li>✔ <strong>Most Viewed Subject:</strong> <%= typeof mostViewedSubject !== 'undefined' ? mostViewedSubject : "None yet" %></li>
-      <li>✔ <strong>Streak Tracking:</strong> <%= typeof streak !== 'undefined' ? streak : 0 %> days active</li>
-      <li>✔ <strong>Recent Activity:</strong> <%= typeof recentActivityCount !== 'undefined' ? recentActivityCount : 0 %> notes accessed this week</li>
-    </ul>
+      <ul class="instruction-list">
+        <li><i class="fa-solid fa-check-circle text-success"></i> <strong>Uploaded Notes:</strong> <%= typeof personalNotesCount !== 'undefined' ? personalNotesCount : 0 %> files</li>
+        <li><i class="fa-solid fa-check-circle text-success"></i> <strong>Top Subject:</strong> <%= typeof mostViewedSubject !== 'undefined' ? mostViewedSubject : "None yet" %></li>
+        <li><i class="fa-solid fa-check-circle text-success"></i> <strong>Active Streak:</strong> <%= typeof streak !== 'undefined' ? streak : 0 %> days streak</li>
+        <li><i class="fa-solid fa-check-circle text-success"></i> <strong>Weekly Activity:</strong> <%= typeof recentActivityCount !== 'undefined' ? recentActivityCount : 0 %> notes accessed</li>
+      </ul>
+    </div>
+
+    <div class="card" style="margin-bottom: 0;">
+      <h3><i class="fa-solid fa-shield-halved"></i> Platform Features</h3>
+      <p class="muted-text">Built for performance and seamless access.</p>
+
+      <ul class="instruction-list">
+        <li><i class="fa-solid fa-lock text-cyan"></i> Secure Google & Password Authentication</li>
+        <li><i class="fa-solid fa-file-pdf text-cyan"></i> Embedded High-Speed PDF Viewer</li>
+        <li><i class="fa-solid fa-mobile-screen text-cyan"></i> Fully Responsive Glassmorphic Interface</li>
+        <li><i class="fa-solid fa-bolt text-cyan"></i> Real-time Active User Tracking</li>
+      </ul>
+    </div>
+
   </div>
 
-  <!-- Features (Resume Boost) -->
-  <div class="card" style="margin-top:30px;">
-    <h3>Platform Features</h3>
+  <!-- Contact & Support Section -->
+  <div class="card" id="contact-support" style="margin-top:30px;">
+    <h3><i class="fa-solid fa-headset"></i> Support & Contact</h3>
+    <p class="muted-text">Need help or want to request assignment solutions for a new course? Contact us anytime.</p>
 
-    <ul class="instruction-list">
-      <li>✔ Secure Login & Authentication</li>
-      <li>✔ Dynamic Dashboard Rendering (EJS)</li>
-      <li>✔ REST API Ready Backend</li>
-      <li>✔ Modular & Scalable Design</li>
-      <li>✔ Responsive UI for all devices</li>
-    </ul>
-  </div>
+    <form action="/contact-us" method="post" class="form-column" style="margin-top: 15px;">
 
-  <!-- Contact -->
-  <div class="card" style="margin-top:30px;">
-    <h3>Support</h3>
-    <p class="muted-text">Need help? Contact us anytime.</p>
+      <div class="form-row" style="margin-bottom: 0;">
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <div class="input-icon-wrapper">
+            <i class="fa-solid fa-user input-icon"></i>
+            <input type="text" class="input input-with-icon" name="name" placeholder="Enter Your Name" required />
+          </div>
+        </div>
 
-    <form action="/contact-us" method="post" class="form-column">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <div class="input-icon-wrapper">
+            <i class="fa-solid fa-at input-icon"></i>
+            <input type="email" class="input input-with-icon" name="email" placeholder="Enter Your Email" required />
+          </div>
+        </div>
+      </div>
 
-      <input type="text" class="input" name="name"
-        placeholder="Enter Your Name" required />
+      <div class="form-group">
+        <label class="form-label">Mobile Number</label>
+        <div class="input-icon-wrapper">
+          <i class="fa-solid fa-phone input-icon"></i>
+          <input type="tel" class="input input-with-icon" name="mobile" placeholder="10 Digit Mobile Number" pattern="[0-9]{10}" required />
+        </div>
+      </div>
 
-      <input type="email" class="input" name="email"
-        placeholder="Enter Your Email" required />
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="input" name="message" rows="4" placeholder="Describe your question or feedback here..." required></textarea>
+      </div>
 
-      <input type="tel" class="input" name="mobile"
-        placeholder="Enter 10 Digit Mobile Number"
-        pattern="[0-9]{10}" required />
-
-      <textarea class="input" name="message" rows="4"
-        placeholder="Write your message here..." required></textarea>
-
-      <button type="submit" class="btn btn-submit">
-        Send Message
+      <button type="submit" class="btn btn-submit" style="align-self: flex-start;">
+        <i class="fa-solid fa-paper-plane"></i> Send Message
       </button>
 
     </form>
@@ -149,4 +201,4 @@
 
 </div>
 
-<%- include("../partials/footer") %>
+<%- include("../partials/footer") %>

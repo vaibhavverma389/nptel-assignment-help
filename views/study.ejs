@@ -2,32 +2,41 @@
 
 <div class="dashboard">
 
-  <!-- ================= SUBJECT SELECT ================= -->
-  <div class="card">
-    <h2> Select Subject</h2>
-
-    <form method="get" action="/study-material">
-      <select name="subject" class="input" required onchange="this.form.submit()">
-        <option value="">-- Select Subject --</option>
-        <% subjects.forEach(s => { %>
-          <option value="<%= s.name %>" <%= subject === s.name ? "selected" : "" %>>
-            <%= s.name %>
-          </option>
-        <% }) %>
-      </select>
-    </form>
+  <div class="page-header-banner">
+    <h2><i class="fa-solid fa-folder-open"></i> Course Study Material & Assignment PDFs</h2>
+    <p class="muted-text">Select your enrolled subject to view weekly assignment questions, solutions, and official course materials.</p>
   </div>
 
-  <!-- ================= ASSIGNMENT ================= -->
+  <!-- Subject Selector Card -->
   <div class="card">
-    <h2> Assignment</h2>
-    <p class="muted-text">Click a week to open assignment PDF</p>
+    <div class="form-group" style="margin-bottom: 0;">
+      <label class="form-label"><i class="fa-solid fa-book-bookmark"></i> Select Course / Subject</label>
+      <form method="get" action="/study-material">
+        <select name="subject" class="select select-lg" required onchange="this.form.submit()">
+          <option value="">-- Choose Subject --</option>
+          <% subjects.forEach(s => { %>
+            <option value="<%= s.name %>" <%= subject === s.name ? "selected" : "" %>>
+              <%= s.name %>
+            </option>
+          <% }) %>
+        </select>
+      </form>
+    </div>
+  </div>
 
-    <% if(!subject){ %>
-      <p class="warning-text" style="color: red;">⚠ Please select subject first</p>
-    <% } else { %>
-      <p class="success-text">✓ Subject: <strong><%= subject %></strong></p>
-    <% } %>
+  <!-- Weekly Assignments Grid -->
+  <div class="card">
+    <div class="card-header-flex">
+      <div>
+        <h3><i class="fa-solid fa-calendar-week"></i> Weekly Assignment Solutions</h3>
+        <p class="muted-text">Click on any week button to view or download the assignment PDF.</p>
+      </div>
+      <% if(subject){ %>
+        <span class="badge badge-success"><i class="fa-solid fa-check"></i> <%= subject %></span>
+      <% } else { %>
+        <span class="badge badge-warning"><i class="fa-solid fa-triangle-exclamation"></i> Select Subject</span>
+      <% } %>
+    </div>
 
     <div class="grid-box">
       <% for(let i = 1; i <= 12; i++) { %>
@@ -37,43 +46,60 @@
             class="grid-item"
             title="Assignment Week <%= i %>"
           >
-            Week <%= i %>
+            <i class="fa-solid fa-file-pdf grid-item-icon"></i>
+            <span>Week <%= i %></span>
           </a>
         <% } else { %>
-          <div class="grid-item disabled">Week <%= i %></div>
+          <div class="grid-item disabled">
+            <i class="fa-solid fa-lock grid-item-icon"></i>
+            <span>Week <%= i %></span>
+          </div>
         <% } %>
       <% } %>
     </div>
   </div>
 
-  <!-- ================= STUDY MATERIAL ================= -->
-   <div class="card">
-    <h2> Study Material</h2>
+  <!-- Official Study Materials Section -->
+  <div class="card">
+    <h3><i class="fa-solid fa-box-archive"></i> Official Lecture Notes & Materials</h3>
+    
     <% if(!subject){ %>
-      <p class="warning-text" style="color: red;">⚠ Please select subject first</p>
+      <div class="empty-state-small">
+        <i class="fa-solid fa-arrow-up muted-icon"></i>
+        <p class="muted-text">Please select a subject above to view official course materials.</p>
+      </div>
     <% } else { %>
-      <p class="success-text">✓ Subject: <strong><%= subject %></strong></p>
 
       <% if (typeof materials !== 'undefined' && materials.length > 0) { %>
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+        <div class="materials-list-grid">
           <% materials.forEach(m => { %>
-            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); padding: 12px 20px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);">
-              <span style="font-weight: 500; color: #fff;">
-                <%= m.fileName || (m.week ? `Study Material Week ${m.week}` : 'Study Material') %>
-              </span>
-              <a href="/materials/download/<%= m._id %>" target="_blank" class="btn btn-secondary btn-sm" style="padding: 5px 12px; font-size: 0.85rem;">
-                Open/Download
+            <div class="material-card-row">
+              <div class="material-info">
+                <div class="material-icon-wrap">
+                  <i class="fa-solid fa-file-pdf"></i>
+                </div>
+                <div>
+                  <h4 class="material-title">
+                    <%= m.fileName || (m.week ? `Study Material Week ${m.week}` : 'Study Material') %>
+                  </h4>
+                  <span class="muted-text" style="font-size: 0.8rem;">Official Course Resource</span>
+                </div>
+              </div>
+              <a href="/materials/download/<%= m._id %>" target="_blank" class="btn btn-download btn-sm">
+                <i class="fa-solid fa-arrow-down-to-line"></i> Download / View
               </a>
             </div>
           <% }) %>
         </div>
       <% } else { %>
-        <p class="muted-text" style="margin-top: 15px;">No study materials uploaded for this subject yet.</p>
+        <div class="empty-state-small">
+          <i class="fa-solid fa-folder-open muted-icon"></i>
+          <p class="muted-text">No official study materials uploaded for this subject yet.</p>
+        </div>
       <% } %>
     <% } %>
-   </div>
-   
+  </div>
 
 </div>
 
-<%- include("./partials/footer") %>
+<%- include("./partials/footer") %>

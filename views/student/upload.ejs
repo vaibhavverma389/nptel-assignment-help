@@ -1,65 +1,124 @@
 <%- include("../partials/header") %>
 
-<h2 class="page-title">Create & Upload Notes</h2>
+<div class="dashboard">
 
-<form method="post" action="/upload" enctype="multipart/form-data" class="card" style="max-width: 650px; margin: 0 auto 30px;">
-  <div class="form-column">
-    
-    <!-- Title -->
-    <div class="form-group">
-      <label class="form-label" for="title">Note Title</label>
-      <input type="text" id="title" name="title" class="input" placeholder="e.g. Artificial Intelligence Basics" required />
-    </div>
-
-    <!-- Subject Selection -->
-    <div class="form-group">
-      <label class="form-label" for="subject">Select Subject</label>
-      <select id="subject" name="subject" class="select" required>
-        <option value="">-- Choose Course/Subject --</option>
-        <% subjects.forEach(s => { %>
-          <option value="<%= s.name %>"><%= s.name %></option>
-        <% }) %>
-      </select>
-    </div>
-
-    <!-- Content / Description -->
-    <div class="form-group">
-      <label class="form-label" for="description">Note Content / Description</label>
-      <textarea id="description" name="description" rows="6" class="input" placeholder="Type key insights, study points, or details about the notes..."></textarea>
-    </div>
-
-    <!-- File Upload -->
-    <div class="form-group">
-      <label class="form-label" for="noteFile">Attach Document / Image (Optional PDF, JPEG, PNG)</label>
-      <input type="file" id="noteFile" name="noteFile" class="input" accept=".pdf,.png,.jpg,.jpeg" style="padding: 10px;" />
-      <span id="check-info" style="margin-top: 5px; font-size: 0.8rem; opacity: 0.75;">Maximum file size: 10MB. Files are securely uploaded to ImageKit storage.</span>
-    </div>
-
-    <!-- Buttons -->
-    <div class="btn-group" style="margin-top: 15px;">
-      <button type="submit" class="btn btn-submit">Create Note</button>
-      <a href="/notes" class="btn btn-secondary">Cancel</a>
-    </div>
-
+  <div class="page-header-banner">
+    <h2><i class="fa-solid fa-cloud-arrow-up"></i> Upload & Share Study Notes</h2>
+    <p class="muted-text">Contribute lecture notes, formulas, or summaries to help your peers excel.</p>
   </div>
-</form>
 
-<div style="text-align: center; margin-bottom: 40px;">
-  <a href="/notes" class="back-dashboard">Back to Notes Hub</a>
+  <form method="post" action="/upload" enctype="multipart/form-data" class="card centered-card" style="max-width: 680px; margin: 0 auto 30px;">
+    <div class="form-column">
+      
+      <!-- Title -->
+      <div class="form-group">
+        <label class="form-label" for="title"><i class="fa-solid fa-heading"></i> Note Title</label>
+        <div class="input-icon-wrapper">
+          <i class="fa-solid fa-pen input-icon"></i>
+          <input type="text" id="title" name="title" class="input input-with-icon" placeholder="e.g. Machine Learning Week 3 Lecture Notes" required />
+        </div>
+      </div>
+
+      <!-- Subject Selection -->
+      <div class="form-group">
+        <label class="form-label" for="subject"><i class="fa-solid fa-book-bookmark"></i> Select Course / Subject</label>
+        <div class="input-icon-wrapper">
+          <i class="fa-solid fa-list-check input-icon"></i>
+          <select id="subject" name="subject" class="select select-with-icon" required>
+            <option value="">-- Choose Course/Subject --</option>
+            <% subjects.forEach(s => { %>
+              <option value="<%= s.name %>"><%= s.name %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+
+      <!-- Content / Description -->
+      <div class="form-group">
+        <label class="form-label" for="description"><i class="fa-solid fa-align-left"></i> Note Description & Key Points</label>
+        <textarea id="description" name="description" rows="5" class="input" placeholder="Summarize key topics, formulas, or exam tips covered in these notes..."></textarea>
+      </div>
+
+      <!-- File Upload Zone -->
+      <div class="form-group">
+        <label class="form-label"><i class="fa-solid fa-paperclip"></i> Attach Document (PDF, JPEG, PNG)</label>
+        <div class="file-dropzone" id="dropzone">
+          <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
+          <p class="dropzone-text" id="dropzoneText">Click or Drag & Drop file here to upload</p>
+          <span class="muted-text" style="font-size: 0.8rem;">Supports PDF, JPG, PNG (Max 10MB)</span>
+          <input type="file" id="noteFile" name="noteFile" class="file-input-hidden" accept=".pdf,.png,.jpg,.jpeg" />
+        </div>
+        <span id="check-info" style="margin-top: 8px; font-size: 0.8rem; opacity: 0.75; display: block;">
+          <i class="fa-solid fa-shield-halved"></i> Files are encrypted & securely stored in ImageKit storage.
+        </span>
+      </div>
+
+      <!-- Submit Buttons -->
+      <div class="btn-group" style="margin-top: 20px;">
+        <button type="submit" class="btn btn-submit btn-lg">
+          <i class="fa-solid fa-upload"></i> Upload Note
+        </button>
+        <a href="/notes" class="btn btn-secondary btn-lg">
+          Cancel
+        </a>
+      </div>
+
+    </div>
+  </form>
+
+  <div style="text-align: center; margin-bottom: 40px;">
+    <a href="/notes" class="back-dashboard">
+      <i class="fa-solid fa-arrow-left"></i> Back to Notes Hub
+    </a>
+  </div>
+
 </div>
 
 <%- include("../partials/footer") %>
 
 <script>
-  document.getElementById('noteFile').addEventListener('change', function(e) {
+  const fileInput = document.getElementById('noteFile');
+  const dropzoneText = document.getElementById('dropzoneText');
+  const dropzone = document.getElementById('dropzone');
+
+  dropzone.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
+      dropzoneText.innerHTML = `<i class="fa-solid fa-circle-check text-success"></i> Selected: <strong>${file.name}</strong>`;
       const titleInput = document.getElementById('title');
-      const fileName = file.name;
-      const lastDotIndex = fileName.lastIndexOf('.');
-      const title = lastDotIndex !== -1 ? fileName.substring(0, lastDotIndex) : fileName;
-      titleInput.value = title;
+      if (!titleInput.value) {
+        const fileName = file.name;
+        const lastDotIndex = fileName.lastIndexOf('.');
+        titleInput.value = lastDotIndex !== -1 ? fileName.substring(0, lastDotIndex) : fileName;
+      }
+    }
+  });
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropzone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      dropzone.classList.add('drag-active');
+    });
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('drag-active');
+    });
+  });
+
+  dropzone.addEventListener('drop', (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files.length) {
+      fileInput.files = files;
+      const event = new Event('change');
+      fileInput.dispatchEvent(event);
     }
   });
 </script>
+
 

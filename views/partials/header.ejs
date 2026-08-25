@@ -10,53 +10,86 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
   <link rel="stylesheet" href="/css/app.css" />
 </head>
 <body>
 
-
-  <header class="header">
+<header class="header">
   <div class="container header-flex">
 
-    <a href="/" style="text-decoration: none;">
-      <h2> Student Notes Portal</h2>
+    <a href="/" class="brand-logo">
+      <div class="logo-icon-wrap">
+        <i class="fa-solid fa-graduation-cap"></i>
+      </div>
+      <h2>Student Notes <span>Portal</span></h2>
     </a>
 
-    <nav class="nav-links">
+    <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Toggle navigation">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <nav class="nav-links" id="navLinks">
+      <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="/study-material"><i class="fa-solid fa-folder-open"></i> Study Material</a>
+      <a href="/notes"><i class="fa-solid fa-book"></i> Notes Hub</a>
 
       <% if (user) { %>
-        <a href="/dashboard">Dashboard</a>
+        <a href="/dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a href="/favorites"><i class="fa-solid fa-star"></i> Favorites</a>
+        <a href="/upload" class="nav-btn-highlight"><i class="fa-solid fa-cloud-arrow-up"></i> Upload</a>
 
         <% if (user.role === "admin") { %>
-          <a href="/admin">Admin Panel</a>
+          <a href="/admin" class="nav-admin-pill"><i class="fa-solid fa-user-shield"></i> Admin</a>
         <% } %>
 
-        <a href="/auth/logout">Logout</a>
+        <div class="user-chip">
+          <% if (user.picture) { %>
+            <img src="<%= user.picture %>" class="user-pic" alt="<%= user.name %>" />
+          <% } else { %>
+            <div class="user-avatar-placeholder"><%= user.name ? user.name.charAt(0).toUpperCase() : 'U' %></div>
+          <% } %>
+          <span class="user-name"><%= user.name ? user.name.split(' ')[0] : 'User' %></span>
+          <a href="/auth/logout" class="logout-link" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></a>
+        </div>
 
       <% } else { %>
-        <a href="/auth/login">Login</a>
-        <a href="/auth/register">Register</a>
+        <a href="/auth/login" class="nav-login-btn"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="/auth/register" class="btn-submit btn-sm"><i class="fa-solid fa-user-plus"></i> Register</a>
       <% } %>
-
     </nav>
 
   </div>
 
   <script src="/js/visitorData.js"></script>
+  <script>
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+      document.getElementById('navLinks')?.classList.toggle('active');
+    });
+  </script>
 </header>
 
 <main class="container">
 
   <!-- Flash Messages -->
   <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
-    <div class="alert alert-success" style="background: rgba(0, 113, 189, 0.15); border: 1px solid var(--sky); padding: 12px 20px; border-radius: var(--radius-md); margin-top: 20px; margin-bottom: 20px; color: var(--ice); font-weight: 500; display: flex; align-items: center; justify-content: space-between;">
-      <span><%= success %></span>
-      <button onclick="this.parentElement.style.display='none'" style="background:none; border:none; color:inherit; font-size:1.2rem; cursor:pointer; padding:0 5px;">&times;</button>
+    <div class="alert alert-success">
+      <div class="alert-content">
+        <i class="fa-solid fa-circle-check"></i>
+        <span><%= success %></span>
+      </div>
+      <button onclick="this.parentElement.style.display='none'" class="alert-close">&times;</button>
     </div>
   <% } %>
   <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
-    <div class="alert alert-danger" style="background: rgba(217, 48, 37, 0.15); border: 1px solid var(--danger-color); padding: 12px 20px; border-radius: var(--radius-md); margin-top: 20px; margin-bottom: 20px; color: #ff8a80; font-weight: 500; display: flex; align-items: center; justify-content: space-between;">
-      <span><%= error %></span>
-      <button onclick="this.parentElement.style.display='none'" style="background:none; border:none; color:inherit; font-size:1.2rem; cursor:pointer; padding:0 5px;">&times;</button>
+    <div class="alert alert-danger">
+      <div class="alert-content">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span><%= error %></span>
+      </div>
+      <button onclick="this.parentElement.style.display='none'" class="alert-close">&times;</button>
     </div>
   <% } %>
+
