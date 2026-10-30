@@ -45,6 +45,30 @@
       </select>
     </div>
 
+    <!-- From Date -->
+    <div style="width: 150px; min-width: 130px;">
+      <label class="muted-text" style="font-size: 0.85rem; display: block; margin-bottom: 6px;">From Date</label>
+      <input 
+        type="date" 
+        name="from" 
+        class="input" 
+        value="<%= filter.from || '' %>" 
+        style="margin: 0; width: 100%;"
+      />
+    </div>
+
+    <!-- To Date -->
+    <div style="width: 150px; min-width: 130px;">
+      <label class="muted-text" style="font-size: 0.85rem; display: block; margin-bottom: 6px;">To Date</label>
+      <input 
+        type="date" 
+        name="to" 
+        class="input" 
+        value="<%= filter.to || '' %>" 
+        style="margin: 0; width: 100%;"
+      />
+    </div>
+
     <!-- Buttons -->
     <div style="display: flex; gap: 10px; margin-bottom: 2px;">
       <button type="submit" class="btn btn-submit" style="padding: 10px 20px; font-size: 0.9rem;">Filter</button>
@@ -57,9 +81,13 @@
         if (filter.email) params.push("email=" + encodeURIComponent(filter.email));
         if (filter.activityType) params.push("activityType=" + encodeURIComponent(filter.activityType));
         if (filter.subject) params.push("subject=" + encodeURIComponent(filter.subject));
+        if (filter.from) params.push("from=" + encodeURIComponent(filter.from));
+        if (filter.to) params.push("to=" + encodeURIComponent(filter.to));
         exportUrl += params.join("&");
       %>
-      <a href="<%= exportUrl %>" class="btn btn-download" style="padding: 10px 20px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; text-decoration: none;">Export Excel</a>
+      <a href="<%= exportUrl %>" class="btn btn-download" style="padding: 10px 20px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+        <i class="fa-solid fa-file-excel" style="margin-right: 6px;"></i> Export Excel
+      </a>
     </div>
   </form>
 </div>
@@ -171,4 +199,3 @@
 </div>
 
 <%- include("../partials/footer") %>
-
