@@ -3,231 +3,274 @@
 <div class="dashboard">
   <%- include("../partials/adminNav", { activeTab: 'visitors' }) %>
 
+  <h2>Visitor Logs & Telemetry</h2>
+  <p class="muted-text">Real-time visitor telemetry, device specs, network info, and IP geolocation tracking</p>
 
-  <h2 style="margin-bottom:10px;">Visitor Logs</h2>
+  <!-- STATS OVERVIEW CARDS -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+    <div class="card" style="padding: 16px; display: flex; align-items: center; gap: 15px;">
+      <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(0, 113, 189, 0.15); color: var(--accent-blue); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+        <i class="fa-solid fa-users"></i>
+      </div>
+      <div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Total Visits</div>
+        <div style="font-size: 1.4rem; font-weight: 700; color: #fff;"><%= typeof totalVisits !== 'undefined' ? totalVisits : logs.length %></div>
+      </div>
+    </div>
 
-  <!-- SEARCH -->
-  <input 
-    type="text"
-    id="searchInput"
-    placeholder="Search by Email or IP..."
-    style="margin-bottom:15px;padding:8px;width:100%;max-width:350px;"
-  >
+    <div class="card" style="padding: 16px; display: flex; align-items: center; gap: 15px;">
+      <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(0, 230, 118, 0.15); color: #00e676; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+        <i class="fa-solid fa-bolt"></i>
+      </div>
+      <div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Today's Visits</div>
+        <div style="font-size: 1.4rem; font-weight: 700; color: #fff;"><%= typeof todayVisits !== 'undefined' ? todayVisits : 0 %></div>
+      </div>
+    </div>
 
-  <div class="table-wrapper">
-
-    <table class="answers-table" id="logsTable">
-
-      <thead>
-        <tr>
-          <th>Email</th>
-          <th>IP</th>
-          <th>Action</th>
-          <th>Path</th>
-          <th>Response</th>
-          <th>Time</th>
-        </tr>
-      </thead>
-
-      <tbody>
-
-        <% if (!logs || logs.length === 0) { %>
-
-          <tr id="noDataRow">
-            <td colspan="6" style="text-align:center;">
-              No visitor logs found
-            </td>
-          </tr>
-
-        <% } else { %>
-
-          <% logs.forEach(v => { %>
-
-            <tr>
-
-              <!-- Email -->
-              <td class="email-cell">
-                <strong style="color: #fff;"><%= v.email || "Guest" %></strong>
-                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">
-                  <%= v.browser || 'Browser' %> <%= v.browserVersion || '' %> on <%= v.os || 'OS' %>
-                </div>
-              </td>
-
-              <!-- IP -->
-              <td>
-                <span class="copy-ip" title="Click to copy IP" data-ip="<%= v.ip %>" style="cursor:pointer;color:#007bff;font-weight:600;"><%= v.ip %></span>
-                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
-                  <%= (v.city || v.region) ? (v.city || v.region) + ', ' + (v.country || '') : (v.country || 'Local/Unknown') %> 
-                  <br>
-                  <span style="opacity: 0.8;"><%= v.isp || 'Local Network' %></span>
-                </div>
-              </td>
-
-              <!-- Action -->
-              <td>
-                <% 
-                  let badgeColor = "rgba(255,255,255,0.1)";
-                  let textColor = "#fff";
-                  const event = v.eventType || "visit";
-                  if (event === "login" || event === "register") {
-                    badgeColor = "rgba(0, 200, 83, 0.15)";
-                    textColor = "#00e676";
-                  } else if (event === "logout") {
-                    badgeColor = "rgba(255, 23, 68, 0.15)";
-                    textColor = "#ff1744";
-                  } else if (event.startsWith("note-")) {
-                    badgeColor = "rgba(238, 186, 27, 0.15)";
-                    textColor = "#EEBA1B";
-                  } else if (event.endsWith("-submit")) {
-                    badgeColor = "rgba(0, 113, 189, 0.15)";
-                    textColor = "#0071BD";
-                  }
-                %>
-                <span style="background: <%= badgeColor %>; color: <%= textColor %>; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                  <%= event.replace(/-/g, " ") %>
-                </span>
-
-                <!-- System & Network Info -->
-                <% if (v.screenWidth || v.connectionType || v.cpuCores) { %>
-                  <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.4;">
-                    <% if (v.screenWidth && v.screenHeight) { %>
-                      <%= v.screenWidth %>x<%= v.screenHeight %>
-                    <% } %>
-                    <% if (v.connectionType) { %>
-                      <%= v.connectionType.toUpperCase() %>
-                    <% } %>
-                    <% if (v.cpuCores || v.deviceMemory) { %>
-                      <br><%= v.cpuCores ? v.cpuCores + ' CPU' : '' %> <%= v.deviceMemory ? '| ' + v.deviceMemory + 'GB RAM' : '' %>
-                    <% } %>
-                  </div>
-                <% } %>
-              </td>
-
-              <!-- Path -->
-              <td title="<%= v.path %>">
-                <%= v.path && v.path.length > 30
-                  ? v.path.slice(0,30) + "..."
-                  : v.path %>
-              </td>
-
-              <!-- Response -->
-              <td>
-                <%= v.responseTime ? v.responseTime + " ms" : "0 ms" %>
-              </td>
-
-              <!-- Time -->
-              <td>
-                <%= v.visitedAt
-                  ? new Date(v.visitedAt).toLocaleString("en-IN",{timeZone:"Asia/Kolkata"})
-                  : "" %>
-              </td>
-
-            </tr>
-
-          <% }) %>
-
-        <% } %>
-
-      </tbody>
-
-    </table>
-
+    <div class="card" style="padding: 16px; display: flex; align-items: center; gap: 15px;">
+      <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(238, 186, 27, 0.15); color: #EEBA1B; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+        <i class="fa-solid fa-user-check"></i>
+      </div>
+      <div>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Registered Active</div>
+        <div style="font-size: 1.4rem; font-weight: 700; color: #fff;"><%= typeof loggedInUsers !== 'undefined' ? loggedInUsers : 0 %></div>
+      </div>
+    </div>
   </div>
 
+  <!-- FILTER & SEARCH FORM -->
+  <form method="get" action="/admin/visitors" style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; align-items: flex-end;">
+    <!-- Live Search / Server Filter -->
+    <div style="flex: 1; min-width: 220px;">
+      <label class="muted-text" style="font-size: 0.85rem; display: block; margin-bottom: 6px;">Search Email, IP or Path</label>
+      <input 
+        type="text"
+        name="search"
+        id="searchInput"
+        placeholder="Type to search..."
+        value="<%= typeof filter !== 'undefined' && filter.search ? filter.search : '' %>"
+        class="input"
+        style="margin: 0; width: 100%;"
+      />
+    </div>
+
+    <!-- From Date -->
+    <div style="width: 150px; min-width: 130px;">
+      <label class="muted-text" style="font-size: 0.85rem; display: block; margin-bottom: 6px;">From Date</label>
+      <input 
+        type="date" 
+        name="from" 
+        class="input" 
+        value="<%= typeof filter !== 'undefined' && filter.from ? filter.from : '' %>" 
+        style="margin: 0; width: 100%;"
+      />
+    </div>
+
+    <!-- To Date -->
+    <div style="width: 150px; min-width: 130px;">
+      <label class="muted-text" style="font-size: 0.85rem; display: block; margin-bottom: 6px;">To Date</label>
+      <input 
+        type="date" 
+        name="to" 
+        class="input" 
+        value="<%= typeof filter !== 'undefined' && filter.to ? filter.to : '' %>" 
+        style="margin: 0; width: 100%;"
+      />
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 10px; margin-bottom: 2px;">
+      <button type="submit" class="btn btn-submit" style="padding: 10px 20px; font-size: 0.9rem;">Filter</button>
+      <a href="/admin/visitors" class="btn btn-secondary" style="padding: 10px 20px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; text-decoration: none;">Reset</a>
+      
+      <% 
+        let exportUrl = "/admin/export/visitors?";
+        let params = [];
+        if (typeof filter !== 'undefined' && filter.from) params.push("from=" + encodeURIComponent(filter.from));
+        if (typeof filter !== 'undefined' && filter.to) params.push("to=" + encodeURIComponent(filter.to));
+        if (typeof filter !== 'undefined' && filter.search) params.push("search=" + encodeURIComponent(filter.search));
+        exportUrl += params.join("&");
+      %>
+      <a href="<%= exportUrl %>" class="btn btn-download" style="padding: 10px 20px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+        <i class="fa-solid fa-file-excel" style="margin-right: 6px;"></i> Export Excel
+      </a>
+    </div>
+  </form>
+
+  <div class="card">
+    <div class="table-wrapper">
+      <table class="answers-table" id="logsTable">
+        <thead>
+          <tr>
+            <th>User / Device</th>
+            <th>IP & Location</th>
+            <th>Action</th>
+            <th>Client System & Specs</th>
+            <th>Path & Referer</th>
+            <th>Response</th>
+            <th>Time (IST)</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <% if (!logs || logs.length === 0) { %>
+            <tr id="noDataRow">
+              <td colspan="7" style="text-align: center; padding: 30px;" class="muted-text">
+                No visitor logs found
+              </td>
+            </tr>
+          <% } else { %>
+            <% logs.forEach(v => { %>
+              <tr class="visitor-row">
+                <!-- User & Device -->
+                <td class="email-cell">
+                  <strong style="color: #fff;"><%= v.email || "Guest" %></strong>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">
+                    <i class="fa-solid fa-<%= v.device === 'Mobile' ? 'mobile-screen' : (v.device === 'Tablet' ? 'tablet-screen-button' : 'desktop') %>" style="margin-right: 4px;"></i>
+                    <%= v.browser || 'Browser' %> <%= v.browserVersion || '' %> on <%= v.os || 'OS' %>
+                  </div>
+                </td>
+
+                <!-- IP & Geo -->
+                <td>
+                  <span class="copy-ip" title="Click to copy IP" data-ip="<%= v.ip %>" style="cursor: pointer; color: var(--accent-blue); font-weight: 600;">
+                    <i class="fa-regular fa-copy" style="font-size: 0.75rem; margin-right: 3px;"></i><%= v.ip || "127.0.0.1" %>
+                  </span>
+                  <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
+                    <%= (v.city || v.region) ? (v.city || v.region) + ', ' + (v.country || '') : (v.country || 'Local/Unknown') %> 
+                    <br>
+                    <span style="opacity: 0.8;"><%= v.isp || 'Local Network' %></span>
+                  </div>
+                </td>
+
+                <!-- Action Badge -->
+                <td>
+                  <% 
+                    let badgeColor = "rgba(255,255,255,0.1)";
+                    let textColor = "#fff";
+                    const event = v.eventType || "visit";
+                    if (event === "login" || event === "register") {
+                      badgeColor = "rgba(0, 200, 83, 0.15)";
+                      textColor = "#00e676";
+                    } else if (event === "logout") {
+                      badgeColor = "rgba(255, 23, 68, 0.15)";
+                      textColor = "#ff1744";
+                    } else if (event.startsWith("note-")) {
+                      badgeColor = "rgba(238, 186, 27, 0.15)";
+                      textColor = "#EEBA1B";
+                    } else if (event.endsWith("-submit")) {
+                      badgeColor = "rgba(0, 113, 189, 0.15)";
+                      textColor = "#0071BD";
+                    }
+                  %>
+                  <span style="background: <%= badgeColor %>; color: <%= textColor %>; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <%= event.replace(/-/g, " ") %>
+                  </span>
+                </td>
+
+                <!-- System & Specs (Screen, Network, CPU, RAM) -->
+                <td>
+                  <% if (v.screenWidth || v.connectionType || v.cpuCores || v.deviceMemory) { %>
+                    <div style="font-size: 0.82rem; line-height: 1.45;">
+                      <% if (v.screenWidth && v.screenHeight) { %>
+                        <span style="color: #fff; font-weight: 500;">
+                          <i class="fa-solid fa-display" style="font-size: 0.75rem; color: var(--text-secondary); margin-right: 4px;"></i><%= v.screenWidth %> &times; <%= v.screenHeight %>
+                        </span>
+                      <% } %>
+                      <% if (v.connectionType) { %>
+                        <span style="margin-left: 6px; background: rgba(0, 200, 83, 0.12); color: #00e676; padding: 2px 6px; border-radius: 3px; font-size: 0.7rem; font-weight: 600;">
+                          <%= v.connectionType.toUpperCase() %>
+                        </span>
+                      <% } %>
+                      <% if (v.cpuCores || v.deviceMemory) { %>
+                        <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 3px;">
+                          <%= v.cpuCores ? v.cpuCores + ' CPU Cores' : '' %>
+                          <%= (v.cpuCores && v.deviceMemory) ? ' • ' : '' %>
+                          <%= v.deviceMemory ? v.deviceMemory + ' GB RAM' : '' %>
+                        </div>
+                      <% } %>
+                    </div>
+                  <% } else { %>
+                    <span class="muted-text" style="font-size: 0.8rem; font-style: italic;">Awaiting ping...</span>
+                  <% } %>
+                </td>
+
+                <!-- Path & Referer -->
+                <td style="max-width: 220px;">
+                  <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; color: #fff;" title="<%= v.path %>">
+                    <%= v.path %>
+                  </div>
+                  <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="Referer: <%= v.referer || 'Direct' %>">
+                    <i class="fa-solid fa-link" style="font-size: 0.7rem; margin-right: 3px;"></i><%= v.referer || "Direct" %>
+                  </div>
+                </td>
+
+                <!-- Response Time -->
+                <td style="white-space: nowrap; font-size: 0.85rem;">
+                  <span style="color: <%= (v.responseTime && v.responseTime > 1000) ? '#ff5252' : 'var(--text-secondary)' %>;">
+                    <%= v.responseTime ? v.responseTime + " ms" : "0 ms" %>
+                  </span>
+                </td>
+
+                <!-- Time -->
+                <td style="white-space: nowrap; font-size: 0.85rem;">
+                  <%= v.visitedAt
+                    ? new Date(v.visitedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+                    : "" %>
+                </td>
+              </tr>
+            <% }) %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <a href="/admin" class="back-dashboard">Back to Dashboard</a>
 </div>
 
 <script>
-
-/* ================= SEARCH (DEBOUNCED) ================= */
-
+/* ================= INSTANT LIVE SEARCH (NON-DESTRUCTIVE) ================= */
 const searchInput = document.getElementById("searchInput");
-let timeout;
+let debounceTimeout;
 
-searchInput.addEventListener("keyup", function () {
+if (searchInput) {
+  searchInput.addEventListener("input", function () {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      const term = this.value.toLowerCase().trim();
+      const rows = document.querySelectorAll("#logsTable tbody tr.visitor-row");
 
-  clearTimeout(timeout);
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = (!term || text.includes(term)) ? "" : "none";
+      });
+    }, 200);
+  });
+}
 
-  timeout = setTimeout(() => {
-
-    const filter = this.value.toLowerCase();
-    const rows = document.querySelectorAll("#logsTable tbody tr");
-
-    let visibleCount = 0;
-
-    rows.forEach(row => {
-
-      if (row.cells.length < 2) return; // skip "no data" row
-
-      const emailCell = row.cells[0];
-      const ipCell = row.cells[1];
-
-      const email = emailCell.textContent.toLowerCase();
-      const ip = ipCell.textContent.toLowerCase();
-
-      // Reset highlight
-      emailCell.innerHTML = emailCell.textContent;
-      ipCell.innerHTML = ipCell.textContent;
-
-      if (email.includes(filter) || ip.includes(filter)) {
-
-        row.style.display = "";
-        visibleCount++;
-
-        // Highlight match
-        if (filter) {
-          emailCell.innerHTML = emailCell.textContent.replace(
-            new RegExp(filter, "gi"),
-            match => `<mark>${match}</mark>`
-          );
-
-          ipCell.innerHTML = ipCell.textContent.replace(
-            new RegExp(filter, "gi"),
-            match => `<mark>${match}</mark>`
-          );
-        }
-
-      } else {
-        row.style.display = "none";
-      }
-
-    });
-
-  }, 300);
-
-});
-
-
-/* ================= COPY IP ================= */
-
+/* ================= COPY IP TO CLIPBOARD ================= */
 document.querySelectorAll(".copy-ip").forEach(el => {
-
   el.addEventListener("click", async () => {
-
     const ip = el.getAttribute("data-ip");
+    if (!ip) return;
 
     try {
       await navigator.clipboard.writeText(ip);
-
-      const original = ip;
-
-      el.innerText = "Copied ✔";
-      el.style.color = "green";
+      const originalHTML = el.innerHTML;
+      el.innerHTML = '<i class="fa-solid fa-check" style="color: #00e676; margin-right: 3px;"></i> Copied';
+      el.style.color = "#00e676";
 
       setTimeout(() => {
-        el.innerText = original;
-        el.style.color = "#007bff";
+        el.innerHTML = originalHTML;
+        el.style.color = "var(--accent-blue)";
       }, 1500);
-
     } catch (err) {
-      alert("Copy failed ❌");
+      alert("Copy failed");
     }
-
   });
-
 });
-
 </script>
 
-</div>
-
-<%- include("../partials/footer") %>
+<%- include("../partials/footer") %>
