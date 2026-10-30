@@ -1,42 +1,103 @@
-(function(){
+(function () {
+  function getCookie(name) {
+    try {
+      const match = document.cookie.match(new RegExp("(?:^|;\\s*)" + name + "=([^;]+)"));
+      return match ? decodeURIComponent(match[1]) : null;
+    } catch (e) {
+      return null;
+    }
+  }
 
-function sendVisitorData(){
+  function setCookie(name, value, days) {
+    try {
+      const date = new Date();
+      date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+      document.cookie =
+        name +
+        "=" +
+        encodeURIComponent(value) +
+        "; expires=" +
+        date.toUTCString() +
+        "; path=/; SameSite=Lax";
+    } catch (e) {}
+  }
 
-const headers={
+  function getOrCreateSessionId() {
+    let sid = getCookie("v_sid");
+    if (sid) {
+      try {
+        localStorage.setItem("v_sid", sid);
+      } catch (e) {}
+      return sid;
+    }
 
-"x-screen-width":screen.width,
-"x-screen-height":screen.height,
+    try {
+      sid = localStorage.getItem("v_sid") || localStorage.getItem("sessionId");
+    } catch (e) {}
 
-"x-viewport-width":window.innerWidth,
-"x-viewport-height":window.innerHeight,
+    if (!sid) {
+      sid = "vs_" + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+    }
 
-"x-connection-type":navigator.connection?.effectiveType,
+    try {
+      localStorage.setItem("v_sid", sid);
+      localStorage.setItem("sessionId", sid);
+    } catch (e) {}
+    setCookie("v_sid", sid, 365);
+    return sid;
+  }
 
-"x-cpu-cores":navigator.hardwareConcurrency,
+  function sendVisitorData() {
+    try {
+      const sid = getOrCreateSessionId();
 
-"x-device-memory":navigator.deviceMemory,
+      const screenWidth = window.screen ? window.screen.width : null;
+      const screenHeight = window.screen ? window.screen.height : null;
+      const viewportWidth = window.innerWidth || null;
+      const viewportHeight = window.innerHeight || null;
+      const connectionType =
+        navigator.connection && navigator.connection.effectiveType
+          ? navigator.connection.effectiveType
+          : "";
+      const cpuCores = navigator.hardwareConcurrency || null;
+      const deviceMemory = navigator.deviceMemory || null;
+      const referer = document.referrer || "";
+      const path = window.location.pathname + window.location.search;
 
-"x-session-id":localStorage.sessionId || createSession()
+      const payload = {
+        sessionId: sid,
+        screenWidth: screenWidth,
+        screenHeight: screenHeight,
+        viewportWidth: viewportWidth,
+        viewportHeight: viewportHeight,
+        connectionType: connectionType,
+        cpuCores: cpuCores,
+        deviceMemory: deviceMemory,
+        referer: referer,
+        path: path
+      };
 
-}
+      if (typeof fetch === "function") {
+        fetch("/ping", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-session-id": sid
+          },
+          body: JSON.stringify(payload),
+          keepalive: true
+        }).catch(function () {});
+      } else if (navigator.sendBeacon) {
+        navigator.sendBeacon("/ping", JSON.stringify(payload));
+      }
+    } catch (err) {
+      // Fail silently without interrupting UI
+    }
+  }
 
-fetch("/ping",{
-method:"GET",
-headers
-})
-
-}
-
-function createSession(){
-
-const id=Math.random().toString(36).substring(2)
-
-localStorage.sessionId=id
-
-return id
-
-}
-
-sendVisitorData()
-
-})()
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", sendVisitorData);
+  } else {
+    sendVisitorData();
+  }
+})();
