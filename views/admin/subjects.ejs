@@ -2,68 +2,103 @@
 
 <div class="dashboard">
   <%- include("../partials/adminNav", { activeTab: 'subjects' }) %>
-  <h2 class="page-title">Manage Subjects</h2>
 
+  <div class="page-header-banner">
+    <h2><i class="fa-solid fa-book"></i> Course Subjects Management</h2>
+    <p class="muted-text">Add, rename, or remove courses and academic subjects offered on the portal.</p>
+  </div>
 
-  <div class="card centered-card" style="text-align: left;">
-    <form method="post" action="/admin/subjects" class="form-row">
-      <input class="input" name="name" placeholder="Enter subject name (e.g. MIS)" required />
-      <button class="btn btn-submit">Add Subject</button>
+  <!-- ADD SUBJECT CARD -->
+  <div class="card" style="margin-bottom: 25px; padding: 22px;">
+    <h3 style="margin-bottom: 12px; font-size: 1.1rem;"><i class="fa-solid fa-plus-circle" style="color: var(--accent-cyan); margin-right: 6px;"></i> Add New Course Subject</h3>
+    <form method="post" action="/admin/subjects" style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 0;">
+      <input 
+        class="input" 
+        name="name" 
+        placeholder="Enter subject name (e.g. Cloud Computing, MIS, Soft Skills)" 
+        required 
+        style="flex: 1; min-width: 250px; margin: 0;"
+      />
+      <button class="btn btn-submit" style="padding: 11px 24px; white-space: nowrap;">
+        <i class="fa-solid fa-plus" style="margin-right: 6px;"></i> Add Subject
+      </button>
     </form>
   </div>
 
+  <!-- ALL SUBJECTS LIST CARD -->
   <div class="card">
-    <h3>All Subjects</h3>
+    <div class="card-header-flex" style="margin-bottom: 20px;">
+      <div>
+        <h3><i class="fa-solid fa-layer-group"></i> Active Course Subjects (<%= subjects.length %>)</h3>
+        <p class="muted-text">Subjects available for student uploads, weekly assignments, and study materials.</p>
+      </div>
+    </div>
 
-    <% if (subjects.length===0) { %>
-      <p class="muted-text">No subjects added yet.</p>
-      <% } else { %>
-        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
-          <% subjects.forEach(s=> { %>
-            <div class="question-row"
-              style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; flex-direction: column; gap: 10px; align-items: stretch;">
-              
-              <!-- View Mode -->
-              <div id="view-<%= s._id %>" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <strong style="color: var(--accent-blue);">
+    <% if (subjects.length === 0) { %>
+      <div class="empty-state-small" style="padding: 35px 20px; text-align: center;">
+        <i class="fa-solid fa-book-open muted-icon" style="font-size: 2.5rem; margin-bottom: 10px; display: block;"></i>
+        <p class="muted-text">No subjects added yet. Use the form above to add your first subject.</p>
+      </div>
+    <% } else { %>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px;">
+        <% subjects.forEach((s, idx) => { %>
+          <div class="card" style="margin-bottom: 0; padding: 18px; border: 1px solid var(--border-light); background: rgba(255,255,255,0.02); transition: all 0.2s ease;">
+            
+            <!-- View Mode -->
+            <div id="view-<%= s._id %>" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <div style="display: flex; align-items: center; gap: 10px; overflow: hidden;">
+                <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0;">
+                  <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <strong style="color: #fff; font-size: 0.98rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                   <%= s.name %>
                 </strong>
-
-                <div style="display: flex; gap: 10px; align-items: center; margin: 0;">
-                  <button type="button" class="btn btn-secondary" onclick="toggleEdit('<%= s._id %>')" style="padding: 8px 15px; font-size: 13px; margin: 0;">Rename</button>
-                  <form method="post" action="/admin/subjects/delete/<%= s._id %>" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this subject?');">
-                    <button class="btn btn-remove" style="padding: 8px 15px; font-size: 13px; margin: 0;">Delete</button>
-                  </form>
-                </div>
               </div>
 
-              <!-- Edit Mode Form -->
-              <form id="edit-<%= s._id %>" method="post" action="/admin/subjects/edit/<%= s._id %>" style="display: none; width: 100%; gap: 10px; margin: 0; align-items: center;">
-                <input class="input" name="name" value="<%= s.name %>" required style="flex-grow: 1; margin: 0; padding: 8px;" />
-                <button class="btn btn-submit" style="padding: 8px 15px; font-size: 13px; margin: 0; white-space: nowrap;">Save</button>
-                <button type="button" class="btn btn-secondary" onclick="toggleEdit('<%= s._id %>')" style="padding: 8px 15px; font-size: 13px; margin: 0; white-space: nowrap;">Cancel</button>
-              </form>
-
+              <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEdit('<%= s._id %>')" style="padding: 6px 12px; font-size: 0.8rem;" title="Rename Subject">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <form method="post" action="/admin/subjects/delete/<%= s._id %>" style="margin: 0;" onsubmit="return confirm('Delete \'<%= s.name %>\'? Associated materials may be affected.');">
+                  <button class="btn btn-remove btn-sm" style="padding: 6px 12px; font-size: 0.8rem;" title="Delete Subject">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </form>
+              </div>
             </div>
-            <% }) %>
-        </div>
-        <% } %>
+
+            <!-- Inline Edit Mode -->
+            <form id="edit-<%= s._id %>" method="post" action="/admin/subjects/edit/<%= s._id %>" style="display: none; width: 100%; gap: 8px; margin: 0; align-items: center;">
+              <input class="input" name="name" value="<%= s.name %>" required style="flex: 1; margin: 0; padding: 7px 12px; font-size: 0.9rem;" />
+              <button class="btn btn-submit btn-sm" style="padding: 7px 14px; white-space: nowrap;">
+                <i class="fa-solid fa-check"></i>
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEdit('<%= s._id %>')" style="padding: 7px 14px; white-space: nowrap;">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </form>
+
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
   </div>
 
-  <a href="/admin" class="back-dashboard">Back to Dashboard</a>
+  <a href="/admin" class="back-dashboard"><i class="fa-solid fa-arrow-left" style="margin-right: 6px;"></i> Back to Dashboard</a>
+</div>
 
-  <script>
-    function toggleEdit(id) {
-      const viewDiv = document.getElementById('view-' + id);
-      const editForm = document.getElementById('edit-' + id);
-      if (viewDiv.style.display === 'none') {
-        viewDiv.style.display = 'flex';
-        editForm.style.display = 'none';
-      } else {
-        viewDiv.style.display = 'none';
-        editForm.style.display = 'flex';
-      }
+<script>
+  function toggleEdit(id) {
+    const viewDiv = document.getElementById('view-' + id);
+    const editForm = document.getElementById('edit-' + id);
+    if (viewDiv.style.display === 'none') {
+      viewDiv.style.display = 'flex';
+      editForm.style.display = 'none';
+    } else {
+      viewDiv.style.display = 'none';
+      editForm.style.display = 'flex';
     }
-  </div>
+  }
+</script>
 
-  <%- include("../partials/footer") %>
+<%- include("../partials/footer") %>

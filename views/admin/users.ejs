@@ -2,66 +2,141 @@
 
 <div class="dashboard">
   <%- include("../partials/adminNav", { activeTab: 'users' }) %>
-  <h2 class="page-title">All Users</h2>
 
-
-  <%
-<!-- users.sort((a, b) => a.name.localeCompare(b.name)); -->
-%>
-
-<div class="card">
-  <div class="table-wrapper">
-    <table class="answers-table">
-      <thead>
-        <tr>
-          <th>SR no.</th>
-          <th>Img</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Role</th>
-          <th>Date</th>
-          <th>Last Active</th>
-        </tr>
-      </thead>
-      <% let i=1; %>
-      <tbody>
-        
-        <% users.forEach(u => { %>
-          <tr>
-            <td><%= i++ %></td>
-            <td>
-          <img
-            src="<%= u.photo || '/images/default-avatar.png' %>"
-            alt="User Photo"
-            class="user-pic"
-          />
-        </td>
-
-            <td><%= u.name %></td>
-            <td><%= u.email %></td>
-            <td><%= u.role %></td>
-            <td>
-              <%= new Date(u.date).toLocaleString() %>
-            </td>
-            <td>
-  <%= u.lastActive
-    ? new Date(u.lastActive).toLocaleString("en-IN", {
-        timeZone: "Asia/Kolkata"
-      })
-    : "—" %>
-</td>
-
-          </tr>
-        <% }) %>
-
-      </tbody>
-    </table>
+  <div class="page-header-banner">
+    <h2><i class="fa-solid fa-users"></i> Registered Users Directory</h2>
+    <p class="muted-text">Manage registered student profiles, roles, and platform activity.</p>
   </div>
+
+  <!-- Search & Quick Stats -->
+  <div class="card" style="margin-bottom: 25px; padding: 18px 22px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; justify-content: space-between;">
+      <div style="flex: 1; min-width: 250px;">
+        <label class="muted-text" style="font-size: 0.85rem; display: block; margin-bottom: 6px;">Search Registered Users</label>
+        <div class="input-icon-wrapper" style="width: 100%;">
+          <i class="fa-solid fa-magnifying-glass input-icon"></i>
+          <input 
+            type="text" 
+            id="userSearchInput" 
+            class="input select-with-icon" 
+            placeholder="Search by name, email, or role..." 
+            style="margin: 0; width: 100%;"
+          />
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <span class="badge badge-purple" style="font-size: 0.85rem; padding: 8px 14px;">
+          <i class="fa-solid fa-users" style="margin-right: 5px;"></i> <%= users.length %> Total Users
+        </span>
+        <a href="/admin/export/users" class="btn btn-download" style="padding: 9px 18px; font-size: 0.88rem; text-decoration: none;">
+          <i class="fa-solid fa-file-excel" style="margin-right: 5px;"></i> Export Excel
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="table-wrapper">
+      <table class="answers-table" id="usersTable">
+        <thead>
+          <tr>
+            <th style="width: 60px;">#</th>
+            <th>Student</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Streak</th>
+            <th>Joined Date</th>
+            <th>Last Active</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!users || users.length === 0) { %>
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 35px;" class="muted-text">
+                No users found
+              </td>
+            </tr>
+          <% } else { %>
+            <% users.forEach((u, idx) => { %>
+              <tr class="user-row">
+                <td style="color: var(--text-muted); font-size: 0.85rem;"><%= idx + 1 %></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <% if (u.photo || u.picture) { %>
+                      <img
+                        src="<%= u.photo || u.picture %>"
+                        alt="<%= u.name %>"
+                        class="user-pic"
+                        style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-light);"
+                      />
+                    <% } else { %>
+                      <div class="user-avatar-placeholder" style="width: 38px; height: 38px; font-size: 0.95rem; border-radius: 50%;">
+                        <%= u.name ? u.name.charAt(0).toUpperCase() : 'U' %>
+                      </div>
+                    <% } %>
+                    <div>
+                      <strong style="color: #fff; font-size: 0.95rem;"><%= u.name || "Student" %></strong>
+                      <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
+                        ID: <%= u._id.toString().slice(-6) %>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span style="color: var(--text-secondary); font-size: 0.88rem;"><%= u.email %></span>
+                </td>
+                <td>
+                  <% if (u.role === 'admin') { %>
+                    <span class="badge badge-purple" style="font-size: 0.75rem; text-transform: uppercase;">
+                      <i class="fa-solid fa-shield-halved" style="margin-right: 4px;"></i> Admin
+                    </span>
+                  <% } else { %>
+                    <span class="badge badge-cyan" style="font-size: 0.75rem; text-transform: uppercase;">
+                      <i class="fa-solid fa-user-graduate" style="margin-right: 4px;"></i> Student
+                    </span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (u.streak && u.streak > 0) { %>
+                    <span style="color: var(--accent-gold); font-weight: 700; font-size: 0.85rem;">
+                      <i class="fa-solid fa-fire" style="margin-right: 3px;"></i> <%= u.streak %>d
+                    </span>
+                  <% } else { %>
+                    <span class="muted-text" style="font-size: 0.82rem;">0d</span>
+                  <% } %>
+                </td>
+                <td style="font-size: 0.85rem; white-space: nowrap;">
+                  <%= u.date ? new Date(u.date).toLocaleDateString("en-IN") : "—" %>
+                </td>
+                <td style="font-size: 0.85rem; white-space: nowrap;">
+                  <%= u.lastActive
+                    ? new Date(u.lastActive).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })
+                    : "—" %>
+                </td>
+              </tr>
+            <% }) %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <a href="/admin" class="back-dashboard"><i class="fa-solid fa-arrow-left" style="margin-right: 6px;"></i> Back to Dashboard</a>
 </div>
 
+<script>
+  const userSearchInput = document.getElementById("userSearchInput");
+  if (userSearchInput) {
+    userSearchInput.addEventListener("input", function() {
+      const term = this.value.toLowerCase().trim();
+      const rows = document.querySelectorAll("#usersTable tbody tr.user-row");
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = (!term || text.includes(term)) ? "" : "none";
+      });
+    });
+  }
+</script>
 
-  <a href="/admin" class="back-dashboard">← Back to Dashboard</a>
-
-</div>
-
-<%- include("../partials/footer") %>
+<%- include("../partials/footer") %>

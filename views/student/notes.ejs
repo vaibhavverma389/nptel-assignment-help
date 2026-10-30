@@ -7,13 +7,14 @@
   </div>
 
   <!-- Filters & Action Header Card -->
-  <div class="card" style="margin-bottom: 25px;">
-    <div class="notes-filter-bar">
-      <!-- Filter Form -->
-      <form method="get" action="/notes" class="filter-form">
+  <div class="card" style="margin-bottom: 25px; padding: 20px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between;">
+      
+      <!-- Filter By Subject -->
+      <form method="get" action="/notes" style="display: flex; gap: 10px; flex: 1; min-width: 250px; margin: 0;">
         <div class="input-icon-wrapper" style="width: 100%;">
-          <i class="fa-solid fa-filter input-icon"></i>
-          <select name="subject" class="select select-with-icon" onchange="this.form.submit()">
+          <i class="fa-solid fa-book-bookmark input-icon"></i>
+          <select name="subject" class="select select-with-icon" onchange="this.form.submit()" style="margin: 0; width: 100%;">
             <option value="">All Course Subjects</option>
             <% subjects.forEach(s => { %>
               <option value="<%= s.name %>" <%= selectedSubject === s.name ? "selected" : "" %>><%= s.name %></option>
@@ -22,47 +23,65 @@
         </div>
       </form>
 
+      <!-- Instant Live Search on Page -->
+      <div style="flex: 1; min-width: 240px;">
+        <div class="input-icon-wrapper" style="width: 100%;">
+          <i class="fa-solid fa-magnifying-glass input-icon"></i>
+          <input 
+            type="text" 
+            id="notesQuickSearch" 
+            class="input select-with-icon" 
+            placeholder="Quick search on this page..." 
+            style="margin: 0; width: 100%;"
+          />
+        </div>
+      </div>
+
       <!-- Action Buttons -->
-      <div class="filter-actions">
+      <div style="display: flex; gap: 10px; align-items: center;">
         <% if (user) { %>
-          <a href="/upload" class="btn btn-submit"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Notes</a>
-          <a href="/dashboard" class="btn btn-secondary"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+          <a href="/upload" class="btn btn-submit" style="padding: 10px 18px; text-decoration: none; white-space: nowrap;">
+            <i class="fa-solid fa-cloud-arrow-up" style="margin-right: 6px;"></i> Upload Note
+          </a>
         <% } else { %>
-          <a href="/auth/login" class="btn btn-submit"><i class="fa-solid fa-right-to-bracket"></i> Login to Upload</a>
+          <a href="/auth/login" class="btn btn-submit" style="padding: 10px 18px; text-decoration: none; white-space: nowrap;">
+            <i class="fa-solid fa-right-to-bracket" style="margin-right: 6px;"></i> Login to Upload
+          </a>
         <% } %>
       </div>
+
     </div>
   </div>
 
   <% if (selectedSubject) { %>
     <!-- ================= OFFICIAL STUDY MATERIALS ================= -->
     <div class="card" style="margin-bottom: 30px;">
-      <div class="section-title-bar">
-        <h3><i class="fa-solid fa-award text-gold"></i> Official Course Study Materials</h3>
+      <div class="section-title-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3><i class="fa-solid fa-award" style="color: var(--accent-gold); margin-right: 6px;"></i> Official Course Study Materials</h3>
         <span class="badge badge-gold"><%= selectedSubject %></span>
       </div>
       
       <% if (typeof adminMaterials !== 'undefined' && adminMaterials.length > 0) { %>
-        <div class="official-materials-grid">
+        <div class="official-materials-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 15px;">
           <% adminMaterials.forEach(m => { %>
-            <div class="card material-item-card">
+            <div class="card material-item-card" style="margin-bottom: 0; padding: 18px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-light); display: flex; flex-direction: column; justify-content: space-between; gap: 14px;">
               <div class="material-card-body">
-                <span class="badge badge-cyan" style="font-size: 0.75rem;">
+                <span class="badge badge-cyan" style="font-size: 0.75rem; margin-bottom: 8px;">
                   <i class="fa-solid fa-file-pdf"></i> Official PDF
                 </span>
-                <h4 class="material-card-title">
+                <h4 class="material-card-title" style="color: #fff; font-size: 0.95rem; line-height: 1.4;">
                   <%= m.fileName || 'Study Material PDF' %>
                 </h4>
               </div>
-              <a href="/materials/download/<%= m._id %>" target="_blank" class="btn btn-download btn-sm">
+              <a href="/materials/download/<%= m._id %>" target="_blank" class="btn btn-download btn-sm" style="text-align: center;">
                 <i class="fa-solid fa-arrow-down-to-line"></i> Download / View
               </a>
             </div>
           <% }) %>
         </div>
       <% } else { %>
-        <div class="empty-state-small">
-          <i class="fa-solid fa-folder-open muted-icon"></i>
+        <div class="empty-state-small" style="padding: 30px 20px; text-align: center;">
+          <i class="fa-solid fa-folder-open muted-icon" style="font-size: 2rem; margin-bottom: 8px; display: block;"></i>
           <p class="muted-text">No official study materials uploaded yet for <%= selectedSubject %>.</p>
         </div>
       <% } %>
@@ -70,36 +89,37 @@
   <% } %>
 
   <!-- ================= STUDENT NOTES HUB ================= -->
-  <div class="section-title-bar" style="margin-bottom: 20px;">
+  <div class="section-title-bar" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
     <h3>
-      <i class="fa-solid fa-users-rectangle"></i>
-      <%= selectedSubject ? `Shared Notes for "${selectedSubject}"` : 'All Shared Student Notes' %>
+      <i class="fa-solid fa-users-rectangle" style="color: var(--accent-purple); margin-right: 6px;"></i>
+      <%= selectedSubject ? `Shared Notes for "${selectedSubject}"` : 'All Community Shared Notes' %>
     </h3>
+    <span class="muted-text" style="font-size: 0.88rem;">Showing <%= notes.length %> notes</span>
   </div>
 
   <% if (notes.length === 0) { %>
     <div class="card empty-state" style="padding: 60px 20px; text-align: center;">
-      <i class="fa-solid fa-file-circle-question" style="font-size: 3rem; color: var(--accent-cyan); margin-bottom: 15px;"></i>
-      <h3>No Notes Found</h3>
+      <i class="fa-solid fa-file-circle-question" style="font-size: 3rem; color: var(--accent-cyan); margin-bottom: 15px; display: block;"></i>
+      <h3 style="color: #fff; margin-bottom: 8px;">No Notes Found</h3>
       <p class="muted-text" style="margin-bottom: 20px;">Be the first student to share study notes for this course!</p>
-      <a href="/upload" class="btn btn-submit">
+      <a href="/upload" class="btn btn-submit" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none;">
         <i class="fa-solid fa-plus"></i> Upload Your Note
       </a>
     </div>
   <% } else { %>
-    <div class="notes-cards-grid">
+    <div class="notes-cards-grid" id="notesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 20px;">
       <% notes.forEach(note => { %>
-        <div class="card note-card">
-          <!-- Favorite Indicator Pin -->
-          <form method="post" action="/notes/favorite/<%= note._id %>" class="favorite-pin-form">
-            <button type="submit" class="favorite-btn <%= note.isFavorite ? 'is-fav' : '' %>" title="<%= note.isFavorite ? 'Remove Favorite' : 'Save to Favorites' %>">
+        <div class="card note-card single-note-card" style="margin-bottom: 0; padding: 22px; position: relative; display: flex; flex-direction: column; justify-content: space-between;">
+          <!-- Favorite Pin Form -->
+          <form method="post" action="/notes/favorite/<%= note._id %>" class="favorite-pin-form" style="position: absolute; top: 18px; right: 18px; margin: 0;">
+            <button type="submit" class="favorite-btn <%= note.isFavorite ? 'is-fav' : '' %>" title="<%= note.isFavorite ? 'Remove Favorite' : 'Save to Favorites' %>" style="background: none; border: none; font-size: 1.15rem; cursor: pointer; color: <%= note.isFavorite ? 'var(--accent-gold)' : 'var(--text-muted)' %>;">
               <i class="<%= note.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star' %>"></i>
             </button>
           </form>
 
           <div>
             <!-- Tags & Status Header -->
-            <div class="note-card-tags">
+            <div class="note-card-tags" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; padding-right: 30px;">
               <span class="badge badge-purple">
                 <i class="fa-solid fa-book-bookmark"></i> <%= note.subject %>
               </span>
@@ -107,7 +127,7 @@
               <% if (typeof note.status !== 'undefined' && note.status) { %>
                 <% if (note.status === 'pending') { %>
                   <span class="badge badge-warning">
-                    <i class="fa-solid fa-clock"></i> Pending Approval
+                    <i class="fa-solid fa-clock"></i> Pending
                   </span>
                 <% } else if (note.status === 'rejected') { %>
                   <span class="badge badge-danger">
@@ -122,41 +142,41 @@
             </div>
 
             <!-- Note Title -->
-            <h3 class="note-card-title">
+            <h3 class="note-card-title" style="color: #fff; font-size: 1.1rem; margin-bottom: 8px; line-height: 1.35;">
               <%= note.title %>
             </h3>
 
             <!-- Note Description Truncated -->
-            <p class="note-card-desc">
+            <p class="note-card-desc muted-text" style="font-size: 0.88rem; line-height: 1.5; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
               <%= note.description || 'No description provided.' %>
             </p>
           </div>
 
           <!-- Attachment & Card Footer -->
-          <div class="note-card-footer">
+          <div class="note-card-footer" style="border-top: 1px solid var(--border-light); padding-top: 14px; margin-top: 10px;">
             <% if (note.fileUrl) { %>
-              <div class="note-attachment-row">
-                <i class="fa-solid fa-paperclip text-cyan"></i>
-                <a href="/notes/download/<%= note._id %>" target="_blank" class="attachment-link" download>
+              <div class="note-attachment-row" style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
+                <i class="fa-solid fa-paperclip" style="color: var(--accent-cyan);"></i>
+                <a href="/notes/download/<%= note._id %>" target="_blank" class="attachment-link" download style="color: var(--accent-cyan); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                   <%= note.fileName || 'Attachment PDF' %>
                 </a>
               </div>
             <% } %>
 
-            <div class="note-actions-row">
+            <div class="note-actions-row" style="display: flex; justify-content: space-between; align-items: center;">
               <!-- View / Details Link -->
-              <a href="/notes/view/<%= note._id %>" class="btn btn-secondary btn-sm">
-                <i class="fa-solid fa-eye"></i> View Details
+              <a href="/notes/view/<%= note._id %>" class="btn btn-secondary btn-sm" style="padding: 7px 14px; font-size: 0.82rem; text-decoration: none;">
+                <i class="fa-solid fa-eye" style="margin-right: 4px;"></i> Details
               </a>
 
               <!-- Edit & Delete tools -->
-              <div class="note-tools">
+              <div class="note-tools" style="display: flex; gap: 6px;">
                 <% if (user && (note.email === user.email || user.role === 'admin')) { %>
-                  <a href="/notes/edit/<%= note._id %>" class="btn btn-secondary btn-sm" title="Edit Note">
+                  <a href="/notes/edit/<%= note._id %>" class="btn btn-secondary btn-sm" title="Edit Note" style="padding: 7px 10px;">
                     <i class="fa-solid fa-pen-to-square"></i>
                   </a>
-                  <form method="post" action="/notes/delete/<%= note._id %>" onsubmit="return confirm('Are you sure you want to delete this note?');" style="display: inline;">
-                    <button type="submit" class="btn btn-remove btn-sm" title="Delete Note">
+                  <form method="post" action="/notes/delete/<%= note._id %>" onsubmit="return confirm('Delete this note permanently?');" style="margin: 0; display: inline;">
+                    <button type="submit" class="btn btn-remove btn-sm" title="Delete Note" style="padding: 7px 10px;">
                       <i class="fa-solid fa-trash"></i>
                     </button>
                   </form>
@@ -170,5 +190,18 @@
   <% } %>
 </div>
 
-<%- include("../partials/footer") %>
+<script>
+  const notesQuickSearch = document.getElementById("notesQuickSearch");
+  if (notesQuickSearch) {
+    notesQuickSearch.addEventListener("input", function() {
+      const term = this.value.toLowerCase().trim();
+      const cards = document.querySelectorAll(".single-note-card");
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = (!term || text.includes(term)) ? "" : "none";
+      });
+    });
+  }
+</script>
 
+<%- include("../partials/footer") %>

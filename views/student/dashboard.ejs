@@ -3,16 +3,20 @@
 <div class="dashboard">
 
   <!-- Welcome Banner -->
-  <div class="welcome-card">
-    <div class="welcome-badge">
-      <i class="fa-solid fa-fire"></i> Active Streak: <strong><%= typeof streak !== 'undefined' ? streak : 0 %> Days</strong>
+  <div class="welcome-card" style="position: relative; overflow: hidden; padding: clamp(24px, 4vw, 36px); margin-bottom: 30px;">
+    <div class="welcome-badge" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--accent-gold); display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 15px;">
+      <i class="fa-solid fa-fire" style="color: var(--accent-gold); animation: pulseDot 1.5s infinite;"></i> Active Learning Streak: <strong><%= typeof streak !== 'undefined' ? streak : 0 %> Days</strong>
     </div>
-    <h2>Welcome Back, <span><%= user ? user.name : "Student" %></span> 👋</h2>
-    <p>Your academic hub for notes, weekly assignment solutions, and study materials.</p>
+    <h2 style="font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 800; color: #fff; margin-bottom: 8px;">
+      Welcome Back, <span style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"><%= user ? user.name : "Student" %></span> 👋
+    </h2>
+    <p class="muted-text" style="font-size: 1.05rem; max-width: 650px;">
+      Your personal academic portal for verified lecture notes, weekly NPTEL assignment solutions, and course reference guides.
+    </p>
   </div>
 
   <!-- Overview Stats Row -->
-  <div class="stats-row">
+  <div class="stats-row" style="margin-bottom: 30px;">
 
     <div class="stat-box highlight-cyan">
       <div class="stat-icon-wrap">
@@ -57,44 +61,44 @@
   </div>
 
   <!-- Quick Action Cards Grid -->
-  <div class="dashboard-actions">
+  <div class="dashboard-actions" style="margin-bottom: 30px;">
 
     <a href="/notes" class="dash-card">
       <div class="dash-card-icon"><i class="fa-solid fa-book-open"></i></div>
-      <h3>My Shared Notes</h3>
-      <p>View, manage, and download all uploaded study notes.</p>
+      <h3>Notes Hub</h3>
+      <p>Browse, manage, and download peer study notes and summaries.</p>
       <div class="card-actions">Explore Notes <i class="fa-solid fa-arrow-right"></i></div>
     </a>
 
     <a href="/upload" class="dash-card">
       <div class="dash-card-icon upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
       <h3>Upload Notes</h3>
-      <p>Share new lecture notes and study material with your peers.</p>
+      <p>Share your handwritten or typed lecture notes with peers.</p>
       <div class="card-actions">Upload Now <i class="fa-solid fa-arrow-right"></i></div>
     </a>
 
     <a href="/study-material" class="dash-card">
       <div class="dash-card-icon study-icon"><i class="fa-solid fa-folder-open"></i></div>
       <h3>Weekly Assignments</h3>
-      <p>Access weekly NPTEL assignment answers and solution PDFs.</p>
+      <p>Access weekly course assignment questions & solution PDFs.</p>
       <div class="card-actions">Browse Materials <i class="fa-solid fa-arrow-right"></i></div>
     </a>
 
     <a href="/favorites" class="dash-card">
       <div class="dash-card-icon fav-icon"><i class="fa-solid fa-heart"></i></div>
-      <h3>Favorite Notes</h3>
-      <p>Quick access to saved notes and essential guides.</p>
+      <h3>Bookmarked Notes</h3>
+      <p>Quick access to your saved favorite notes and study guides.</p>
       <div class="card-actions">View Favorites <i class="fa-solid fa-arrow-right"></i></div>
     </a>
 
   </div>
 
   <!-- Browse by Subject Section -->
-  <div class="card">
-    <div class="card-header-flex">
+  <div class="card" style="margin-bottom: 30px;">
+    <div class="card-header-flex" style="margin-bottom: 20px;">
       <div>
-        <h3><i class="fa-solid fa-layer-group"></i> Browse Notes by Subject</h3>
-        <p class="muted-text">Click on any course or subject to view shared student notes and official study materials.</p>
+        <h3><i class="fa-solid fa-layer-group" style="color: var(--accent-purple); margin-right: 6px;"></i> Browse Notes by Course</h3>
+        <p class="muted-text">Explore student-contributed notes and resources by your enrolled subject.</p>
       </div>
     </div>
 
@@ -111,69 +115,68 @@
     </div>
   </div>
 
-
   <!-- Search Notes Card -->
-  <div class="card">
-    <h3><i class="fa-solid fa-magnifying-glass"></i> Search Notes & Topics</h3>
-    <p class="muted-text">Find notes instantly by subject, topic name, or keywords.</p>
+  <div class="card" style="margin-bottom: 30px; padding: 25px;">
+    <h3 style="margin-bottom: 8px;"><i class="fa-solid fa-magnifying-glass" style="color: var(--accent-cyan); margin-right: 6px;"></i> Search Study Notes & Topics</h3>
+    <p class="muted-text" style="margin-bottom: 18px;">Find notes instantly across all subjects, topics, or keywords.</p>
 
-    <form action="/search" method="GET" class="search-form-row">
+    <form action="/search" method="GET" class="search-form-row" style="display: flex; gap: 12px; margin-bottom: 0;">
       <div class="input-icon-wrapper" style="flex-grow: 1;">
         <i class="fa-solid fa-magnifying-glass input-icon"></i>
-        <input type="text" name="query" class="input input-with-icon" placeholder="Search by subject, topic, or keyword..." required />
+        <input type="text" name="query" class="input input-with-icon" placeholder="Type a subject name, chapter, or keyword..." required style="margin: 0;" />
       </div>
-      <button type="submit" class="btn btn-submit">
-        <i class="fa-solid fa-search"></i> Search
+      <button type="submit" class="btn btn-submit" style="padding: 12px 24px; white-space: nowrap;">
+        <i class="fa-solid fa-search" style="margin-right: 6px;"></i> Search Notes
       </button>
     </form>
   </div>
 
   <!-- Insights & Platform Features Row -->
-  <div class="form-row" style="margin-top: 25px;">
+  <div class="form-row" style="margin-top: 25px; margin-bottom: 30px;">
     
-    <div class="card" style="margin-bottom: 0;">
-      <h3><i class="fa-solid fa-chart-line"></i> Study Insights</h3>
-      <p class="muted-text">Track your learning progress & platform activity.</p>
+    <div class="card" style="margin-bottom: 0; flex: 1;">
+      <h3 style="margin-bottom: 8px;"><i class="fa-solid fa-chart-line" style="color: var(--accent-emerald); margin-right: 6px;"></i> Study Insights</h3>
+      <p class="muted-text" style="margin-bottom: 18px;">Track your learning progress & platform activity.</p>
 
-      <ul class="instruction-list">
-        <li><i class="fa-solid fa-check-circle text-success"></i> <strong>Uploaded Notes:</strong> <%= typeof personalNotesCount !== 'undefined' ? personalNotesCount : 0 %> files</li>
-        <li><i class="fa-solid fa-check-circle text-success"></i> <strong>Top Subject:</strong> <%= typeof mostViewedSubject !== 'undefined' ? mostViewedSubject : "None yet" %></li>
-        <li><i class="fa-solid fa-check-circle text-success"></i> <strong>Active Streak:</strong> <%= typeof streak !== 'undefined' ? streak : 0 %> days streak</li>
-        <li><i class="fa-solid fa-check-circle text-success"></i> <strong>Weekly Activity:</strong> <%= typeof recentActivityCount !== 'undefined' ? recentActivityCount : 0 %> notes accessed</li>
+      <ul class="instruction-list" style="display: flex; flex-direction: column; gap: 10px;">
+        <li style="display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-circle-check" style="color: var(--accent-emerald);"></i> <span><strong>Uploaded Notes:</strong> <%= typeof personalNotesCount !== 'undefined' ? personalNotesCount : 0 %> contributions</span></li>
+        <li style="display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-circle-check" style="color: var(--accent-emerald);"></i> <span><strong>Top Subject:</strong> <%= typeof mostViewedSubject !== 'undefined' ? mostViewedSubject : "None yet" %></span></li>
+        <li style="display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-circle-check" style="color: var(--accent-emerald);"></i> <span><strong>Active Streak:</strong> <%= typeof streak !== 'undefined' ? streak : 0 %> days streak</span></li>
+        <li style="display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-circle-check" style="color: var(--accent-emerald);"></i> <span><strong>Weekly Activity:</strong> <%= typeof recentActivityCount !== 'undefined' ? recentActivityCount : 0 %> notes accessed</span></li>
       </ul>
     </div>
 
-    <div class="card" style="margin-bottom: 0;">
-      <h3><i class="fa-solid fa-shield-halved"></i> Platform Features</h3>
-      <p class="muted-text">Built for performance and seamless access.</p>
+    <div class="card" style="margin-bottom: 0; flex: 1;">
+      <h3 style="margin-bottom: 8px;"><i class="fa-solid fa-shield-halved" style="color: var(--accent-cyan); margin-right: 6px;"></i> Platform Highlights</h3>
+      <p class="muted-text" style="margin-bottom: 18px;">Engineered for high performance and seamless study access.</p>
 
-      <ul class="instruction-list">
-        <li><i class="fa-solid fa-lock text-cyan"></i> Secure Google & Password Authentication</li>
-        <li><i class="fa-solid fa-file-pdf text-cyan"></i> Embedded High-Speed PDF Viewer</li>
-        <li><i class="fa-solid fa-mobile-screen text-cyan"></i> Fully Responsive Glassmorphic Interface</li>
-        <li><i class="fa-solid fa-bolt text-cyan"></i> Real-time Active User Tracking</li>
+      <ul class="instruction-list" style="display: flex; flex-direction: column; gap: 10px;">
+        <li style="display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-lock" style="color: var(--accent-cyan);"></i> <span>Secure Google OAuth 2.0 & Session Authentication</span></li>
+        <li style="display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-file-pdf" style="color: var(--accent-cyan);"></i> <span>High-Speed Integrated PDF Reader & Cloud Delivery</span></li>
+        <li style="display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-mobile-screen" style="color: var(--accent-cyan);"></i> <span>Fully Responsive Glassmorphic Dark UI</span></li>
+        <li style="display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-bolt" style="color: var(--accent-cyan);"></i> <span>Real-Time Active Student Tracking</span></li>
       </ul>
     </div>
 
   </div>
 
   <!-- Contact & Support Section -->
-  <div class="card" id="contact-support" style="margin-top:30px;">
-    <h3><i class="fa-solid fa-headset"></i> Support & Contact</h3>
-    <p class="muted-text">Need help or want to request assignment solutions for a new course? Contact us anytime.</p>
+  <div class="card" id="contact-support" style="margin-top: 20px;">
+    <h3 style="margin-bottom: 8px;"><i class="fa-solid fa-headset" style="color: var(--accent-purple); margin-right: 6px;"></i> Support & Inquiry</h3>
+    <p class="muted-text">Need assistance or want to request assignment answers for a new course? Send us a message.</p>
 
-    <form action="/contact-us" method="post" class="form-column" style="margin-top: 15px;">
+    <form action="/contact-us" method="post" class="form-column" style="margin-top: 20px;">
 
-      <div class="form-row" style="margin-bottom: 0;">
-        <div class="form-group">
-          <label class="form-label">Your Name</label>
+      <div class="form-row" style="margin-bottom: 0; display: flex; gap: 15px; flex-wrap: wrap;">
+        <div class="form-group" style="flex: 1; min-width: 240px;">
+          <label class="form-label">Your Full Name</label>
           <div class="input-icon-wrapper">
             <i class="fa-solid fa-user input-icon"></i>
             <input type="text" class="input input-with-icon" name="name" placeholder="Enter Your Name" required />
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="flex: 1; min-width: 240px;">
           <label class="form-label">Email Address</label>
           <div class="input-icon-wrapper">
             <i class="fa-solid fa-at input-icon"></i>
@@ -186,17 +189,17 @@
         <label class="form-label">Mobile Number</label>
         <div class="input-icon-wrapper">
           <i class="fa-solid fa-phone input-icon"></i>
-          <input type="tel" class="input input-with-icon" name="mobile" placeholder="10 Digit Mobile Number" pattern="[0-9]{10}" required />
+          <input type="tel" class="input input-with-icon" name="mobile" placeholder="10-Digit Mobile Number" pattern="[0-9]{10}" required />
         </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Message</label>
-        <textarea class="input" name="message" rows="4" placeholder="Describe your question or feedback here..." required></textarea>
+        <label class="form-label">Your Message or Request</label>
+        <textarea class="input" name="message" rows="4" placeholder="Describe your question, request, or feedback here..." required style="resize: vertical;"></textarea>
       </div>
 
-      <button type="submit" class="btn btn-submit" style="align-self: flex-start;">
-        <i class="fa-solid fa-paper-plane"></i> Send Message
+      <button type="submit" class="btn btn-submit" style="align-self: flex-start; padding: 12px 28px;">
+        <i class="fa-solid fa-paper-plane" style="margin-right: 6px;"></i> Send Message
       </button>
 
     </form>
@@ -204,4 +207,4 @@
 
 </div>
 
-<%- include("../partials/footer") %>
+<%- include("../partials/footer") %>

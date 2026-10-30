@@ -2,60 +2,118 @@
 
 <div class="dashboard">
   <%- include("../partials/adminNav", { activeTab: 'answers' }) %>
-  <h2 class="page-title">All Answers</h2>
 
+  <div class="page-header-banner">
+    <h2><i class="fa-solid fa-check-double"></i> Assignment Answer Keys</h2>
+    <p class="muted-text">Course-wise weekly assignment answers submitted for verification.</p>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <div class="card" style="margin-bottom: 25px; padding: 18px 22px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; justify-content: space-between;">
+      <div style="flex: 1; min-width: 250px;">
+        <label class="muted-text" style="font-size: 0.85rem; display: block; margin-bottom: 6px;">Filter / Search Answers</label>
+        <div class="input-icon-wrapper" style="width: 100%;">
+          <i class="fa-solid fa-magnifying-glass input-icon"></i>
+          <input 
+            type="text" 
+            id="answerSearchInput" 
+            class="input select-with-icon" 
+            placeholder="Search by course, question, user or option..." 
+            style="margin: 0; width: 100%;"
+          />
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <span class="badge badge-cyan" style="font-size: 0.85rem; padding: 8px 14px;">
+          <i class="fa-solid fa-database" style="margin-right: 5px;"></i> Total: <%= answers.length %>
+        </span>
+        <a href="/submit-bulk" class="btn btn-submit" style="padding: 9px 18px; font-size: 0.88rem; text-decoration: none;">
+          <i class="fa-solid fa-plus" style="margin-right: 5px;"></i> Bulk Submit
+        </a>
+      </div>
+    </div>
+  </div>
 
   <div class="card">
     <div class="table-wrapper">
-      <table class="answers-table">
+      <table class="answers-table" id="answersTable">
         <thead>
           <tr>
-            <th>Course </th>
-            <th>Week </th>
-            <th>Question </th>
-            <th>Answer </th>
-            <th>User </th>
-            <th>Email </th>
-            <th>Time&&Date</th>
-            <th>Action </th>
+            <th>Course</th>
+            <th>Week</th>
+            <th>Question</th>
+            <th>Answer Option</th>
+            <th>Submitted By</th>
+            <th>Student Email</th>
+            <th>Date & Time</th>
+            <th style="text-align: center;">Action</th>
           </tr>
         </thead>
         <tbody>
-          <% answers.forEach(a=> { %>
+          <% if (!answers || answers.length === 0) { %>
             <tr>
-              <td>
-                <%= a.course %>
-              </td>
-              <td>Week <%= a.week %>
-              </td>
-              <td>Question <%= a.question %>
-              </td>
-              <td class="answer-cell">
-                <%= a.option %>
-              </td>
-              <td>
-                <%= a.user %>
-              </td>
-              <td>
-                <%= a.email || "—" %>
-              </td>
-              <td>
-                <%= new Date(a.createdAt).toLocaleString() %>
-              </td>
-
-              <td>
-                <form method="post" action="/admin/answers/delete/<%= a._id %>">
-                  <button class="btn btn-remove">Delete</button>
-                </form>
+              <td colspan="8" style="text-align: center; padding: 35px;" class="muted-text">
+                No answers found in database
               </td>
             </tr>
+          <% } else { %>
+            <% answers.forEach(a => { %>
+              <tr class="answer-row">
+                <td>
+                  <strong style="color: var(--accent-cyan); font-weight: 600;"><%= a.course %></strong>
+                </td>
+                <td>
+                  <span class="badge badge-purple" style="font-size: 0.78rem;">Week <%= a.week %></span>
+                </td>
+                <td>
+                  <strong style="color: #fff;">Q<%= a.question %></strong>
+                </td>
+                <td class="answer-cell">
+                  <span style="background: rgba(16, 185, 129, 0.15); color: #00e676; padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; display: inline-block;">
+                    Option <%= a.option %>
+                  </span>
+                </td>
+                <td>
+                  <span style="color: var(--text-primary); font-weight: 500;"><%= a.user || "Student" %></span>
+                </td>
+                <td>
+                  <span class="muted-text" style="font-size: 0.85rem;"><%= a.email || "—" %></span>
+                </td>
+                <td style="font-size: 0.85rem; white-space: nowrap;">
+                  <%= a.createdAt ? new Date(a.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "—" %>
+                </td>
+                <td style="text-align: center;">
+                  <form method="post" action="/admin/answers/delete/<%= a._id %>" style="margin: 0;" onsubmit="return confirm('Delete this answer?');">
+                    <button class="btn btn-remove" style="padding: 6px 12px; font-size: 0.8rem;" title="Delete Answer">
+                      <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
             <% }) %>
+          <% } %>
         </tbody>
       </table>
     </div>
   </div>
-  <a href="/admin" class="back-dashboard">← Back to Dashboard</a>
 
+  <a href="/admin" class="back-dashboard"><i class="fa-solid fa-arrow-left" style="margin-right: 6px;"></i> Back to Dashboard</a>
 </div>
 
-<%- include("../partials/footer") %>
+<script>
+  const answerSearchInput = document.getElementById("answerSearchInput");
+  if (answerSearchInput) {
+    answerSearchInput.addEventListener("input", function() {
+      const term = this.value.toLowerCase().trim();
+      const rows = document.querySelectorAll("#answersTable tbody tr.answer-row");
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = (!term || text.includes(term)) ? "" : "none";
+      });
+    });
+  }
+</script>
+
+<%- include("../partials/footer") %>

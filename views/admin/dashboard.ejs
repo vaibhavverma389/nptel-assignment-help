@@ -3,13 +3,12 @@
 <div class="dashboard">
 
   <div class="page-header-banner">
-    <h2><i class="fa-solid fa-user-shield"></i> Admin Control Panel</h2>
-    <p class="muted-text">Manage users, approve student note submissions, upload official study materials, and monitor real-time activity.</p>
+    <h2><i class="fa-solid fa-shield-halved"></i> Admin Control Panel</h2>
+    <p class="muted-text">Real-time telemetry, student content moderation, official resources & course management.</p>
   </div>
 
   <!-- Admin Sub Navigation Tabs -->
   <%- include("../partials/adminNav", { activeTab: 'dashboard' }) %>
-
 
   <!-- Live Stats Row -->
   <div class="stats-row" style="margin-bottom: 30px;">
@@ -19,7 +18,10 @@
         <i class="fa-solid fa-signal"></i>
       </div>
       <div>
-        <label>Active Live Users</label>
+        <label style="display: flex; align-items: center; gap: 6px;">
+          Active Live Users
+          <span class="pulse-indicator" title="Connected via WebSockets"></span>
+        </label>
         <p><span id="liveUsers">0</span></p>
       </div>
     </div>
@@ -29,7 +31,7 @@
         <i class="fa-solid fa-users"></i>
       </div>
       <div>
-        <label>Total Registered Users</label>
+        <label>Total Registered</label>
         <p><%= usersCount %></p>
       </div>
     </div>
@@ -49,7 +51,7 @@
         <i class="fa-solid fa-bolt"></i>
       </div>
       <div>
-        <label>24h Activity Logs</label>
+        <label>24h Activity</label>
         <p><%= logsLast24h %></p>
       </div>
     </div>
@@ -63,7 +65,7 @@
     <a href="/admin/notes" class="dash-card">
       <div class="dash-card-icon"><i class="fa-solid fa-book-open"></i></div>
       <h3>Student Notes Approval</h3>
-      <p>Review, approve, reject, or delete student-submitted notes.</p>
+      <p>Review, approve, reject, or delete student-submitted lecture notes.</p>
       <div class="card-actions">Manage Notes <i class="fa-solid fa-arrow-right"></i></div>
     </a>
 
@@ -71,7 +73,7 @@
     <a href="/admin/materials" class="dash-card">
       <div class="dash-card-icon study-icon"><i class="fa-solid fa-file-pdf"></i></div>
       <h3>Official Study Materials</h3>
-      <p>Upload and manage weekly PDFs and assignment resources.</p>
+      <p>Upload and manage weekly assignment PDFs and course resources.</p>
       <div class="card-actions">Manage Materials <i class="fa-solid fa-arrow-right"></i></div>
     </a>
 
@@ -79,7 +81,7 @@
     <a href="/admin/users" class="dash-card">
       <div class="dash-card-icon upload-icon"><i class="fa-solid fa-users-gear"></i></div>
       <h3>User Management</h3>
-      <p>View registered student profiles and platform permissions.</p>
+      <p>View registered student profiles, roles, and activity records.</p>
       <div class="card-actions">View All Users <i class="fa-solid fa-arrow-right"></i></div>
     </a>
 
@@ -103,8 +105,16 @@
     <a href="/admin/activity-logs" class="dash-card">
       <div class="dash-card-icon study-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
       <h3>Activity & Download Logs</h3>
-      <p>Track student download and upload activity in real-time.</p>
+      <p>Track student download, upload, and approval activity in real-time.</p>
       <div class="card-actions">View Logs <i class="fa-solid fa-arrow-right"></i></div>
+    </a>
+
+    <!-- VISITOR LOGS -->
+    <a href="/admin/visitors" class="dash-card">
+      <div class="dash-card-icon" style="background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan);"><i class="fa-solid fa-chart-pie"></i></div>
+      <h3>Visitor Analytics & IP</h3>
+      <p>Real-time telemetry, screen sizes, browser specs, and IP geolocation.</p>
+      <div class="card-actions">View Telemetry <i class="fa-solid fa-arrow-right"></i></div>
     </a>
 
     <!-- CONTACT MESSAGES -->
@@ -125,9 +135,9 @@
 
     <!-- EXPORT VISITORS -->
     <a href="/admin/export/visitors" class="dash-card">
-      <div class="dash-card-icon"><i class="fa-solid fa-file-csv"></i></div>
+      <div class="dash-card-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);"><i class="fa-solid fa-file-csv"></i></div>
       <h3>Export Visitors Data</h3>
-      <p>Download visitor analytics and IP traffic logs (Excel).</p>
+      <p>Download visitor analytics and hardware telemetry logs (Excel).</p>
       <div class="card-actions">Export Analytics <i class="fa-solid fa-arrow-right"></i></div>
     </a>
 
@@ -145,4 +155,4 @@
   });
 </script>
 
-<%- include("../partials/footer") %>
+<%- include("../partials/footer") %>

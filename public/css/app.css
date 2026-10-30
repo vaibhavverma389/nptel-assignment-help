@@ -2231,3 +2231,137 @@ select option {
   }
 }
 
+
+
+/* ==========================================================
+   ENHANCED MODERN UI, MICRO-INTERACTIONS & GLASS POLISH
+   ========================================================== */
+
+/* Pulse Indicator for Real-time Sockets & Live Users */
+.pulse-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00e676;
+  box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.7);
+  animation: pulseDot 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@keyframes pulseDot {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 7px rgba(0, 230, 118, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 230, 118, 0);
+  }
+}
+
+/* User Avatar & Online Indicator */
+.user-avatar-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-status-dot {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  background: #00e676;
+  border-radius: 50%;
+  border: 1.5px solid var(--bg-primary);
+  box-shadow: 0 0 4px rgba(0, 230, 118, 0.6);
+}
+
+/* Mobile Nav Overlay Backdrop */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 11, 17, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Admin Tabs Horizontal Smooth Scroll */
+.admin-nav-tabs {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  gap: 8px;
+  padding-bottom: 12px;
+}
+
+.admin-nav-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.admin-nav-link {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Enhanced Cards Glassmorphism & Transition */
+.dash-card {
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base) !important;
+}
+
+.dash-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.5), 0 0 20px rgba(139, 92, 246, 0.15) !important;
+  border-color: rgba(139, 92, 246, 0.35) !important;
+}
+
+.dash-card:hover .card-actions i {
+  transform: translateX(4px);
+  transition: transform 0.2s ease;
+}
+
+/* Week Grid Items Hover */
+.grid-item {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s !important;
+}
+
+.grid-item:not(.disabled):hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 10px 25px rgba(139, 92, 246, 0.2) !important;
+  border-color: rgba(139, 92, 246, 0.45) !important;
+}
+
+/* Table Hover Smoothness */
+.answers-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.answers-table tbody tr:hover td {
+  background-color: rgba(255, 255, 255, 0.025) !important;
+}
+
+/* Action button micro-interactions */
+.btn {
+  transition: all var(--transition-fast) !important;
+}
+
+.btn:active {
+  transform: scale(0.97) !important;
+}

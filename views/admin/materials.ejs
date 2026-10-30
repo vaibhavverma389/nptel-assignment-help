@@ -3,173 +3,196 @@
 <div class="dashboard">
   <%- include("../partials/adminNav", { activeTab: 'materials' }) %>
 
+  <div class="page-header-banner">
+    <h2><i class="fa-solid fa-file-pdf"></i> Official Study Materials & Assignment PDFs</h2>
+    <p class="muted-text">Upload official weekly assignments, solution guides, and lecture resources.</p>
+  </div>
 
-  <!-- ================= UPLOAD FORM ================= -->
-  <div class="card">
-    <h2> Upload Study Material / Assignment</h2>
+  <!-- UPLOAD FORM CARD -->
+  <div class="card" style="margin-bottom: 30px;">
+    <div class="card-header-flex" style="margin-bottom: 20px;">
+      <div>
+        <h3><i class="fa-solid fa-cloud-arrow-up"></i> Upload Resource</h3>
+        <p class="muted-text">Add a new weekly assignment solution or general course study material.</p>
+      </div>
+    </div>
 
     <form action="/admin/materials" method="post" enctype="multipart/form-data" class="form-upload">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 20px;">
+        
+        <!-- TYPE -->
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label"><i class="fa-solid fa-tag"></i> Material Type *</label>
+          <select name="type" id="typeSelect" class="select" required onchange="toggleWeekInput()">
+            <option value="material">Study Material (General)</option>
+            <option value="assignment">Assignment PDF (Weekly)</option>
+          </select>
+        </div>
 
-      <!-- TYPE -->
-      <div class="form-group">
-        <label>Select Type *</label>
-        <select name="type" id="typeSelect" class="input" required onchange="toggleWeekInput()">
-          <option value="material"> Study Material</option>
-          <option value="assignment">Assignment PDF</option>
-        </select>
+        <!-- SUBJECT -->
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label"><i class="fa-solid fa-book"></i> Course Subject *</label>
+          <select name="subject" class="select" required>
+            <% subjects.forEach(s => { %>
+              <option value="<%= s.name %>"><%= s.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <!-- WEEK -->
+        <div class="form-group" id="weekGroup" style="display: none; margin-bottom: 0;">
+          <label class="form-label"><i class="fa-solid fa-calendar-week"></i> Assignment Week (1-12) *</label>
+          <input 
+            type="number" 
+            name="week" 
+            id="weekInput"
+            placeholder="e.g. 1" 
+            min="1" 
+            max="12"
+            class="input"
+          >
+        </div>
+
       </div>
 
-      <!-- SUBJECT -->
-      <div class="form-group">
-        <label>Select Subject *</label>
-        <select name="subject" class="input" required>
-          <% subjects.forEach(s => { %>
-            <option value="<%= s.name %>"><%= s.name %></option>
-          <% }) %>
-        </select>
+      <!-- FILE UPLOAD DROPPER -->
+      <div class="form-group" style="margin-bottom: 25px;">
+        <label class="form-label"><i class="fa-solid fa-paperclip"></i> Select PDF Document *</label>
+        <div style="border: 2px dashed rgba(6, 182, 212, 0.3); border-radius: var(--radius-lg); padding: 30px; text-align: center; background: rgba(6, 182, 212, 0.03); transition: all 0.2s ease;">
+          <i class="fa-solid fa-file-arrow-up" style="font-size: 2.2rem; color: var(--accent-cyan); margin-bottom: 12px; display: block;"></i>
+          <input 
+            type="file" 
+            name="pdf" 
+            id="pdfFileInput"
+            accept="application/pdf" 
+            required 
+            class="input"
+            style="max-width: 320px; margin: 0 auto 10px auto; display: block;"
+          >
+          <div class="muted-text" style="font-size: 0.8rem;">Supported format: PDF only • Maximum file size: 50MB</div>
+        </div>
       </div>
 
-      <!-- WEEK -->
-      <div class="form-group" id="weekGroup" style="display: none;">
-        <label>Week *</label>
-        <input 
-          type="number" 
-          name="week" 
-          id="weekInput"
-          placeholder="Enter Week (1-12)" 
-          min="1" 
-          max="12"
-          class="input"
-        >
-      </div>
-
-      <!-- FILE -->
-      <div class="form-group">
-        <label>Upload PDF *</label>
-        <input 
-          type="file" 
-          name="pdf" 
-          accept="application/pdf" 
-          required 
-          class="input"
-        >
-        <small class="help-text">Max file size: 50MB</small>
-      </div>
-
-      <button type="submit" class="btn btn-primary">
-        Upload Material
+      <button type="submit" class="btn btn-submit" style="padding: 12px 28px; font-size: 0.95rem;">
+        <i class="fa-solid fa-upload" style="margin-right: 8px;"></i> Upload Material
       </button>
-
     </form>
   </div>
 
-
-<div class="card">
-  <h3>Uploaded Materials (<%= materials.length %>)</h3>
-
-  <% if(materials.length === 0) { %>
-    <p class="muted-text">No materials uploaded yet</p>
-
-  <% } else { %>
-
-    <div class="table-wrapper">
-      <table class="answers-table">
-
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Subject</th>
-            <th>Week</th>
-            <th>Type</th>
-            <th>Time</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <% materials.forEach((m, index) => { %>
-            <tr>
-
-              <td><%= index + 1 %></td>
-
-              <td><strong><%= m.subject %></strong></td>
-
-              <td><%= m.week ? `Week ${m.week}` : 'N/A' %></td>
-
-              <td>
-                <%= m.type === "assignment" ? " Assignment" : " Study Material" %>
-              </td>
-
-              <td>
-                <%= m.createdAt.toLocaleString() %>
-              </td>
-
-              <td>
-                <div class="table-actions">
-
-                  <!-- VIEW -->
-                  <% if (m.type === 'assignment') { %>
-                    <a 
-                      href="/pdf/assi/<%= m.week %>?subject=<%= encodeURIComponent(m.subject) %>" 
-                      target="_blank"
-                      class="btn btn-secondary btn-sm"
-                    >
-                      View
-                    </a>
-                  <% } else { %>
-                    <a 
-                      href="<%= m.fileUrl %>" 
-                      target="_blank"
-                      class="btn btn-secondary btn-sm"
-                    >
-                      View
-                    </a>
-                  <% } %>
-
-                  <!-- DELETE -->
-                  <form 
-                    action="/admin/materials/delete/<%= m._id %>" 
-                    method="post"
-                    style="display:inline;" 
-                    onsubmit="return confirm('Delete this material?');"
-                  >
-                    <button class="btn btn-danger btn-sm  btn-remove">
-                      Delete
-                    </button>
-                  </form>
-
-                </div>
-              </td>
-
-            </tr>
-          <% }) %>
-        </tbody>
-
-      </table>
+  <!-- UPLOADED MATERIALS LIST CARD -->
+  <div class="card">
+    <div class="card-header-flex" style="margin-bottom: 20px;">
+      <div>
+        <h3><i class="fa-solid fa-folder-open"></i> Uploaded Materials (<%= materials.length %>)</h3>
+        <p class="muted-text">All active official resources and weekly assignment PDFs.</p>
+      </div>
     </div>
 
-  <% } %>
-</div>
-  <!-- ================= BACK ================= -->
-  <div class="card">
-    <a href="/admin" class="btn btn-secondary">Back</a>
+    <% if(materials.length === 0) { %>
+      <div class="empty-state-small" style="padding: 40px 20px; text-align: center;">
+        <i class="fa-solid fa-folder-open muted-icon" style="font-size: 2.5rem; margin-bottom: 10px; display: block;"></i>
+        <p class="muted-text">No materials uploaded yet. Use the form above to add your first resource.</p>
+      </div>
+    <% } else { %>
+      <div class="table-wrapper">
+        <table class="answers-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">#</th>
+              <th>Course Subject</th>
+              <th>Week / Category</th>
+              <th>Resource Type</th>
+              <th>Uploaded Date</th>
+              <th style="text-align: center; width: 180px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% materials.forEach((m, index) => { %>
+              <tr>
+                <td style="color: var(--text-muted); font-size: 0.85rem;"><%= index + 1 %></td>
+                <td>
+                  <strong style="color: #fff;"><%= m.subject %></strong>
+                </td>
+                <td>
+                  <% if (m.week) { %>
+                    <span class="badge badge-purple" style="font-size: 0.78rem;">Week <%= m.week %></span>
+                  <% } else { %>
+                    <span class="muted-text" style="font-size: 0.85rem;">General Study</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (m.type === "assignment") { %>
+                    <span class="badge badge-cyan" style="font-size: 0.78rem;">
+                      <i class="fa-solid fa-file-pen" style="margin-right: 4px;"></i> Assignment PDF
+                    </span>
+                  <% } else { %>
+                    <span class="badge badge-gold" style="font-size: 0.78rem;">
+                      <i class="fa-solid fa-book-bookmark" style="margin-right: 4px;"></i> Study Material
+                    </span>
+                  <% } %>
+                </td>
+                <td style="font-size: 0.85rem; white-space: nowrap;">
+                  <%= m.createdAt ? new Date(m.createdAt).toLocaleDateString("en-IN") : "—" %>
+                </td>
+                <td style="text-align: center;">
+                  <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                    <% if (m.type === 'assignment') { %>
+                      <a 
+                        href="/pdf/assi/<%= m.week %>?subject=<%= encodeURIComponent(m.subject) %>" 
+                        target="_blank"
+                        class="btn btn-secondary btn-sm"
+                        title="View Assignment PDF"
+                        style="padding: 6px 12px;"
+                      >
+                        <i class="fa-solid fa-eye"></i>
+                      </a>
+                    <% } else { %>
+                      <a 
+                        href="<%= m.fileUrl %>" 
+                        target="_blank"
+                        class="btn btn-secondary btn-sm"
+                        title="View File"
+                        style="padding: 6px 12px;"
+                      >
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                      </a>
+                    <% } %>
+
+                    <form 
+                      action="/admin/materials/delete/<%= m._id %>" 
+                      method="post"
+                      style="margin: 0;" 
+                      onsubmit="return confirm('Delete this material permanently?');"
+                    >
+                      <button class="btn btn-remove btn-sm" style="padding: 6px 12px;" title="Delete Resource">
+                        <i class="fa-solid fa-trash-can"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
   </div>
 
+  <a href="/admin" class="back-dashboard"><i class="fa-solid fa-arrow-left" style="margin-right: 6px;"></i> Back to Dashboard</a>
 </div>
 
-<!-- ================= SCRIPT ================= -->
 <script>
-  const fileInput = document.querySelector('input[name="pdf"]');
-
-  fileInput.addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    const maxSize = 50 * 1024 * 1024;
-
-    if (file && file.size > maxSize) {
-      alert("File too large (Max 50MB)");
-      this.value = "";
-    }
-  });
+  const fileInput = document.getElementById('pdfFileInput');
+  if (fileInput) {
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const maxSize = 50 * 1024 * 1024;
+      if (file && file.size > maxSize) {
+        alert("Selected file is too large (Maximum allowed: 50MB)");
+        this.value = "";
+      }
+    });
+  }
 
   function toggleWeekInput() {
     const typeSelect = document.getElementById("typeSelect");
@@ -186,7 +209,6 @@
     }
   }
 
-  // Run on startup to set initial state
   document.addEventListener("DOMContentLoaded", toggleWeekInput);
 </script>
 
