@@ -517,7 +517,27 @@ router.post("/notes/delete/:id", isAuth, asyncHandler(async (req, res) => {
   if (req.user.role !== 'admin') {
     query.email = req.user.email;
   }
-  await Note.deleteOne(query);
+
+  const note = await Note.findOne(query);
+  if (!note) {
+    return res.redirect("/notes?error=Note not found or unauthorized");
+  }
+
+  await Note.deleteOne({ _id: note._id });
+
+  await ActivityLog.create({
+    userId: req.user ? req.user._id : null,
+    email: req.user ? req.user.email : "student",
+    userName: req.user ? req.user.name : "Student",
+    activityType: "delete_note",
+    itemType: "Note",
+    itemId: note._id,
+    title: note.title,
+    fileName: note.fileName || "Text Note (No File)",
+    subject: note.subject,
+    timestamp: new Date()
+  });
+
   res.redirect("/notes?success=Note deleted successfully");
 }));
 
