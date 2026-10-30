@@ -124,21 +124,57 @@ router.get(
   isAdmin,
   asyncHandler(async (req, res) => {
     const today = DATE_RANGES.TODAY();
+    const { from, to, search } = req.query;
+    const query = {};
 
-    const [logs, loggedInUsers, todayVisits] = await Promise.all([
-      VisitorLog.find()
+    if (from || to) {
+      query.visitedAt = {};
+      if (from) {
+        const fromDate = new Date(from);
+        if (!isNaN(fromDate.getTime())) {
+          fromDate.setHours(0, 0, 0, 0);
+          query.visitedAt.$gte = fromDate;
+        }
+      }
+      if (to) {
+        const toDate = new Date(to);
+        if (!isNaN(toDate.getTime())) {
+          toDate.setHours(23, 59, 59, 999);
+          query.visitedAt.$lte = toDate;
+        }
+      }
+    }
+
+    if (search && search.trim()) {
+      const safeSearch = escapeRegex(search.trim());
+      query.$or = [
+        { email: { $regex: safeSearch, $options: "i" } },
+        { ip: { $regex: safeSearch, $options: "i" } }
+      ];
+    }
+
+    const [logs, loggedInUsers, todayVisits, totalVisits] = await Promise.all([
+      VisitorLog.find(query)
+        .select("+ip")
         .sort({ visitedAt: -1 })
         .limit(500)
         .lean(),
       VisitorLog.countDocuments({ role: { $ne: "admin" } }),
-      VisitorLog.countDocuments({ visitedAt: { $gte: today } })
+      VisitorLog.countDocuments({ visitedAt: { $gte: today } }),
+      VisitorLog.countDocuments()
     ]);
 
     res.render("admin/visitors", {
       logs,
       loggedInUsers,
       guests: 0,
-      todayVisits
+      todayVisits,
+      totalVisits,
+      filter: {
+        from: from || "",
+        to: to || "",
+        search: search || ""
+      }
     });
   })
 );
@@ -146,14 +182,33 @@ router.get(
 // ================= EXPORT VISITORS =================
 router.get("/admin/export/visitors", isAdmin, asyncHandler(async (req, res) => {
 
-  const { from, to } = req.query;
+  const { from, to, search } = req.query;
   const query = {};
 
-  if (from && to) {
-    query.visitedAt = {
-      $gte: new Date(from),
-      $lte: new Date(to)
-    };
+  if (from || to) {
+    query.visitedAt = {};
+    if (from) {
+      const fromDate = new Date(from);
+      if (!isNaN(fromDate.getTime())) {
+        fromDate.setHours(0, 0, 0, 0);
+        query.visitedAt.$gte = fromDate;
+      }
+    }
+    if (to) {
+      const toDate = new Date(to);
+      if (!isNaN(toDate.getTime())) {
+        toDate.setHours(23, 59, 59, 999);
+        query.visitedAt.$lte = toDate;
+      }
+    }
+  }
+
+  if (search && search.trim()) {
+    const safeSearch = escapeRegex(search.trim());
+    query.$or = [
+      { email: { $regex: safeSearch, $options: "i" } },
+      { ip: { $regex: safeSearch, $options: "i" } }
+    ];
   }
 
   const logs = await VisitorLog.find(query)
@@ -201,12 +256,12 @@ router.get("/admin/export/visitors", isAdmin, asyncHandler(async (req, res) => {
     // 💻 SYSTEM & NETWORK
     screenWidth: v.screenWidth || "",
     screenHeight: v.screenHeight || "",
-    connectionType: v.connectionType || "",
+    connectionType: v.connectionType ? v.connectionType.toUpperCase() : "",
     cpuCores: v.cpuCores || "",
     deviceMemory: v.deviceMemory || "",
 
     // 🔗 TRACKING
-    referer: v.referer || "",
+    referer: v.referer || "Direct",
     language: v.language || "",
     dnt: v.dnt ? "Yes" : "No",
     isAjax: v.isAjax ? "Yes" : "No",
@@ -535,7 +590,7 @@ router.get(
   "/admin/activity-logs",
   isAdmin,
   asyncHandler(async (req, res) => {
-    const { email, activityType, subject } = req.query;
+    const { email, activityType, subject, from, to } = req.query;
     const filter = {};
 
     if (email && email.trim()) {
@@ -550,6 +605,23 @@ router.get(
     }
     if (subject) {
       filter.subject = subject;
+    }
+    if (from || to) {
+      filter.timestamp = {};
+      if (from) {
+        const fromDate = new Date(from);
+        if (!isNaN(fromDate.getTime())) {
+          fromDate.setHours(0, 0, 0, 0);
+          filter.timestamp.$gte = fromDate;
+        }
+      }
+      if (to) {
+        const toDate = new Date(to);
+        if (!isNaN(toDate.getTime())) {
+          toDate.setHours(23, 59, 59, 999);
+          filter.timestamp.$lte = toDate;
+        }
+      }
     }
 
     const [logs, subjects] = await Promise.all([
@@ -563,7 +635,9 @@ router.get(
       filter: {
         email: email || "",
         activityType: activityType || "",
-        subject: subject || ""
+        subject: subject || "",
+        from: from || "",
+        to: to || ""
       }
     });
   })
@@ -573,7 +647,7 @@ router.get(
   "/admin/export/activity-logs",
   isAdmin,
   asyncHandler(async (req, res) => {
-    const { email, activityType, subject } = req.query;
+    const { email, activityType, subject, from, to } = req.query;
     const filter = {};
 
     if (email && email.trim()) {
@@ -589,6 +663,23 @@ router.get(
     }
     if (subject) {
       filter.subject = subject;
+    }
+    if (from || to) {
+      filter.timestamp = {};
+      if (from) {
+        const fromDate = new Date(from);
+        if (!isNaN(fromDate.getTime())) {
+          fromDate.setHours(0, 0, 0, 0);
+          filter.timestamp.$gte = fromDate;
+        }
+      }
+      if (to) {
+        const toDate = new Date(to);
+        if (!isNaN(toDate.getTime())) {
+          toDate.setHours(23, 59, 59, 999);
+          filter.timestamp.$lte = toDate;
+        }
+      }
     }
 
     const logs = await ActivityLog.find(filter).sort({ timestamp: -1 }).lean();
