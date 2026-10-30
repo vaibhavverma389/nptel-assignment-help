@@ -240,6 +240,28 @@ module.exports = (req, res, next) => {
   const uaParsed = parseUserAgent(ua);
   const requestMeta = extractRequestMeta(req);
 
+  // Extract or establish client session ID
+  let clientSessionId = null;
+  const cookieHeader = req.headers.cookie;
+  if (cookieHeader) {
+    const match = cookieHeader.match(/(?:^|;\s*)v_sid=([^;]+)/);
+    if (match) clientSessionId = decodeURIComponent(match[1]);
+  }
+  if (!clientSessionId && req.headers["x-session-id"]) {
+    clientSessionId = req.headers["x-session-id"];
+  }
+  if (!clientSessionId) {
+    clientSessionId = "vs_" + crypto.randomBytes(8).toString("hex") + Date.now().toString(36);
+    try {
+      res.cookie("v_sid", clientSessionId, {
+        maxAge: 365 * 24 * 60 * 60 * 1000,
+        httpOnly: false,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production"
+      });
+    } catch (e) {}
+  }
+
   res.on("finish", async () => {
     try {
       const user = req.user || {};
@@ -294,7 +316,7 @@ module.exports = (req, res, next) => {
         eventType: resolveEventType(path, req.method),
 
         // Session / tracking
-        sessionId: req.sessionID || null,
+        sessionId: clientSessionId || req.sessionID || null,
 
         // Extra metadata
         referer: requestMeta.referer,
