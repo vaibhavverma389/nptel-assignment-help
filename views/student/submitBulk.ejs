@@ -77,7 +77,7 @@
 
 <script>
   let questionCount = 0;
-  const existingAnswers = <%- JSON.stringify(existingAnswers || []) %>;
+  const existingAnswers = <%- JSON.stringify(existingAnswers || []).replace(/</g, '\\u003c') %>;
 
   function renderQuestion(questionNo, selectedOption = "") {
     questionCount = questionNo;
