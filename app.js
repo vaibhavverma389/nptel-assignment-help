@@ -13,8 +13,18 @@ const compression = require("compression");
 const http = require("http");
 const { Server } = require("socket.io");
 
-
 const connectDB = require("./utils/db");
+
+/* ================= SECURITY VALIDATION ================= */
+const sessionSecret = process.env.SESSION_SECRET;
+if (!sessionSecret) {
+  if (process.env.NODE_ENV === "production") {
+    console.error("FATAL ERROR: SESSION_SECRET is not set in production environment!");
+    process.exit(1);
+  } else {
+    console.warn("⚠️ WARNING: SESSION_SECRET is not configured in .env. Please configure a strong secret.");
+  }
+}
 
 /* ================= ROUTES ================= */
 const authRoutes = require("./routes/authRoutes");
@@ -27,11 +37,11 @@ const pingRoutes = require("./routes/ping");
 const lastActive = require("./middlewares/lastActive");
 const visitorLogger = require("./middlewares/visitorLogger");
 const isAuth = require("./middlewares/auth");
+const csrfMiddleware = require("./middlewares/csrf");
 
 require("./utils/passport");
 
 const app = express();
-
 
 app.use(
   helmet({
@@ -40,7 +50,6 @@ app.use(
 );
 
 app.use(compression());
-
 
 app.set("trust proxy", 1);
 
@@ -54,7 +63,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(
   session({
     name: "nptel.sid",
-    secret: process.env.SESSION_SECRET || "nptel_default_secret_key_2026",
+    secret: sessionSecret || "nptel_development_secret_key_2026",
 
     resave: false,
     saveUninitialized: false,
@@ -78,9 +87,10 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.get("/auth/register", (req, res) => {
-  res.redirect("login");
-});
+
+// Anti-CSRF Token Middleware (Session-bound)
+app.use(csrfMiddleware);
+
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
   res.locals.success = req.flash("success");
@@ -125,8 +135,6 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).render("404");
 });
 
-
-
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -140,21 +148,13 @@ app.set("io", io);
 let onlineUsers = 0;
 
 io.on("connection", (socket) => {
-
-  console.log("User connected:", socket.id);
-
   onlineUsers++;
-
   io.emit("liveUsers", onlineUsers);
 
   socket.on("disconnect", () => {
-
     if (onlineUsers > 0) onlineUsers--;
-
     io.emit("liveUsers", onlineUsers);
-
   });
-
 });
 
 const PORT = process.env.PORT || 3000;
