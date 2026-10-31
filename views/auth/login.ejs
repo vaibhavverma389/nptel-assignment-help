@@ -22,6 +22,7 @@
     </div>
 
     <form method="post" action="/auth/login" class="form-column" style="margin-top: 25px; text-align: left;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
       <div class="form-group">
         <label class="form-label"><i class="fa-solid fa-envelope"></i> Email Address</label>
         <div class="input-icon-wrapper">
