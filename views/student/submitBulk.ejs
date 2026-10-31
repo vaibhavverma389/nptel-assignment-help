@@ -39,6 +39,7 @@
 
   <!-- Submit Form -->
   <form method="post" action="/submit-bulk" class="card">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     <input type="hidden" name="course" value="<%= selectedCourse %>">
     <input type="hidden" name="week" value="<%= selectedWeek %>">
 
