@@ -12,6 +12,7 @@
   <div class="card" style="margin-bottom: 25px; padding: 22px;">
     <h3 style="margin-bottom: 12px; font-size: 1.1rem;"><i class="fa-solid fa-plus-circle" style="color: var(--accent-cyan); margin-right: 6px;"></i> Add New Course Subject</h3>
     <form method="post" action="/admin/subjects" style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 0;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
       <input 
         class="input" 
         name="name" 
@@ -59,7 +60,8 @@
                 <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEdit('<%= s._id %>')" style="padding: 6px 12px; font-size: 0.8rem;" title="Rename Subject">
                   <i class="fa-solid fa-pen-to-square"></i>
                 </button>
-                <form method="post" action="/admin/subjects/delete/<%= s._id %>" style="margin: 0;" onsubmit="return confirm('Delete \'<%= s.name %>\'? Associated materials may be affected.');">
+                <form method="post" action="/admin/subjects/delete/<%= s._id %>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />" style="margin: 0;" onsubmit="return confirm('Delete \'<%= s.name %>\'? Associated materials may be affected.');">
                   <button class="btn btn-remove btn-sm" style="padding: 6px 12px; font-size: 0.8rem;" title="Delete Subject">
                     <i class="fa-solid fa-trash-can"></i>
                   </button>
