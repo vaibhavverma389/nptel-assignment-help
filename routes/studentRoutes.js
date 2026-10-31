@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const path = require("path");
 const multer = require("multer");
 const imagekit = require("../utils/imagekit");
 
@@ -12,19 +13,48 @@ const ActivityLog = require("../models/ActivityLog");
 const isAuth = require("../middlewares/auth");
 const { uploadLimiter } = require("../middlewares/rateLimiter");
 
-// Secure Multer configuration with 10MB limit and MIME-type validation
+// Validate MongoDB ObjectId params across all student routes
+router.param("id", (req, res, next, id) => {
+  if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+    return res.status(400).render("404");
+  }
+  next();
+});
+
+// Secure Multer configuration with 10MB limit and MIME & extension validation
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB Max limit
   fileFilter: (req, file, cb) => {
     const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/jpg"];
-    if (allowedTypes.includes(file.mimetype)) {
+    const allowedExts = [".pdf", ".jpeg", ".jpg", ".png"];
+    const ext = path.extname(file.originalname).toLowerCase();
+
+    if (allowedTypes.includes(file.mimetype) && allowedExts.includes(ext)) {
       cb(null, true);
     } else {
       cb(new Error("Invalid file type. Only PDF, PNG, and JPEG files are allowed."));
     }
   }
 });
+
+// Multer error handling wrapper
+const handleUpload = (req, res, next) => {
+  upload.single("noteFile")(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        req.flash("error", "File size exceeds 10MB limit.");
+        return res.redirect("/upload");
+      }
+      req.flash("error", err.message);
+      return res.redirect("/upload");
+    } else if (err) {
+      req.flash("error", err.message);
+      return res.redirect("/upload");
+    }
+    next();
+  });
+};
 
 // Helper: Escape special regex characters to prevent ReDoS injection
 function escapeRegex(text) {
