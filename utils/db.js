@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
+    if (!process.env.MONGO_URI) {
+      console.error("FATAL CONFIG ERROR: MONGO_URI environment variable is missing.");
+      process.exit(1);
+    }
+
     await mongoose.connect(process.env.MONGO_URI);
     console.log("MongoDB Connected");
 
@@ -29,7 +34,7 @@ const connectDB = async () => {
       console.error("Notes migration error:", migrateErr);
     }
   } catch (err) {
-    console.error(err);
+    console.error("Database connection failure:", err.message || err);
     process.exit(1);
   }
 };
