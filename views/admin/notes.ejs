@@ -143,19 +143,19 @@
                 <td>
                   <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
                     <% if (note.status !== 'approved') { %>
-                      <form method="post" action="/admin/notes/approve/<%= note._id %>
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />" style="margin: 0;">
+                      <form method="post" action="/admin/notes/approve/<%= note._id %>" style="margin: 0;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                         <button type="submit" class="btn btn-submit btn-sm" title="Approve Note"><i class="fa-solid fa-check"></i> Approve</button>
                       </form>
                     <% } %>
                     <% if (note.status !== 'rejected') { %>
-                      <form method="post" action="/admin/notes/reject/<%= note._id %>
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />" style="margin: 0;">
+                      <form method="post" action="/admin/notes/reject/<%= note._id %>" style="margin: 0;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                         <button type="submit" class="btn btn-secondary btn-sm" style="border-color: rgba(244, 63, 94, 0.4); color: var(--accent-rose);" title="Reject Note"><i class="fa-solid fa-xmark"></i> Reject</button>
                       </form>
                     <% } %>
-                    <form method="post" action="/admin/notes/delete/<%= note._id %>
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this note permanently?');">
+                    <form method="post" action="/admin/notes/delete/<%= note._id %>" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this note permanently?');">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                       <button type="submit" class="btn btn-remove btn-sm" title="Delete Note"><i class="fa-solid fa-trash"></i></button>
                     </form>
                   </div>

@@ -165,6 +165,7 @@
                       style="margin: 0;" 
                       onsubmit="return confirm('Delete this material permanently?');"
                     >
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                       <button class="btn btn-remove btn-sm" style="padding: 6px 12px;" title="Delete Resource">
                         <i class="fa-solid fa-trash-can"></i>
                       </button>

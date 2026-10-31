@@ -60,8 +60,8 @@
                 <button type="button" class="btn btn-secondary btn-sm" onclick="toggleEdit('<%= s._id %>')" style="padding: 6px 12px; font-size: 0.8rem;" title="Rename Subject">
                   <i class="fa-solid fa-pen-to-square"></i>
                 </button>
-                <form method="post" action="/admin/subjects/delete/<%= s._id %>
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />" style="margin: 0;" onsubmit="return confirm('Delete \'<%= s.name %>\'? Associated materials may be affected.');">
+                <form method="post" action="/admin/subjects/delete/<%= s._id %>" style="margin: 0;" onsubmit="return confirm('Delete \'<%= s.name %>\'? Associated materials may be affected.');">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
                   <button class="btn btn-remove btn-sm" style="padding: 6px 12px; font-size: 0.8rem;" title="Delete Subject">
                     <i class="fa-solid fa-trash-can"></i>
                   </button>
@@ -71,6 +71,7 @@
 
             <!-- Inline Edit Mode -->
             <form id="edit-<%= s._id %>" method="post" action="/admin/subjects/edit/<%= s._id %>" style="display: none; width: 100%; gap: 8px; margin: 0; align-items: center;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
               <input class="input" name="name" value="<%= s.name %>" required style="flex: 1; margin: 0; padding: 7px 12px; font-size: 0.9rem;" />
               <button class="btn btn-submit btn-sm" style="padding: 7px 14px; white-space: nowrap;">
                 <i class="fa-solid fa-check"></i>

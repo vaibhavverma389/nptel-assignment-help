@@ -61,8 +61,8 @@
           <i class="fa-solid fa-pen-to-square"></i> Edit Note
         </a>
         
-        <form method="post" action="/notes/delete/<%= note._id %>
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />" onsubmit="return confirm('Are you sure you want to delete this note?');" style="display: inline;">
+        <form method="post" action="/notes/delete/<%= note._id %>" onsubmit="return confirm('Are you sure you want to delete this note?');" style="display: inline;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
           <button type="submit" class="btn btn-remove">
             <i class="fa-solid fa-trash"></i> Delete Note
           </button>

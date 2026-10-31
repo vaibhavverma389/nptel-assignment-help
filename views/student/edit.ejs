@@ -7,8 +7,8 @@
     <p class="muted-text">Update the title, course category, or description of your note.</p>
   </div>
 
-  <form method="post" action="/notes/edit/<%= note._id %>
-      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />" class="card centered-card" style="max-width: 680px; margin: 0 auto 30px;">
+  <form method="post" action="/notes/edit/<%= note._id %>" class="card centered-card" style="max-width: 680px; margin: 0 auto 30px;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     <div class="form-column">
       
       <!-- Title -->
