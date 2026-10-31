@@ -366,11 +366,12 @@ router.get("/upload", isAuth, asyncHandler(async (req, res) => {
 }));
 
 // Handle note upload (file/text)
-router.post("/upload", isAuth, uploadLimiter, upload.single("noteFile"), asyncHandler(async (req, res) => {
+router.post("/upload", isAuth, uploadLimiter, handleUpload, asyncHandler(async (req, res) => {
   const { title, description, subject } = req.body;
 
   if (!title || !subject) {
-    return res.status(400).send("Title and subject are required");
+    req.flash("error", "Title and subject are required");
+    return res.redirect("/upload");
   }
 
   let fileUrl = null;
@@ -378,16 +379,19 @@ router.post("/upload", isAuth, uploadLimiter, upload.single("noteFile"), asyncHa
 
   if (req.file) {
     try {
+      const sanitizedOriginalName = req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const safeUserName = (req.user.name || "student").replace(/[^a-zA-Z0-9_-]/g, "_");
       const result = await imagekit.upload({
         file: req.file.buffer,
-        fileName: `${req.user.name.replace(/\s+/g, "_")}-note-${Date.now()}-${req.file.originalname}`,
+        fileName: `${safeUserName}-note-${Date.now()}-${sanitizedOriginalName}`,
         folder: "student-notes"
       });
       fileUrl = result.url;
-      fileName = req.file.originalname;
+      fileName = sanitizedOriginalName;
     } catch (error) {
       console.error("ImageKit upload error:", error);
-      return res.status(500).send("Error uploading file to storage");
+      req.flash("error", "Error uploading file to storage. Please try again.");
+      return res.redirect("/upload");
     }
   }
 

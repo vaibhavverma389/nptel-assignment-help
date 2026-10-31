@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const multer = require("multer");
 const router = express.Router();
 
@@ -18,8 +19,43 @@ const isAdmin = require("../middlewares/isAdmin");
 const asyncHandler = require("../utils/asyncHandler");
 const exportExcel = require("../utils/exportExcel");
 
-// Multer configuration
-const upload = multer({ storage: multer.memoryStorage() });
+// Validate MongoDB ObjectId params across all admin routes
+router.param("id", (req, res, next, id) => {
+  if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+    return res.status(400).send("Invalid ID format");
+  }
+  next();
+});
+
+// Secure Multer configuration for Admin study materials (25MB limit, PDF only)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 25 * 1024 * 1024 }, // 25MB max
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const allowedTypes = ["application/pdf"];
+    if (allowedTypes.includes(file.mimetype) && ext === ".pdf") {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type. Only PDF documents are allowed."));
+    }
+  }
+});
+
+// Multer error handling wrapper for admin uploads
+const handleAdminUpload = (req, res, next) => {
+  upload.single("pdf")(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).send("File size exceeds 25MB limit.");
+      }
+      return res.status(400).send(err.message);
+    } else if (err) {
+      return res.status(400).send(err.message);
+    }
+    next();
+  });
+};
 
 // ================= CONSTANTS & HELPERS =================
 
