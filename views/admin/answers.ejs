@@ -85,7 +85,8 @@
                   <%= a.createdAt ? new Date(a.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "—" %>
                 </td>
                 <td style="text-align: center;">
-                  <form method="post" action="/admin/answers/delete/<%= a._id %>" style="margin: 0;" onsubmit="return confirm('Delete this answer?');">
+                  <form method="post" action="/admin/answers/delete/<%= a._id %>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />" style="margin: 0;" onsubmit="return confirm('Delete this answer?');">
                     <button class="btn btn-remove" style="padding: 6px 12px; font-size: 0.8rem;" title="Delete Answer">
                       <i class="fa-solid fa-trash-can"></i>
                     </button>
