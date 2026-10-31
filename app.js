@@ -143,8 +143,11 @@ app.use((err, req, res, next) => {
   if (res.headersSent) {
     return next(err);
   }
+  const isProd = process.env.NODE_ENV === "production";
   if (req.xhr || (req.headers.accept && req.headers.accept.includes("json"))) {
-    return res.status(500).json({ error: err.message || "Internal Server Error" });
+    return res.status(err.status || 500).json({
+      error: isProd ? "An unexpected error occurred. Please try again later." : (err.message || "Internal Server Error")
+    });
   }
   res.status(err.status || 500).render("404");
 });
@@ -153,7 +156,8 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*"
+    origin: process.env.APP_URL || "*",
+    methods: ["GET", "POST"]
   }
 });
 
