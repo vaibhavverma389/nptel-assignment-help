@@ -403,7 +403,7 @@ router.get(
 router.post(
   "/admin/materials",
   isAdmin,
-  upload.single("pdf"),
+  handleAdminUpload,
   asyncHandler(async (req, res) => {
     const { subject, week, type } = req.body;
 
@@ -421,10 +421,12 @@ router.post(
     }
 
     try {
-      // Create a unique file name
+      // Create a unique sanitized file name
+      const safeSubject = subject.replace(/[^a-zA-Z0-9_-]/g, "_");
       const filePrefix = type === "assignment" 
-        ? `${subject.replace(/\s+/g, "_")}-week${week}` 
-        : `${subject.replace(/\s+/g, "_")}-material-${Date.now()}`;
+        ? `${safeSubject}-week${week}` 
+        : `${safeSubject}-material-${Date.now()}`;
+      const sanitizedOriginalName = req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
 
       // Upload to ImageKit
       const result = await imagekit.upload({
@@ -442,7 +444,7 @@ router.post(
             week: Number(week),
             type,
             fileUrl: result.url,
-            fileName: req.file.originalname
+            fileName: sanitizedOriginalName
           },
           { upsert: true, new: true }
         );
@@ -451,7 +453,7 @@ router.post(
           subject,
           type,
           fileUrl: result.url,
-          fileName: req.file.originalname
+          fileName: sanitizedOriginalName
         });
       }
 
