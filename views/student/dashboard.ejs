@@ -166,6 +166,7 @@
     <p class="muted-text">Need assistance or want to request assignment answers for a new course? Send us a message.</p>
 
     <form action="/contact-us" method="post" class="form-column" style="margin-top: 20px;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
 
       <div class="form-row" style="margin-bottom: 0; display: flex; gap: 15px; flex-wrap: wrap;">
         <div class="form-group" style="flex: 1; min-width: 240px;">
