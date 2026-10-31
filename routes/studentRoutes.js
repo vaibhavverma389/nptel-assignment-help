@@ -10,6 +10,7 @@ const Note = require("../models/Note");
 const VisitorLog = require("../models/VisitorLog");
 const ActivityLog = require("../models/ActivityLog");
 const isAuth = require("../middlewares/auth");
+const { uploadLimiter } = require("../middlewares/rateLimiter");
 
 // Secure Multer configuration with 10MB limit and MIME-type validation
 const upload = multer({
@@ -335,7 +336,7 @@ router.get("/upload", isAuth, asyncHandler(async (req, res) => {
 }));
 
 // Handle note upload (file/text)
-router.post("/upload", isAuth, upload.single("noteFile"), asyncHandler(async (req, res) => {
+router.post("/upload", isAuth, uploadLimiter, upload.single("noteFile"), asyncHandler(async (req, res) => {
   const { title, description, subject } = req.body;
 
   if (!title || !subject) {
