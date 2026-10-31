@@ -38,14 +38,27 @@ const lastActive = require("./middlewares/lastActive");
 const visitorLogger = require("./middlewares/visitorLogger");
 const isAuth = require("./middlewares/auth");
 const csrfMiddleware = require("./middlewares/csrf");
+const mongoSanitize = require("./middlewares/mongoSanitize");
 
 require("./utils/passport");
 
 const app = express();
 
+app.disable("x-powered-by");
+
 app.use(
   helmet({
-    contentSecurityPolicy: false
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    hsts: process.env.NODE_ENV === "production" ? {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true
+    } : false,
+    noSniff: true,
+    xssFilter: true
   })
 );
 
@@ -57,6 +70,7 @@ connectDB();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(mongoSanitize);
 
 app.use(express.static(path.join(__dirname, "public")));
 
