@@ -8,6 +8,7 @@
   </div>
 
   <form method="post" action="/upload" enctype="multipart/form-data" class="card centered-card" style="max-width: 680px; margin: 0 auto 30px;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     <div class="form-column">
       
       <!-- Title -->
