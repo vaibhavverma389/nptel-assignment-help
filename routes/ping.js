@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const VisitorLog = require("../models/VisitorLog");
 const crypto = require("crypto");
+const { pingLimiter } = require("../middlewares/rateLimiter");
 
 function hashIP(ip) {
   return crypto.createHash("sha256").update(String(ip)).digest("hex");
@@ -111,7 +112,7 @@ const handlePing = async (req, res) => {
   res.status(200).json({ success: true });
 };
 
-router.get("/ping", handlePing);
-router.post("/ping", handlePing);
+router.get("/ping", pingLimiter, handlePing);
+router.post("/ping", pingLimiter, handlePing);
 
 module.exports = router;
