@@ -18,6 +18,7 @@
     </div>
 
     <form action="/admin/materials" method="post" enctype="multipart/form-data" class="form-upload">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 20px;">
         
         <!-- TYPE -->
