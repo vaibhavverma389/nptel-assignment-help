@@ -111,7 +111,8 @@
       <% notes.forEach(note => { %>
         <div class="card note-card single-note-card" style="margin-bottom: 0; padding: 22px; position: relative; display: flex; flex-direction: column; justify-content: space-between;">
           <!-- Favorite Pin Form -->
-          <form method="post" action="/notes/favorite/<%= note._id %>" class="favorite-pin-form" style="position: absolute; top: 18px; right: 18px; margin: 0;">
+          <form method="post" action="/notes/favorite/<%= note._id %>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />" class="favorite-pin-form" style="position: absolute; top: 18px; right: 18px; margin: 0;">
             <button type="submit" class="favorite-btn <%= note.isFavorite ? 'is-fav' : '' %>" title="<%= note.isFavorite ? 'Remove Favorite' : 'Save to Favorites' %>" style="background: none; border: none; font-size: 1.15rem; cursor: pointer; color: <%= note.isFavorite ? 'var(--accent-gold)' : 'var(--text-muted)' %>;">
               <i class="<%= note.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star' %>"></i>
             </button>
@@ -175,7 +176,8 @@
                   <a href="/notes/edit/<%= note._id %>" class="btn btn-secondary btn-sm" title="Edit Note" style="padding: 7px 10px;">
                     <i class="fa-solid fa-pen-to-square"></i>
                   </a>
-                  <form method="post" action="/notes/delete/<%= note._id %>" onsubmit="return confirm('Delete this note permanently?');" style="margin: 0; display: inline;">
+                  <form method="post" action="/notes/delete/<%= note._id %>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />" onsubmit="return confirm('Delete this note permanently?');" style="margin: 0; display: inline;">
                     <button type="submit" class="btn btn-remove btn-sm" title="Delete Note" style="padding: 7px 10px;">
                       <i class="fa-solid fa-trash"></i>
                     </button>
